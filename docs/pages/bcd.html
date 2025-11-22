@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCD - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>BCD - Boot Configuration Data</h1>
+                <div class="meta">
+                    <strong>Location:</strong> boot/BCD/BCD.h, boot/BCD/BCD.c<br>
+                    <strong>Type:</strong> C Library<br>
+                    <strong>Purpose:</strong> Boot configuration database
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>BCD (Boot Configuration Data) is a database system that stores boot configuration information and parameters. It is similar in function to Windows' BCD but designed specifically for FreeWorld OS.</p>
+            </section>
+
+            <section class="section">
+                <h2>Data Structures</h2>
+                
+                <h3>bcd_header_t</h3>
+                <p>Header structure containing BCD metadata:</p>
+                <div class="code-block">
+                    <pre>typedef struct {
+    char signature[8];      // "FWBCD\0\0\0"
+    uint32_t version;       // BCD version
+    uint32_t entry_count;   // Number of boot entries
+    uint32_t default_entry; // Default boot entry index
+} bcd_header_t;</pre>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>signature</code></td>
+                            <td>char[8]</td>
+                            <td>8 bytes</td>
+                            <td>BCD file signature: "FWBCD\0\0\0"</td>
+                        </tr>
+                        <tr>
+                            <td><code>version</code></td>
+                            <td>uint32_t</td>
+                            <td>4 bytes</td>
+                            <td>BCD format version number</td>
+                        </tr>
+                        <tr>
+                            <td><code>entry_count</code></td>
+                            <td>uint32_t</td>
+                            <td>4 bytes</td>
+                            <td>Total number of boot entries</td>
+                        </tr>
+                        <tr>
+                            <td><code>default_entry</code></td>
+                            <td>uint32_t</td>
+                            <td>4 bytes</td>
+                            <td>Index of default boot entry</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>bcd_entry_t</h3>
+                <p>Boot entry structure containing boot configuration:</p>
+                <div class="code-block">
+                    <pre>typedef struct {
+    char name[64];          // Entry name
+    char loader[256];       // Path to loader (e.g., freeload.exe)
+    char kernel[256];       // Path to kernel (e.g., fwoskrnl.exe)
+    uint32_t flags;         // Boot flags
+} bcd_entry_t;</pre>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Size</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>name</code></td>
+                            <td>char[64]</td>
+                            <td>64 bytes</td>
+                            <td>Human-readable boot entry name</td>
+                        </tr>
+                        <tr>
+                            <td><code>loader</code></td>
+                            <td>char[256]</td>
+                            <td>256 bytes</td>
+                            <td>Path to OS loader executable</td>
+                        </tr>
+                        <tr>
+                            <td><code>kernel</code></td>
+                            <td>char[256]</td>
+                            <td>256 bytes</td>
+                            <td>Path to kernel executable</td>
+                        </tr>
+                        <tr>
+                            <td><code>flags</code></td>
+                            <td>uint32_t</td>
+                            <td>4 bytes</td>
+                            <td>Boot flags (bit flags for options)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                
+                <h3>bcd_init</h3>
+                <p>Initializes a new BCD structure in memory:</p>
+                <div class="code-block">
+                    <pre>int bcd_init(void);</pre>
+                </div>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+                <p><strong>Description:</strong> Allocates memory for BCD header and initializes it with default values.</p>
+
+                <h3>bcd_load</h3>
+                <p>Loads BCD data from a file:</p>
+                <div class="code-block">
+                    <pre>int bcd_load(const char* path);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>path</code>: Path to BCD file</li>
+                </ul>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+                <p><strong>Description:</strong> Reads BCD header and entries from disk file.</p>
+
+                <h3>bcd_get_default_entry</h3>
+                <p>Retrieves the default boot entry:</p>
+                <div class="code-block">
+                    <pre>int bcd_get_default_entry(bcd_entry_t* entry);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>entry</code>: Pointer to bcd_entry_t to fill with default entry data</li>
+                </ul>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+
+                <h3>bcd_add_entry</h3>
+                <p>Adds a new boot entry to the BCD:</p>
+                <div class="code-block">
+                    <pre>int bcd_add_entry(const bcd_entry_t* entry);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>entry</code>: Pointer to bcd_entry_t containing entry data</li>
+                </ul>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+
+                <h3>bcd_remove_entry</h3>
+                <p>Removes a boot entry by index:</p>
+                <div class="code-block">
+                    <pre>int bcd_remove_entry(uint32_t index);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>index</code>: Index of entry to remove</li>
+                </ul>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+            </section>
+
+            <section class="section">
+                <h2>Static Variables</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Type</th>
+                            <th>Scope</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>bcd_header</code></td>
+                            <td>bcd_header_t*</td>
+                            <td>static</td>
+                            <td>Pointer to BCD header structure</td>
+                        </tr>
+                        <tr>
+                            <td><code>bcd_entries</code></td>
+                            <td>bcd_entry_t*</td>
+                            <td>static</td>
+                            <td>Pointer to array of boot entries</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>File Format</h2>
+                <p>BCD files are stored in binary format:</p>
+                <ol>
+                    <li><strong>Header</strong> (16 bytes): bcd_header_t structure</li>
+                    <li><strong>Entries</strong> (variable): Array of bcd_entry_t structures</li>
+                </ol>
+                <p>Total file size = sizeof(bcd_header_t) + (entry_count * sizeof(bcd_entry_t))</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre>#include "BCD.h"
+
+bcd_entry_t entry;
+if (bcd_load("BCD") == 0) {
+    if (bcd_get_default_entry(&entry) == 0) {
+        printf("Boot entry: %s\n", entry.name);
+        printf("Kernel: %s\n", entry.kernel);
+        printf("Loader: %s\n", entry.loader);
+    }
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                <ul>
+                    <li><strong>BOOTMGR:</strong> May read BCD to determine boot configuration</li>
+                    <li><strong>freeload.exe:</strong> Loads BCD to get kernel and loader paths</li>
+                    <li><strong>Boot menu:</strong> Can display multiple boot entries from BCD</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

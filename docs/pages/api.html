@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System API - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>FreeWorld System API</h1>
+                <div class="meta">
+                    <strong>Location:</strong> system/api.js<br>
+                    <strong>Type:</strong> Node.js Module<br>
+                    <strong>Purpose:</strong> System-level APIs for applications
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorldAPI class provides system-level APIs for applications, including file operations (Windows and Linux compatible), window operations, and system information.</p>
+            </section>
+
+            <section class="section">
+                <h2>FreeWorldAPI Class</h2>
+                
+                <h3>Constructor</h3>
+                <div class="code-block">
+                    <pre>constructor()</pre>
+                </div>
+                <p>Initializes the API with a WindowManager instance.</p>
+
+                <h3>File Operations</h3>
+                <h4>readFile(filePath)</h4>
+                <p>Reads a file synchronously.</p>
+                <p><strong>Returns:</strong> File contents as string</p>
+                
+                <h4>writeFile(filePath, data)</h4>
+                <p>Writes data to a file.</p>
+                
+                <h4>exists(filePath)</h4>
+                <p>Checks if a file or directory exists.</p>
+                <p><strong>Returns:</strong> boolean</p>
+                
+                <h4>mkdir(dirPath)</h4>
+                <p>Creates a directory (recursive).</p>
+                
+                <h4>rmdir(dirPath)</h4>
+                <p>Removes a directory (recursive).</p>
+
+                <h3>Window Operations</h3>
+                <h4>createWindow(title, width, height)</h4>
+                <p>Creates a new window.</p>
+                <p><strong>Returns:</strong> Window object</p>
+                
+                <h4>getWindow(hwnd)</h4>
+                <p>Retrieves a window by handle.</p>
+                <p><strong>Returns:</strong> Window object or undefined</p>
+
+                <h3>System Information</h3>
+                <h4>getSystemInfo()</h4>
+                <p>Returns system information object:</p>
+                <div class="code-block">
+                    <pre>{
+    os: 'FreeWorld',
+    version: '0.1.0',
+    architecture: process.arch,
+    platform: process.platform,
+    nodeVersion: process.version
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre>const FreeWorldAPI = require('./api');
+
+const api = new FreeWorldAPI();
+
+// File operations
+api.writeFile('test.txt', 'Hello World');
+const content = api.readFile('test.txt');
+
+// Window operations
+const window = api.createWindow('My App', 800, 600);
+
+// System info
+const info = api.getSystemInfo();
+console.log(info);</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

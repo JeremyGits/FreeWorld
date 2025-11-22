@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resource Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="input.html">Input Manager</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="window-relationships.html">Window Relationships</a></li>
+                <li><a href="menu.html">Menu System</a></li>
+                <li><a href="nonclient.html">Non-Client Area</a></li>
+                <li><a href="controls.html">Standard Controls</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Resource Manager</h1>
+                <div class="meta">
+                    <strong>Location:</strong> system/resources.js<br>
+                    <strong>Type:</strong> Node.js Module<br>
+                    <strong>Purpose:</strong> Global resource registry to prevent memory waste
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Resource Manager maintains a central registry where resources (fonts, icons, cursors, brushes, pens, bitmaps) are loaded once and referenced by ID. This prevents every application from loading its own copy of "Arial.ttf" and running out of memory.</p>
+            </section>
+
+            <section class="section">
+                <h2>Resource Types</h2>
+                <ul>
+                    <li><strong>Fonts</strong> - Text fonts (Arial, Times, etc.)</li>
+                    <li><strong>Icons</strong> - Application icons</li>
+                    <li><strong>Cursors</strong> - Mouse cursors</li>
+                    <li><strong>Brushes</strong> - Fill patterns and colors</li>
+                    <li><strong>Pens</strong> - Line drawing tools</li>
+                    <li><strong>Bitmaps</strong> - Image resources</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Key Methods</h2>
+                
+                <h3>Font Management</h3>
+                <ul>
+                    <li><code>loadFont(name, size, style)</code> - Load font (returns existing if already loaded)</li>
+                    <li><code>getFont(handle)</code> - Get font by handle</li>
+                </ul>
+
+                <h3>Icon Management</h3>
+                <ul>
+                    <li><code>loadIcon(name, path)</code> - Load icon</li>
+                </ul>
+
+                <h3>Cursor Management</h3>
+                <ul>
+                    <li><code>loadCursor(name, path)</code> - Load cursor</li>
+                </ul>
+
+                <h3>GDI Objects</h3>
+                <ul>
+                    <li><code>createBrush(color, style)</code> - Create brush</li>
+                    <li><code>createPen(color, width, style)</code> - Create pen</li>
+                    <li><code>loadBitmap(path)</code> - Load bitmap</li>
+                </ul>
+
+                <h3>Handle Management</h3>
+                <ul>
+                    <li><code>registerHandleOwner(handle, ownerHwnd)</code> - Track resource ownership</li>
+                    <li><code>cleanupWindowResources(hwnd)</code> - Clean up resources when window is destroyed</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Handle Format</h2>
+                <p>Resources use handle formats:</p>
+                <ul>
+                    <li><code>FW_HFONT_&lt;id&gt;</code> - Font handle</li>
+                    <li><code>FW_HICON_&lt;id&gt;</code> - Icon handle</li>
+                    <li><code>FW_HCURSOR_&lt;id&gt;</code> - Cursor handle</li>
+                    <li><code>FW_HBRUSH_&lt;id&gt;</code> - Brush handle</li>
+                    <li><code>FW_HPEN_&lt;id&gt;</code> - Pen handle</li>
+                    <li><code>FW_HBITMAP_&lt;id&gt;</code> - Bitmap handle</li>
+                    <li><code>FW_HGDIOBJ_&lt;id&gt;</code> - Generic GDI object handle</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Memory Management</h2>
+                <p>When a window is destroyed, the Resource Manager automatically cleans up all resources owned by that window, preventing memory leaks.</p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FreeWorld OS - Documentation</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>FreeWorld OS Documentation</h1>
+            <p class="subtitle">Complete technical documentation for the FreeWorld Operating System</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="pages/bootmgr.html">BOOTMGR</a></li>
+                <li><a href="pages/bcd.html">BCD</a></li>
+                <li><a href="pages/freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="pages/kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="pages/hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="pages/smss.html">smss.exe</a></li>
+                <li><a href="pages/csrss.html">csrss.exe</a></li>
+                <li><a href="pages/freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="pages/shell.html">Shell</a></li>
+                <li><a href="pages/wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="pages/dc.html">Device Context</a></li>
+                <li><a href="pages/compositor.html">Compositor</a></li>
+                <li><a href="pages/resources.html">Resource Manager</a></li>
+                <li><a href="pages/input.html">Input Manager</a></li>
+                <li><a href="pages/clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="pages/window-relationships.html">Window Relationships</a></li>
+                <li><a href="pages/menu.html">Menu System</a></li>
+                <li><a href="pages/nonclient.html">Non-Client Area</a></li>
+                <li><a href="pages/controls.html">Standard Controls</a></li>
+                <li><a href="pages/timer.html">Timer Manager</a></li>
+                <li><a href="pages/property.html">Property Manager</a></li>
+                <li><a href="pages/hooks.html">Hook Manager</a></li>
+                <li><a href="pages/focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="pages/object-manager.html">Object Manager</a></li>
+                <li><a href="pages/path.html">Path Parser</a></li>
+                <li><a href="pages/registry.html">Registry</a></li>
+                <li><a href="pages/filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="pages/security.html">Security Manager</a></li>
+                <li><a href="pages/error.html">Error Manager</a></li>
+                <li><a href="pages/shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="pages/window.html">Window API</a></li>
+                <li><a href="pages/desktop.html">Desktop</a></li>
+                <li><a href="pages/api.html">System API</a></li>
+                <li><a href="pages/filesystem.html">Filesystem API</a></li>
+                <li><a href="pages/integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="pages/naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="pages/boot-process.html">Boot Process</a></li>
+                <li><a href="pages/architecture.html">Architecture</a></li>
+                <li><a href="pages/syscalls.html">System Calls</a></li>
+                <li><a href="pages/variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <section class="intro">
+                <h2>Welcome to FreeWorld OS Documentation</h2>
+                <p>This documentation provides comprehensive information about every component, class, module, and system detail of the FreeWorld Operating System.</p>
+                
+                <h3>Quick Links</h3>
+                <div class="card-grid">
+                    <div class="card">
+                        <h4>Boot Components</h4>
+                        <p>Documentation for boot manager, BCD, and OS loader</p>
+                        <a href="pages/bootmgr.html">View Boot Components →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Kernel & HAL</h4>
+                        <p>Core system components and hardware abstraction</p>
+                        <a href="pages/kernel.html">View Kernel →</a>
+                    </div>
+                    <div class="card">
+                        <h4>System Services</h4>
+                        <p>Session manager, CSRSS, and login system</p>
+                        <a href="pages/smss.html">View Services →</a>
+                    </div>
+                    <div class="card">
+                        <h4>User Interface</h4>
+                        <p>Shell and file manager documentation</p>
+                        <a href="pages/shell.html">View UI Components →</a>
+                    </div>
+                    <div class="card">
+                        <h4>GUI Subsystems</h4>
+                        <p>Device Context, Compositor, Resources, Input, Controls</p>
+                        <a href="pages/dc.html">View GUI Subsystems →</a>
+                    </div>
+                    <div class="card">
+                        <h4>System Services</h4>
+                        <p>Object Manager, Registry, Security, Error Handling</p>
+                        <a href="pages/object-manager.html">View System Services →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Node.js System</h4>
+                        <p>Window management, desktop, and APIs</p>
+                        <a href="pages/window.html">View Node.js System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Reference</h4>
+                        <p>Naming conventions, boot process, architecture</p>
+                        <a href="pages/naming-conventions.html">View Reference →</a>
+                    </div>
+                </div>
+
+                <h3>System Overview</h3>
+                <p>FreeWorld OS is a hybrid operating system that combines:</p>
+                <ul>
+                    <li><strong>Low-level boot layer</strong>: ASM/C/C++ for boot components, kernel, and HAL</li>
+                    <li><strong>High-level runtime</strong>: Node.js for desktop environment and applications</li>
+                    <li><strong>Cross-platform support</strong>: Windows and Linux file operations</li>
+                    <li><strong>Architecture independence</strong>: x86_64, ARM64, RISC-V, and future architectures</li>
+                </ul>
+
+                <h3>New GUI Subsystems</h3>
+                <p>FreeWorld OS includes comprehensive GUI subsystems for Win32-like functionality:</p>
+                <ul>
+                    <li><strong>Rendering</strong>: Device Context (DC), Compositor with transparency and shadows</li>
+                    <li><strong>Resources</strong>: Global resource manager for fonts, icons, cursors, brushes</li>
+                    <li><strong>Input</strong>: Focus management, mouse capture, hit testing, modifiers</li>
+                    <li><strong>IPC</strong>: Clipboard with multiple formats, Drag & Drop</li>
+                    <li><strong>Windows</strong>: Parent/child relationships, clipping, modal loops, non-client area</li>
+                    <li><strong>Controls</strong>: Standard controls (BUTTON, EDIT, STATIC)</li>
+                    <li><strong>Menus</strong>: Menu system with accelerators</li>
+                    <li><strong>Services</strong>: Timers, properties, hooks, focus management</li>
+                </ul>
+
+                <h3>System Services</h3>
+                <p>Comprehensive system services for OS functionality:</p>
+                <ul>
+                    <li><strong>File Management</strong>: Object Manager, Path Parser, File System Watcher</li>
+                    <li><strong>Configuration</strong>: Registry with hive management and persistence</li>
+                    <li><strong>Security</strong>: Security Manager with sessions, tokens, ACLs</li>
+                    <li><strong>Error Handling</strong>: Error Manager with GetLastError, OutputDebugString</li>
+                    <li><strong>Shell</strong>: Desktop, Taskbar, ShellExecute</li>
+                </ul>
+
+                <div class="alert alert-warning">
+                    <strong>Implementation Status:</strong> All new subsystems are <strong>structural implementations only</strong>. They provide class definitions, method signatures, and data structures, but do not yet provide actual hardware access or real rendering. See <a href="../STATUS.md">STATUS.md</a> and <a href="../REALITY_CHECK.md">REALITY_CHECK.md</a> for realistic assessment.
+                </div>
+
+                <h3>Documentation Structure</h3>
+                <p>Each component is documented with:</p>
+                <ul>
+                    <li>Purpose and overview</li>
+                    <li>Code structure and implementation details</li>
+                    <li>Functions, classes, and modules</li>
+                    <li>Variables and constants</li>
+                    <li>Usage examples</li>
+                    <li>Integration points</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="navigation.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wanderer - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Wanderer - FreeWorld File Manager</h1>
+                <div class="meta">
+                    <strong>Location:</strong> wanderer/wanderer.c<br>
+                    <strong>Type:</strong> C Executable<br>
+                    <strong>Purpose:</strong> File and folder operations manager
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>Wanderer is the FreeWorld file manager, similar to Windows Explorer or Linux Nautilus. It provides tools for controlling all file and folder operations, similar to how classic DOS and Linux handle file management.</p>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                
+                <h3>list_directory</h3>
+                <p>Lists directory contents with file information:</p>
+                <div class="code-block">
+                    <pre>void list_directory(const char* path);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>path</code>: Directory path to list</li>
+                </ul>
+                <p><strong>Description:</strong> Displays directory listing with name, type, and size columns.</p>
+
+                <h3>main</h3>
+                <p>Main entry point:</p>
+                <div class="code-block">
+                    <pre>int main(int argc, char** argv);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>argc</code>: Argument count</li>
+                    <li><code>argv</code>: Argument array (first argument is optional directory path)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Directory Listing Format</h2>
+                <p>Wanderer displays directory listings in a formatted table:</p>
+                <div class="code-block">
+                    <pre>Name                           Type           Size
+------------------------------------------------------------
+file1.txt                     File           1024 bytes
+folder1                        Directory      4096 bytes</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Variables</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Type</th>
+                            <th>Scope</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>entry</code></td>
+                            <td>struct dirent*</td>
+                            <td>local</td>
+                            <td>Directory entry pointer</td>
+                        </tr>
+                        <tr>
+                            <td><code>file_stat</code></td>
+                            <td>struct stat</td>
+                            <td>local</td>
+                            <td>File statistics structure</td>
+                        </tr>
+                        <tr>
+                            <td><code>full_path</code></td>
+                            <td>char[1024]</td>
+                            <td>local</td>
+                            <td>Full file path buffer</td>
+                        </tr>
+                        <tr>
+                            <td><code>start_path</code></td>
+                            <td>const char*</td>
+                            <td>local (main)</td>
+                            <td>Starting directory path</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Cross-Platform Support</h2>
+                <p>Wanderer supports both Windows and Linux:</p>
+                <div class="code-block">
+                    <pre>#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#else
+#include <sys/types.h>
+#endif</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Future Features</h2>
+                <ul>
+                    <li>Interactive mode with navigation</li>
+                    <li>File operations (copy, move, delete)</li>
+                    <li>Directory operations (create, remove)</li>
+                    <li>File search functionality</li>
+                    <li>Graphical interface (future)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage</h2>
+                <div class="code-block">
+                    <pre>wanderer.exe [directory]</pre>
+                </div>
+                <p>If no directory is specified, lists the current directory.</p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

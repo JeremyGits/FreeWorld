@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>FreeWorld Shell</h1>
+                <div class="meta">
+                    <strong>Location:</strong> shell/shell.c<br>
+                    <strong>Type:</strong> C Executable<br>
+                    <strong>Purpose:</strong> Command-line interpreter with blue "FREE" and white "WORLD" prompt
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld Shell is a console application that provides a text-based interface for running commands, scripts, and interacting with the file system. It features modern capabilities like long file name support and advanced scripting.</p>
+            </section>
+
+            <section class="section">
+                <h2>Prompt Design</h2>
+                <p>The shell displays a distinctive prompt:</p>
+                <div class="code-block">
+                    <pre>FREE WORLD></pre>
+                </div>
+                <p>Where "FREE" is displayed in <span style="color: blue;">blue</span> and "WORLD" is displayed in <span style="color: black;">white</span>.</p>
+                
+                <h3>ANSI Color Codes</h3>
+                <div class="code-block">
+                    <pre>#define COLOR_BLUE "\033[34m"
+#define COLOR_WHITE "\033[37m"
+#define COLOR_RESET "\033[0m"</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>MAX_INPUT</code></td>
+                            <td>1024</td>
+                            <td>Maximum input line length</td>
+                        </tr>
+                        <tr>
+                            <td><code>MAX_ARGS</code></td>
+                            <td>64</td>
+                            <td>Maximum number of command arguments</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_BLUE</code></td>
+                            <td>"\033[34m"</td>
+                            <td>ANSI blue color code</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_WHITE</code></td>
+                            <td>"\033[37m"</td>
+                            <td>ANSI white color code</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_RESET</code></td>
+                            <td>"\033[0m"</td>
+                            <td>ANSI reset color code</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                
+                <h3>print_prompt</h3>
+                <p>Displays the shell prompt with colored text:</p>
+                <div class="code-block">
+                    <pre>void print_prompt(void);</pre>
+                </div>
+
+                <h3>print_welcome</h3>
+                <p>Displays welcome message on shell startup:</p>
+                <div class="code-block">
+                    <pre>void print_welcome(void);</pre>
+                </div>
+
+                <h3>execute_command</h3>
+                <p>Executes a shell command:</p>
+                <div class="code-block">
+                    <pre>int execute_command(char** args, int argc);</pre>
+                </div>
+                <p><strong>Returns:</strong> 0 on success, -1 to exit, 1 on error</p>
+
+                <h3>parse_input</h3>
+                <p>Parses input string into command arguments:</p>
+                <div class="code-block">
+                    <pre>int parse_input(char* input, char** args, int max_args);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Built-in Commands</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                            <th>Usage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>help</code></td>
+                            <td>Show help message</td>
+                            <td>help</td>
+                        </tr>
+                        <tr>
+                            <td><code>exit</code></td>
+                            <td>Exit the shell</td>
+                            <td>exit</td>
+                        </tr>
+                        <tr>
+                            <td><code>quit</code></td>
+                            <td>Exit the shell</td>
+                            <td>quit</td>
+                        </tr>
+                        <tr>
+                            <td><code>pwd</code></td>
+                            <td>Print working directory</td>
+                            <td>pwd</td>
+                        </tr>
+                        <tr>
+                            <td><code>cd</code></td>
+                            <td>Change directory</td>
+                            <td>cd &lt;dir&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>ls</code></td>
+                            <td>List directory contents</td>
+                            <td>ls [dir]</td>
+                        </tr>
+                        <tr>
+                            <td><code>mkdir</code></td>
+                            <td>Create directory</td>
+                            <td>mkdir &lt;dir&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>rmdir</code></td>
+                            <td>Remove directory</td>
+                            <td>rmdir &lt;dir&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>touch</code></td>
+                            <td>Create empty file</td>
+                            <td>touch &lt;file&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>rm</code></td>
+                            <td>Remove file</td>
+                            <td>rm &lt;file&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>cat</code></td>
+                            <td>Display file contents</td>
+                            <td>cat &lt;file&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>echo</code></td>
+                            <td>Echo text</td>
+                            <td>echo &lt;text&gt;</td>
+                        </tr>
+                        <tr>
+                            <td><code>clear</code></td>
+                            <td>Clear screen</td>
+                            <td>clear</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Cross-Platform Support</h2>
+                <p>The shell supports both Windows and Linux:</p>
+                <div class="code-block">
+                    <pre>#ifdef _WIN32
+#include <windows.h>
+#include <io.h>
+#define access _access
+#define stat _stat
+#else
+#include <sys/types.h>
+#include <pwd.h>
+#endif</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Main Loop</h2>
+                <p>The shell runs a continuous loop:</p>
+                <ol>
+                    <li>Display prompt</li>
+                    <li>Read user input</li>
+                    <li>Parse input into arguments</li>
+                    <li>Execute command</li>
+                    <li>Repeat until exit command</li>
+                </ol>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>hal.dll - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>hal.dll - Hardware Abstraction Layer</h1>
+                <div class="meta">
+                    <strong>Location:</strong> hal/hal.c, hal/hal.h<br>
+                    <strong>Type:</strong> Dynamic Link Library (DLL)<br>
+                    <strong>Purpose:</strong> Hardware abstraction between hardware and kernel
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>hal.dll (Hardware Abstraction Layer) provides an abstraction layer between hardware interfaces and the kernel. It allows the kernel to work with different hardware configurations without modification.</p>
+            </section>
+
+            <section class="section">
+                <h2>Data Structures</h2>
+                
+                <h3>hal_info_t</h3>
+                <div class="code-block">
+                    <pre>typedef struct {
+    uint32_t cpu_vendor;
+    uint32_t cpu_features;
+    uint64_t memory_size;
+    uint32_t device_count;
+} hal_info_t;</pre>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>cpu_vendor</code></td>
+                            <td>uint32_t</td>
+                            <td>CPU vendor identifier</td>
+                        </tr>
+                        <tr>
+                            <td><code>cpu_features</code></td>
+                            <td>uint32_t</td>
+                            <td>CPU feature flags</td>
+                        </tr>
+                        <tr>
+                            <td><code>memory_size</code></td>
+                            <td>uint64_t</td>
+                            <td>Total system memory in bytes</td>
+                        </tr>
+                        <tr>
+                            <td><code>device_count</code></td>
+                            <td>uint32_t</td>
+                            <td>Number of detected devices</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                
+                <h3>hal_init</h3>
+                <div class="code-block">
+                    <pre>int hal_init(void);</pre>
+                </div>
+                <p><strong>Returns:</strong> 0 on success, -1 on failure</p>
+                <p><strong>Description:</strong> Initializes HAL, detects CPU, memory, and devices.</p>
+
+                <h3>hal_get_info</h3>
+                <div class="code-block">
+                    <pre>hal_info_t* hal_get_info(void);</pre>
+                </div>
+                <p><strong>Returns:</strong> Pointer to hal_info_t structure</p>
+
+                <h3>hal_device_read</h3>
+                <div class="code-block">
+                    <pre>int hal_device_read(uint32_t device_id, void* buffer, size_t size);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>device_id</code>: Device identifier</li>
+                    <li><code>buffer</code>: Buffer to read into</li>
+                    <li><code>size</code>: Number of bytes to read</li>
+                </ul>
+
+                <h3>hal_device_write</h3>
+                <div class="code-block">
+                    <pre>int hal_device_write(uint32_t device_id, const void* buffer, size_t size);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Static Variables</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>hal_info</code></td>
+                            <td>hal_info_t</td>
+                            <td>Static HAL information structure</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Initialization Process</h2>
+                <ol>
+                    <li>Detect CPU vendor and features</li>
+                    <li>Detect total system memory</li>
+                    <li>Detect and enumerate devices</li>
+                    <li>Initialize device drivers</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                <ul>
+                    <li><strong>fwoskrnl.exe:</strong> Kernel uses HAL for hardware access</li>
+                    <li><strong>Device Drivers:</strong> HAL provides interface for drivers</li>
+                    <li><strong>freeload.exe:</strong> May load HAL before kernel</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

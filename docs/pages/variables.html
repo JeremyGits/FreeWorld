@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Variables & Constants - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Variables & Constants</h1>
+                <div class="meta">
+                    <strong>Purpose:</strong> Reference for all system variables and constants
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Boot Sector Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>0x7C00</code></td>
+                            <td>0x7C00</td>
+                            <td>BIOS boot sector load address</td>
+                        </tr>
+                        <tr>
+                            <td><code>0xAA55</code></td>
+                            <td>0xAA55</td>
+                            <td>Boot sector signature (bytes 510-511)</td>
+                        </tr>
+                        <tr>
+                            <td><code>0x1000:0x0000</code></td>
+                            <td>Segment:Offset</td>
+                            <td>Kernel entry point address</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>BCD Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>BCD_SIGNATURE</code></td>
+                            <td>"FWBCD\0\0\0"</td>
+                            <td>BCD file signature (8 bytes)</td>
+                        </tr>
+                        <tr>
+                            <td><code>BCD_VERSION</code></td>
+                            <td>1</td>
+                            <td>BCD format version</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Kernel Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>KERNEL_MAGIC</code></td>
+                            <td>0x46524545574F524C</td>
+                            <td>Kernel magic number ("FREEWORL")</td>
+                        </tr>
+                        <tr>
+                            <td><code>KERNEL_VERSION_MAJOR</code></td>
+                            <td>0</td>
+                            <td>Kernel major version</td>
+                        </tr>
+                        <tr>
+                            <td><code>KERNEL_VERSION_MINOR</code></td>
+                            <td>1</td>
+                            <td>Kernel minor version</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Shell Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>MAX_INPUT</code></td>
+                            <td>1024</td>
+                            <td>Maximum input line length</td>
+                        </tr>
+                        <tr>
+                            <td><code>MAX_ARGS</code></td>
+                            <td>64</td>
+                            <td>Maximum number of command arguments</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_BLUE</code></td>
+                            <td>"\033[34m"</td>
+                            <td>ANSI blue color code</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_WHITE</code></td>
+                            <td>"\033[37m"</td>
+                            <td>ANSI white color code</td>
+                        </tr>
+                        <tr>
+                            <td><code>COLOR_RESET</code></td>
+                            <td>"\033[0m"</td>
+                            <td>ANSI reset color code</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Desktop Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DESKTOP_WIDTH</code></td>
+                            <td>1920</td>
+                            <td>Desktop window width (pixels)</td>
+                        </tr>
+                        <tr>
+                            <td><code>DESKTOP_HEIGHT</code></td>
+                            <td>1080</td>
+                            <td>Desktop window height (pixels)</td>
+                        </tr>
+                        <tr>
+                            <td><code>TASKBAR_HEIGHT</code></td>
+                            <td>40</td>
+                            <td>Taskbar height (pixels)</td>
+                        </tr>
+                        <tr>
+                            <td><code>TASKBAR_Y</code></td>
+                            <td>1040</td>
+                            <td>Taskbar Y position</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Static Variables</h2>
+                <h3>BCD Module</h3>
+                <ul>
+                    <li><code>bcd_header</code> (bcd_header_t*): Pointer to BCD header</li>
+                    <li><code>bcd_entries</code> (bcd_entry_t*): Pointer to BCD entries array</li>
+                </ul>
+
+                <h3>HAL Module</h3>
+                <ul>
+                    <li><code>hal_info</code> (hal_info_t): Static HAL information structure</li>
+                </ul>
+
+                <h3>Kernel Module</h3>
+                <ul>
+                    <li><code>kernel_info</code> (kernel_info_t): Static kernel information structure</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Window Handle Format</h2>
+                <p>Window handles use the format:</p>
+                <div class="code-block">
+                    <pre>FW_HWND_&lt;random_id&gt;</pre>
+                </div>
+                <p>Where <code>&lt;random_id&gt;</code> is a random alphanumeric string generated using:</p>
+                <div class="code-block">
+                    <pre>Math.random().toString(36).substr(2, 9)</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fwoskrnl.exe - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>fwoskrnl.exe - FreeWorld Kernel Executive</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/fwoskrnl.c, kernel/fwoskrnl.h<br>
+                    <strong>Type:</strong> C Kernel<br>
+                    <strong>Purpose:</strong> Core operating system component
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>fwoskrnl.exe (FreeWorld Kernel Executive) is the core operating system component. It provides system calls, manages memory, processes, and device drivers, and coordinates all system operations.</p>
+            </section>
+
+            <section class="section">
+                <h2>Data Structures</h2>
+                
+                <h3>kernel_info_t</h3>
+                <p>Kernel information structure:</p>
+                <div class="code-block">
+                    <pre>typedef struct {
+    uint64_t magic;         // Kernel magic number
+    uint32_t version_major;
+    uint32_t version_minor;
+    uint64_t memory_base;   // Base memory address
+    uint64_t memory_size;   // Total memory size
+} kernel_info_t;</pre>
+                </div>
+
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Field</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>magic</code></td>
+                            <td>uint64_t</td>
+                            <td>Kernel magic number: 0x46524545574F524C ("FREEWORL")</td>
+                        </tr>
+                        <tr>
+                            <td><code>version_major</code></td>
+                            <td>uint32_t</td>
+                            <td>Major version number (currently 0)</td>
+                        </tr>
+                        <tr>
+                            <td><code>version_minor</code></td>
+                            <td>uint32_t</td>
+                            <td>Minor version number (currently 1)</td>
+                        </tr>
+                        <tr>
+                            <td><code>memory_base</code></td>
+                            <td>uint64_t</td>
+                            <td>Base memory address</td>
+                        </tr>
+                        <tr>
+                            <td><code>memory_size</code></td>
+                            <td>uint64_t</td>
+                            <td>Total memory size</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                
+                <h3>kernel_init</h3>
+                <p>Initializes kernel subsystems:</p>
+                <div class="code-block">
+                    <pre>void kernel_init(void);</pre>
+                </div>
+                <p><strong>Description:</strong> Initializes memory management, process scheduler, device drivers, and file system.</p>
+
+                <h3>kernel_main</h3>
+                <p>Kernel main entry point:</p>
+                <div class="code-block">
+                    <pre>int kernel_main(void);</pre>
+                </div>
+                <p><strong>Returns:</strong> 0 on success</p>
+                <p><strong>Description:</strong> Main kernel function called after boot. Initializes kernel and starts system services.</p>
+
+                <h3>System Calls (from fwoskrnl.h)</h3>
+                <div class="code-block">
+                    <pre>int sys_read(int fd, void* buf, size_t count);
+int sys_write(int fd, const void* buf, size_t count);
+int sys_open(const char* path, int flags);
+int sys_close(int fd);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Static Variables</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Variable</th>
+                            <th>Type</th>
+                            <th>Initial Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>kernel_info</code></td>
+                            <td>kernel_info_t</td>
+                            <td>See structure</td>
+                            <td>Static kernel information structure</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Constant</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>KERNEL_MAGIC</code></td>
+                            <td>0x46524545574F524C</td>
+                            <td>Kernel magic number ("FREEWORL")</td>
+                        </tr>
+                        <tr>
+                            <td><code>KERNEL_VERSION_MAJOR</code></td>
+                            <td>0</td>
+                            <td>Major version</td>
+                        </tr>
+                        <tr>
+                            <td><code>KERNEL_VERSION_MINOR</code></td>
+                            <td>1</td>
+                            <td>Minor version</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Initialization Process</h2>
+                <ol>
+                    <li>Display kernel version</li>
+                    <li>Initialize memory management subsystem</li>
+                    <li>Initialize process scheduler</li>
+                    <li>Initialize device drivers</li>
+                    <li>Initialize file system</li>
+                    <li>Start system services</li>
+                    <li>Start session manager</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                <ul>
+                    <li><strong>freeload.exe:</strong> Loaded and executed by OS loader</li>
+                    <li><strong>hal.dll:</strong> Uses HAL for hardware abstraction</li>
+                    <li><strong>smss.exe:</strong> Starts session manager after initialization</li>
+                    <li><strong>System Calls:</strong> Provides syscalls for user applications</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

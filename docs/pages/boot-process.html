@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boot Process - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Boot Process</h1>
+                <div class="meta">
+                    <strong>Purpose:</strong> Complete boot sequence documentation
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS boot process follows a multi-stage sequence from BIOS/UEFI initialization to user login.</p>
+            </section>
+
+            <section class="section">
+                <h2>Boot Sequence</h2>
+                <ol>
+                    <li><strong>BIOS/UEFI Initialization</strong>
+                        <ul>
+                            <li>BIOS/UEFI performs hardware initialization</li>
+                            <li>BIOS/UEFI loads boot sector from disk</li>
+                        </ul>
+                    </li>
+                    <li><strong>BOOTMGR (Boot Manager)</strong>
+                        <ul>
+                            <li>BIOS loads boot sector (512 bytes) to 0x7C00</li>
+                            <li>BOOTMGR initializes segments and stack</li>
+                            <li>BOOTMGR displays boot message</li>
+                            <li>BOOTMGR loads kernel (via load_kernel)</li>
+                            <li>BOOTMGR jumps to kernel entry point (0x1000:0x0000)</li>
+                        </ul>
+                    </li>
+                    <li><strong>BCD (Boot Configuration Data)</strong>
+                        <ul>
+                            <li>freeload.exe reads BCD file</li>
+                            <li>BCD provides boot entry configuration</li>
+                            <li>Contains kernel and loader paths</li>
+                        </ul>
+                    </li>
+                    <li><strong>freeload.exe (OS Loader)</strong>
+                        <ul>
+                            <li>Loads BCD configuration</li>
+                            <li>Loads kernel (fwoskrnl.exe) into memory</li>
+                            <li>Loads essential device drivers</li>
+                            <li>Transfers control to kernel</li>
+                        </ul>
+                    </li>
+                    <li><strong>fwoskrnl.exe (Kernel)</strong>
+                        <ul>
+                            <li>Kernel initialization (kernel_init)</li>
+                            <li>Initialize memory management</li>
+                            <li>Initialize process scheduler</li>
+                            <li>Initialize device drivers</li>
+                            <li>Initialize file system</li>
+                            <li>Start system services</li>
+                        </ul>
+                    </li>
+                    <li><strong>hal.dll (Hardware Abstraction Layer)</strong>
+                        <ul>
+                            <li>HAL initialization (hal_init)</li>
+                            <li>Detect CPU</li>
+                            <li>Detect memory</li>
+                            <li>Detect devices</li>
+                            <li>Initialize device drivers</li>
+                        </ul>
+                    </li>
+                    <li><strong>smss.exe (Session Manager)</strong>
+                        <ul>
+                            <li>Initialize user session</li>
+                            <li>Load critical system processes</li>
+                            <li>Start CSRSS</li>
+                            <li>Start login manager</li>
+                        </ul>
+                    </li>
+                    <li><strong>csrss.exe (Client Server Runtime)</strong>
+                        <ul>
+                            <li>Initialize console subsystem</li>
+                            <li>Initialize window manager</li>
+                            <li>Start message loop</li>
+                        </ul>
+                    </li>
+                    <li><strong>freeworldlogon.exe (Login Manager)</strong>
+                        <ul>
+                            <li>Display login prompt</li>
+                            <li>Authenticate user</li>
+                            <li>Start user shell</li>
+                        </ul>
+                    </li>
+                    <li><strong>shell.exe (User Shell)</strong>
+                        <ul>
+                            <li>Display "FREE WORLD>" prompt</li>
+                            <li>Accept user commands</li>
+                            <li>Execute commands</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Memory Layout During Boot</h2>
+                <div class="code-block">
+                    <pre>0x0000 - 0x03FF  : Interrupt Vector Table
+0x0400 - 0x04FF  : BIOS Data Area
+0x0500 - 0x7BFF  : Available
+0x7C00 - 0x7DFF  : Boot Sector (512 bytes) - BOOTMGR
+0x7E00 - 0x9FFF  : Available
+0xA000 - 0xBFFF  : Video Memory
+0xC000 - 0xFFFF  : BIOS ROM
+0x1000:0x0000    : Kernel Entry Point</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>JMP Instructions</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Location</th>
+                            <th>Instruction</th>
+                            <th>Purpose</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BOOTMGR</td>
+                            <td><code>jmp 0x1000:0x0000</code></td>
+                            <td>Far jump to kernel entry point</td>
+                        </tr>
+                        <tr>
+                            <td>BOOTMGR (print_string)</td>
+                            <td><code>jz done</code></td>
+                            <td>Conditional jump if end of string</td>
+                        </tr>
+                        <tr>
+                            <td>BOOTMGR (print_string)</td>
+                            <td><code>jmp print_string</code></td>
+                            <td>Unconditional jump to continue loop</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Boot Sector Format</h2>
+                <ul>
+                    <li><strong>Size:</strong> 512 bytes</li>
+                    <li><strong>Boot Signature:</strong> 0xAA55 at bytes 510-511</li>
+                    <li><strong>Load Address:</strong> 0x7C00</li>
+                    <li><strong>Mode:</strong> 16-bit real mode</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

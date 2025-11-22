@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naming Conventions - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Naming Conventions</h1>
+                <div class="meta">
+                    <strong>Purpose:</strong> Standard naming conventions for FreeWorld OS components
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>FreeWorld OS follows consistent naming conventions for files, functions, classes, variables, and system components to ensure code clarity and maintainability.</p>
+            </section>
+
+            <section class="section">
+                <h2>Executable Files</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>lowercase.exe</td>
+                            <td>freeload.exe</td>
+                            <td>All lowercase, descriptive name</td>
+                        </tr>
+                        <tr>
+                            <td>lowercase.exe</td>
+                            <td>fwoskrnl.exe</td>
+                            <td>Abbreviation + descriptive (fw = FreeWorld)</td>
+                        </tr>
+                        <tr>
+                            <td>lowercase.exe</td>
+                            <td>smss.exe</td>
+                            <td>Acronym (Session Manager Subsystem)</td>
+                        </tr>
+                        <tr>
+                            <td>lowercase.exe</td>
+                            <td>csrss.exe</td>
+                            <td>Acronym (Client Server Runtime Subsystem)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Dynamic Link Libraries</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>lowercase.dll</td>
+                            <td>hal.dll</td>
+                            <td>All lowercase, acronym or abbreviation</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>C/C++ Functions</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>component_action</td>
+                            <td>bcd_load</td>
+                            <td>Component prefix + underscore + action</td>
+                        </tr>
+                        <tr>
+                            <td>component_action</td>
+                            <td>hal_init</td>
+                            <td>Component prefix + underscore + action</td>
+                        </tr>
+                        <tr>
+                            <td>component_get_item</td>
+                            <td>bcd_get_default_entry</td>
+                            <td>Component + get + item name</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>C/C++ Types</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>component_name_t</td>
+                            <td>bcd_header_t</td>
+                            <td>Component prefix + underscore + name + _t suffix</td>
+                        </tr>
+                        <tr>
+                            <td>component_name_t</td>
+                            <td>hal_info_t</td>
+                            <td>Component prefix + underscore + name + _t suffix</td>
+                        </tr>
+                        <tr>
+                            <td>component_name_t</td>
+                            <td>kernel_info_t</td>
+                            <td>Component prefix + underscore + name + _t suffix</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>JavaScript/Node.js Classes</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>PascalCase</td>
+                            <td>Window</td>
+                            <td>Pascal case for class names</td>
+                        </tr>
+                        <tr>
+                            <td>PascalCase</td>
+                            <td>WindowManager</td>
+                            <td>Pascal case, descriptive compound names</td>
+                        </tr>
+                        <tr>
+                            <td>PascalCase</td>
+                            <td>FreeWorldAPI</td>
+                            <td>Pascal case, system prefix</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>JavaScript/Node.js Methods</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>camelCase</td>
+                            <td>createWindow</td>
+                            <td>Camel case for method names</td>
+                        </tr>
+                        <tr>
+                            <td>camelCase</td>
+                            <td>getSystemInfo</td>
+                            <td>Verb + noun in camel case</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Window Handles (HWND)</h2>
+                <p>Window handles follow the format:</p>
+                <div class="code-block">
+                    <pre>FW_HWND_&lt;random_id&gt;</pre>
+                </div>
+                <p>Where:</p>
+                <ul>
+                    <li><code>FW</code> = FreeWorld prefix</li>
+                    <li><code>HWND</code> = Window Handle identifier</li>
+                    <li><code>&lt;random_id&gt;</code> = Random alphanumeric string</li>
+                </ul>
+                <p>Example: <code class="code-inline">FW_HWND_a3k9j2x1m</code></p>
+            </section>
+
+            <section class="section">
+                <h2>Constants</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Language</th>
+                            <th>Pattern</th>
+                            <th>Example</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>C/C++</td>
+                            <td>UPPER_SNAKE_CASE</td>
+                            <td>MAX_INPUT, COLOR_BLUE</td>
+                        </tr>
+                        <tr>
+                            <td>JavaScript</td>
+                            <td>UPPER_SNAKE_CASE</td>
+                            <td>KERNEL_MAGIC (if used)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>File Paths</h2>
+                <ul>
+                    <li><strong>Boot Components:</strong> <code>boot/COMPONENT/</code></li>
+                    <li><strong>Kernel:</strong> <code>kernel/</code></li>
+                    <li><strong>HAL:</strong> <code>hal/</code></li>
+                    <li><strong>Services:</strong> <code>services/SERVICE/</code></li>
+                    <li><strong>System (Node.js):</strong> <code>system/</code></li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Magic Numbers</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Component</th>
+                            <th>Magic Number</th>
+                            <th>Format</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>BCD</td>
+                            <td>"FWBCD\0\0\0"</td>
+                            <td>8-byte string</td>
+                        </tr>
+                        <tr>
+                            <td>Kernel</td>
+                            <td>0x46524545574F524C</td>
+                            <td>64-bit integer ("FREEWORL")</td>
+                        </tr>
+                        <tr>
+                            <td>Boot Sector</td>
+                            <td>0xAA55</td>
+                            <td>16-bit integer (bytes 510-511)</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

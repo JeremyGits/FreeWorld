@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>csrss.exe - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>csrss.exe - Client Server Runtime Subsystem</h1>
+                <div class="meta">
+                    <strong>Location:</strong> services/csrss/csrss.c<br>
+                    <strong>Type:</strong> C Executable<br>
+                    <strong>Purpose:</strong> Handles console and window management
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>csrss.exe (Client Server Runtime Subsystem) handles console and window management. It provides the runtime environment for console applications and window management services.</p>
+            </section>
+
+            <section class="section">
+                <h2>Main Function</h2>
+                <div class="code-block">
+                    <pre>int main(int argc, char** argv) {
+    printf("FreeWorld Client Server Runtime Subsystem (CSRSS) v0.1\n");
+    printf("Initializing console and window subsystems...\n");
+    
+    // Initialize console subsystem
+    // Initialize window manager
+    // Start message loop
+    
+    printf("CSRSS initialized successfully.\n");
+    
+    // Main message loop
+    while (1) {
+        // Process window messages
+        // Handle console I/O
+        // Sleep to prevent CPU spinning
+        sleep_ms(10); // 10ms
+    }
+    
+    return 0;
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Functions</h2>
+                <ul>
+                    <li>Initialize console subsystem</li>
+                    <li>Initialize window manager</li>
+                    <li>Process window messages</li>
+                    <li>Handle console I/O</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Message Loop</h2>
+                <p>CSRSS runs a continuous message loop that:</p>
+                <ul>
+                    <li>Processes window messages</li>
+                    <li>Handles console input/output</li>
+                    <li>Sleeps for 10ms between iterations to prevent CPU spinning</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Platform-Specific Code</h2>
+                <p>CSRSS uses platform-specific sleep functions:</p>
+                <div class="code-block">
+                    <pre>#ifdef _WIN32
+#include <windows.h>
+#define sleep_ms(x) Sleep(x)
+#else
+#include <unistd.h>
+#define sleep_ms(x) usleep((x) * 1000)
+#endif</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                <ul>
+                    <li><strong>smss.exe:</strong> Started by Session Manager</li>
+                    <li><strong>Window Manager:</strong> Provides window management services</li>
+                    <li><strong>Console Applications:</strong> Provides console I/O services</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

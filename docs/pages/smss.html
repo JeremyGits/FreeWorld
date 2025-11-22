@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>smss.exe - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>smss.exe - Session Manager Subsystem</h1>
+                <div class="meta">
+                    <strong>Location:</strong> services/smss/smss.c<br>
+                    <strong>Type:</strong> C Executable<br>
+                    <strong>Purpose:</strong> Starts user session and loads critical system processes
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>smss.exe (Session Manager Subsystem) is responsible for starting the user session, loading critical system processes, and handling further stages of the boot process.</p>
+            </section>
+
+            <section class="section">
+                <h2>Main Function</h2>
+                <div class="code-block">
+                    <pre>int main(int argc, char** argv) {
+    printf("FreeWorld Session Manager Subsystem (SMSS) v0.1\n");
+    printf("Starting user session...\n");
+    
+    // Initialize session
+    // Load critical system processes
+    // Start CSRSS
+    // Start login manager
+    
+    printf("Session started successfully.\n");
+    
+    // Start login process
+    system("freeworldlogon.exe");
+    
+    return 0;
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Responsibilities</h2>
+                <ul>
+                    <li>Initialize user session</li>
+                    <li>Load critical system processes</li>
+                    <li>Start CSRSS (Client Server Runtime Subsystem)</li>
+                    <li>Start login manager (freeworldlogon.exe)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Boot Sequence</h2>
+                <ol>
+                    <li>Kernel starts SMSS</li>
+                    <li>SMSS initializes session</li>
+                    <li>SMSS loads critical processes</li>
+                    <li>SMSS starts CSRSS</li>
+                    <li>SMSS starts login manager</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                <ul>
+                    <li><strong>fwoskrnl.exe:</strong> Started by kernel after initialization</li>
+                    <li><strong>csrss.exe:</strong> Started by SMSS</li>
+                    <li><strong>freeworldlogon.exe:</strong> Started by SMSS</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+
