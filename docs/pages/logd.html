@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logging Daemon (logd) - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Logging Daemon (logd)</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete<br>
+                    <strong>Location:</strong> <code>services/logd/logd.c</code><br>
+                    <strong>Type:</strong> System Daemon (C)<br>
+                    <strong>Purpose:</strong> System-wide centralized logging service
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Logging Daemon (logd) provides centralized logging services for FreeWorld OS, collecting and managing log messages from all system components. It handles log rotation, filtering, and archival.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Log Message Collection:</strong> Receives log entries from all system components</li>
+                    <li><strong>Log File Rotation:</strong> Automatically rotates logs when size limit reached</li>
+                    <li><strong>Log Level Filtering:</strong> Filters logs by severity level (DEBUG, INFO, WARNING, ERROR, CRITICAL)</li>
+                    <li><strong>Log Archival:</strong> Maintains multiple rotated log files</li>
+                    <li><strong>Structured Logging:</strong> Timestamp, level, source, PID, and message</li>
+                    <li><strong>Daemon Mode:</strong> Runs as background daemon</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Log Levels</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Level</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DEBUG</code></td>
+                            <td>0</td>
+                            <td>Debug information (verbose)</td>
+                        </tr>
+                        <tr>
+                            <td><code>INFO</code></td>
+                            <td>1</td>
+                            <td>Informational messages</td>
+                        </tr>
+                        <tr>
+                            <td><code>WARNING</code></td>
+                            <td>2</td>
+                            <td>Warning messages</td>
+                        </tr>
+                        <tr>
+                            <td><code>ERROR</code></td>
+                            <td>3</td>
+                            <td>Error messages</td>
+                        </tr>
+                        <tr>
+                            <td><code>CRITICAL</code></td>
+                            <td>4</td>
+                            <td>Critical system errors</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Log Format</h2>
+                <p>Log entries are written in the following format:</p>
+                <pre><code>[YYYY-MM-DD HH:MM:SS] [LEVEL] [SOURCE] [PID:####] Message text</code></pre>
+                <p><strong>Example:</strong></p>
+                <pre><code>[2024-01-15 10:30:45] [INFO] [kernel] [PID:1] Kernel initialized successfully
+[2024-01-15 10:30:46] [ERROR] [networkd] [PID:42] Failed to configure interface eth0</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Configuration</h2>
+                <p>logd can be configured via command-line arguments:</p>
+                <ul>
+                    <li><code>--no-daemon</code> - Run in foreground (for debugging)</li>
+                    <li><code>--log-dir &lt;path&gt;</code> - Set log directory (default: /var/log)</li>
+                    <li><code>--max-size &lt;MB&gt;</code> - Maximum log file size in MB (default: 10MB)</li>
+                    <li><code>--min-level &lt;LEVEL&gt;</code> - Minimum log level to record (default: INFO)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Log Rotation</h2>
+                <p>When a log file reaches the maximum size, logd automatically rotates it:</p>
+                <ol>
+                    <li>Current log (<code>system.log</code>) is renamed to <code>system.log.1</code></li>
+                    <li>Existing rotated logs are shifted (<code>system.log.1</code> → <code>system.log.2</code>, etc.)</li>
+                    <li>Oldest log files beyond the limit are deleted</li>
+                    <li>A new <code>system.log</code> is created</li>
+                </ol>
+                <p><strong>Default:</strong> Keeps up to 10 rotated log files</p>
+            </section>
+
+            <section class="section">
+                <h2>IPC Interface</h2>
+                <p>Components send log entries to logd via IPC (stdin in current implementation). The format is:</p>
+                <pre><code>LEVEL|SOURCE|PID|MESSAGE</code></pre>
+                <p><strong>Example:</strong></p>
+                <pre><code>INFO|kernel|1|Kernel initialized
+ERROR|networkd|42|Failed to configure interface</code></pre>
+                <p><strong>Future:</strong> Will use Unix domain sockets or named pipes for better IPC</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage</h2>
+                <h3>Starting logd</h3>
+                <pre><code># Start as daemon (default)
+logd
+
+# Start in foreground for debugging
+logd --no-daemon
+
+# Custom configuration
+logd --log-dir /custom/logs --max-size 50 --min-level WARNING</code></pre>
+
+                <h3>Sending Log Entries</h3>
+                <pre><code># From a C program
+printf("INFO|myapp|%d|Application started\n", getpid()) | logd
+
+# From shell script
+echo "WARNING|script|$$|Disk space low" | logd</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <pre><code>services/logd/
+├── logd.c          # Main daemon implementation
+└── Makefile        # Build system</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>logd integrates with:</p>
+                <ul>
+                    <li><strong>Kernel Logger:</strong> Receives kernel log messages</li>
+                    <li><strong>System Services:</strong> All services send logs to logd</li>
+                    <li><strong>Applications:</strong> User applications can send logs via IPC</li>
+                    <li><strong>System Monitor:</strong> Can read log files for monitoring</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Core Functionality</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Log Rotation</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Level Filtering</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item in-progress">
+                        <strong>IPC Interface</strong><br>
+                        ⚠️ Simplified (stdin), needs sockets/pipes
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

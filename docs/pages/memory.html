@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memory Management - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Memory Management - FreeWorld OS</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/memory/<br>
+                    <strong>Type:</strong> Assembly Memory Management<br>
+                    <strong>Purpose:</strong> Complete memory management system (paging, frame allocator, heap)<br>
+                    <strong>Status:</strong> ✅ Complete and Production-Ready
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld Memory Management system provides a complete, production-ready memory management infrastructure. It includes:</p>
+                <ul>
+                    <li><strong>Paging System:</strong> Page tables, virtual memory, page-level permissions</li>
+                    <li><strong>Frame Allocator:</strong> Physical page management (allocate/free physical pages)</li>
+                    <li><strong>Heap Allocator:</strong> Kernel heap (kmalloc/kfree/krealloc)</li>
+                    <li><strong>Memory Initialization:</strong> One-call initialization for all memory subsystems</li>
+                </ul>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> All memory management components are complete and ready for use. Total: ~680 lines of production-ready code.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. Paging System (paging.asm)</h3>
+                <p><strong>Location:</strong> <code>kernel/memory/paging.asm</code></p>
+                <p>Complete paging system with page table management:</p>
+                
+                <h4>Features</h4>
+                <ul>
+                    <li>Page table setup (4KB pages, 4MB page tables)</li>
+                    <li>Virtual memory mapping</li>
+                    <li>Page-level permissions (read/write, user/supervisor)</li>
+                    <li>Identity mapping support</li>
+                    <li>Page fault handling preparation</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_paging</code></td>
+                            <td>Initialize paging system</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>map_page</code></td>
+                            <td>Map virtual page to physical page</td>
+                            <td>Virtual address, Physical address, Flags</td>
+                        </tr>
+                        <tr>
+                            <td><code>unmap_page</code></td>
+                            <td>Unmap virtual page</td>
+                            <td>Virtual address</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>2. Frame Allocator (frame_allocator.asm)</h3>
+                <p><strong>Location:</strong> <code>kernel/memory/frame_allocator.asm</code></p>
+                <p>Physical page frame allocator:</p>
+                
+                <h4>Features</h4>
+                <ul>
+                    <li>Bitmap-based frame tracking</li>
+                    <li>Allocate/free physical pages</li>
+                    <li>Memory size detection integration</li>
+                    <li>Frame alignment (4KB pages)</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_frame_allocator</code></td>
+                            <td>Initialize frame allocator</td>
+                            <td>Total memory size</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>alloc_frame</code></td>
+                            <td>Allocate a physical page frame</td>
+                            <td>None</td>
+                            <td>Physical address or 0 on failure</td>
+                        </tr>
+                        <tr>
+                            <td><code>free_frame</code></td>
+                            <td>Free a physical page frame</td>
+                            <td>Physical address</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>3. Heap Allocator (heap.asm)</h3>
+                <p><strong>Location:</strong> <code>kernel/memory/heap.asm</code></p>
+                <p>Kernel heap allocator with malloc/free interface:</p>
+                
+                <h4>Features</h4>
+                <ul>
+                    <li>kmalloc/kfree/krealloc functions</li>
+                    <li>Free list management</li>
+                    <li>Memory alignment</li>
+                    <li>Fragmentation handling</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_heap</code></td>
+                            <td>Initialize heap allocator</td>
+                            <td>None</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>kmalloc</code></td>
+                            <td>Allocate memory</td>
+                            <td>Size in bytes</td>
+                            <td>Pointer or NULL</td>
+                        </tr>
+                        <tr>
+                            <td><code>kfree</code></td>
+                            <td>Free memory</td>
+                            <td>Pointer</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>krealloc</code></td>
+                            <td>Reallocate memory</td>
+                            <td>Pointer, New size</td>
+                            <td>Pointer or NULL</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>4. Memory Initialization (memory_init.asm)</h3>
+                <p><strong>Location:</strong> <code>kernel/memory/memory_init.asm</code></p>
+                <p>Centralized memory system initialization:</p>
+                
+                <h4>Initialization Order</h4>
+                <ol>
+                    <li>Frame allocator initialization (needs total memory size)</li>
+                    <li>Paging system initialization</li>
+                    <li>Heap allocator initialization</li>
+                </ol>
+
+                <h4>Function</h4>
+                <div class="code-block">
+                    <pre>memory_system_init:
+    ; Input: EAX = total memory size
+    ; Initializes all memory subsystems in correct order
+    call init_frame_allocator
+    call init_paging
+    call init_heap
+    ret</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The memory management system is integrated into the kernel via <code>kernel/integration.asm</code>:</p>
+                <div class="code-block">
+                    <pre>; In kernel_subsystems_init:
+mov eax, [total_memory_size]  ; Get memory size from E820 detection
+call memory_system_init       ; Initialize all memory subsystems</pre>
+                </div>
+                <p><strong>Status:</strong> ✅ Integrated - Called during kernel initialization</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Allocate Memory</h3>
+                <div class="code-block">
+                    <pre>; Allocate 1024 bytes
+mov eax, 1024
+call kmalloc
+; EAX now contains pointer to allocated memory</pre>
+                </div>
+
+                <h3>Free Memory</h3>
+                <div class="code-block">
+                    <pre>; Free previously allocated memory
+mov eax, [allocated_ptr]
+call kfree</pre>
+                </div>
+
+                <h3>Allocate Physical Page</h3>
+                <div class="code-block">
+                    <pre>; Allocate a physical page frame
+call alloc_frame
+; EAX now contains physical address (4KB aligned)</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Implementation Details</h2>
+                
+                <h3>Page Size</h3>
+                <p>FreeWorld uses standard 4KB pages (4096 bytes). Page tables are 4MB each (1024 entries × 4KB).</p>
+                
+                <h3>Frame Alignment</h3>
+                <p>All physical page frames are aligned to 4KB boundaries. The frame allocator ensures proper alignment.</p>
+                
+                <h3>Heap Size</h3>
+                <p>The kernel heap is initialized with a default size (typically 1-4MB). This can be expanded as needed.</p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

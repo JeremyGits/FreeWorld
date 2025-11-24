@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Daemon (securityd) - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Security Daemon (securityd)</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ⚠️ Needs Implementation<br>
+                    <strong>Related:</strong> <code>system/security.js</code>, <code>system/security-manager.js</code><br>
+                    <strong>Type:</strong> System Daemon (Planned)<br>
+                    <strong>Purpose:</strong> System security policies, access control, and authentication services
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Security Daemon (securityd) will manage system security policies, access control, and authentication services for FreeWorld OS. Currently, security functionality is provided by Node.js modules, but a dedicated daemon is planned for kernel-level security operations.</p>
+            </section>
+
+            <section class="section">
+                <h2>Planned Functions</h2>
+                <ul>
+                    <li><strong>Access Control Enforcement:</strong> Enforce file and system access permissions</li>
+                    <li><strong>User Permission Management:</strong> Manage user permissions and groups</li>
+                    <li><strong>Security Policy Enforcement:</strong> Enforce system-wide security policies</li>
+                    <li><strong>Audit Logging:</strong> Log security events for auditing</li>
+                    <li><strong>Intrusion Detection:</strong> Detect and respond to security threats</li>
+                    <li><strong>Session Management:</strong> Manage user sessions and tokens</li>
+                    <li><strong>ACL Management:</strong> Manage Access Control Lists</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Current Implementation</h2>
+                <p>Security functionality is currently provided by Node.js modules:</p>
+                <ul>
+                    <li><strong><code>system/security.js</code>:</strong> SecurityManager class with session and token management</li>
+                    <li><strong><code>system/security-manager.js</code>:</strong> Extended security management functionality</li>
+                </ul>
+                <p>These modules provide:</p>
+                <ul>
+                    <li>Session creation and management</li>
+                    <li>Access token generation</li>
+                    <li>Privilege calculation</li>
+                    <li>ACL (Access Control List) management</li>
+                    <li>User/group management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Future Daemon Implementation</h2>
+                <p>The securityd daemon will:</p>
+                <ul>
+                    <li>Run as a privileged system daemon</li>
+                    <li>Provide kernel-level security enforcement</li>
+                    <li>Handle security policy updates</li>
+                    <li>Coordinate with kernel security subsystem</li>
+                    <li>Provide IPC interface for security operations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>securityd will integrate with:</p>
+                <ul>
+                    <li><strong>Kernel Security Subsystem:</strong> Low-level security enforcement</li>
+                    <li><strong>SecurityManager (Node.js):</strong> High-level security API</li>
+                    <li><strong>logd:</strong> Security audit logging</li>
+                    <li><strong>freeworldlogon:</strong> Authentication services</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Node.js Security Modules</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item pending">
+                        <strong>securityd Daemon</strong><br>
+                        ⏳ Planned
+                    </div>
+                    <div class="status-item pending">
+                        <strong>Kernel Integration</strong><br>
+                        ⏳ Planned
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

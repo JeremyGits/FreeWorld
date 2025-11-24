@@ -30,7 +30,7 @@
                 <li><a href="dc.html">Device Context</a></li>
                 <li><a href="compositor.html">Compositor</a></li>
                 <li><a href="resources.html">Resource Manager</a></li>
-                <li><a href="input.html">Input Manager</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
                 <li><a href="window-relationships.html">Window Relationships</a></li>
                 <li><a href="menu.html">Menu System</a></li>
@@ -76,6 +76,14 @@
             <section class="section">
                 <h2>Overview</h2>
                 <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
+                </div>
+                
+                <div class="alert alert-success">
+                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
+                </div>
             </section>
 
             <section class="section">
@@ -95,8 +103,33 @@
                 <h3>registerWindow(hwnd, dc)</h3>
                 <p>Registers a window's Device Context with the compositor.</p>
 
-                <h3>composite()</h3>
-                <p>Composites all windows into final buffer. Draws from bottom to top, applying transparency and shadows.</p>
+                <h3>render() / composite()</h3>
+                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
+                <div class="code-block">
+                    <pre>render() {
+    const graphicsBridge = require('./graphics-bridge');
+    
+    // Initialize graphics if needed
+    if (!graphicsBridge.initialized) {
+        graphicsBridge.init();
+    }
+    
+    // Clear screen
+    graphicsBridge.clear(0xFF000000);
+    
+    // Blit all windows to framebuffer
+    for (const window of windows) {
+        if (window.visible && window.dirty) {
+            graphicsBridge.blitWindow(
+                window.x, window.y,
+                window.width, window.height,
+                window.dc.buffer  // RGBA buffer
+            );
+            window.dirty = false;
+        }
+    }
+}</pre>
+                </div>
 
                 <h3>invalidateRegion(x, y, width, height)</h3>
                 <p>Calculates which windows intersect with an invalidated region.</p>
@@ -106,10 +139,15 @@
             </section>
 
             <section class="section">
-                <h2>Implementation Status</h2>
-                <div class="alert alert-warning">
-                    <strong>Current Status:</strong> Structural implementation. Requires actual rendering hardware access.
-                </div>
+                <h2>Graphics Integration</h2>
+                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <ul>
+                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
+                    <li>Blits window RGBA buffers directly to framebuffer</li>
+                    <li>Supports 1024x768x32 graphics mode</li>
+                    <li>Handles window dirty regions for efficient updates</li>
+                </ul>
+                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
             </section>
         </main>
     </div>

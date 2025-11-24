@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASM Browser Engine - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Browser System</li>
+                <li><a href="browser-engine.html">ASM Browser Engine</a></li>
+                <li><a href="browser-nodejs.html">Node.js Integration</a></li>
+                <li><a href="browser-rendering.html">Rendering System</a></li>
+                <li><a href="browser-network.html">Network Stack</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>ASM Browser Engine</h1>
+                <div class="meta">
+                    <strong>Purpose:</strong> Pure assembly-language browser engine for Node.js integration at kernel level
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The ASM Browser is a pure assembly-language browser engine that runs at the kernel level, designed to serve and execute Node.js applications. It provides a machine-level interface for web-like functionality without requiring a traditional web browser.</p>
+            </section>
+
+            <section class="section">
+                <h2>Design Principles</h2>
+                <ul>
+                    <li><strong>Pure Assembly:</strong> All core functionality in x86_64 assembly</li>
+                    <li><strong>Kernel-Level:</strong> Runs in kernel space with direct hardware access</li>
+                    <li><strong>Node.js Integration:</strong> Serves and executes Node.js applications</li>
+                    <li><strong>Minimal Dependencies:</strong> No external browser engine (no Chromium, no WebKit)</li>
+                    <li><strong>Native Rendering:</strong> Direct framebuffer rendering, no HTML/CSS parsing</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Architecture Components</h2>
+                
+                <h3>1. Browser Engine Core</h3>
+                <p><strong>File:</strong> <code>kernel/browser/engine.asm</code></p>
+                <p><strong>Purpose:</strong> Core browser engine that manages rendering, execution, and resource loading.</p>
+                <p><strong>Components:</strong></p>
+                <ul>
+                    <li><strong>Document Object Model (DOM) - Simplified</strong>
+                        <ul>
+                            <li>Tree structure for UI elements</li>
+                            <li>Element properties (position, size, style)</li>
+                            <li>Event handling</li>
+                        </ul>
+                    </li>
+                    <li><strong>Rendering Engine</strong>
+                        <ul>
+                            <li>Direct framebuffer rendering</li>
+                            <li>Rectangle, line, text rendering</li>
+                            <li>Image rendering (PNG, ICO support)</li>
+                            <li>Font rendering (bitmap fonts)</li>
+                        </ul>
+                    </li>
+                    <li><strong>JavaScript Runtime Bridge</strong>
+                        <ul>
+                            <li>V8 engine integration</li>
+                            <li>Node.js module loading</li>
+                            <li>API bridge to kernel services</li>
+                        </ul>
+                    </li>
+                    <li><strong>Resource Loader</strong>
+                        <ul>
+                            <li>File system access</li>
+                            <li>Network requests (future)</li>
+                            <li>Caching mechanism</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>2. Node.js Integration Layer</h3>
+                <p><strong>File:</strong> <code>kernel/browser/nodejs.asm</code></p>
+                <p><strong>Purpose:</strong> Bridge between ASM browser and Node.js runtime.</p>
+                <p><strong>Components:</strong></p>
+                <ul>
+                    <li><strong>Node.js Process Management</strong>
+                        <ul>
+                            <li>Spawn Node.js processes</li>
+                            <li>IPC communication</li>
+                            <li>Process lifecycle management</li>
+                        </ul>
+                    </li>
+                    <li><strong>Module Loading</strong>
+                        <ul>
+                            <li>Load Node.js modules from filesystem</li>
+                            <li>Resolve module dependencies</li>
+                            <li>Execute module code</li>
+                        </ul>
+                    </li>
+                    <li><strong>API Bridge</strong>
+                        <ul>
+                            <li>Kernel syscalls → Node.js APIs</li>
+                            <li>Node.js requests → Kernel services</li>
+                            <li>Event system integration</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>3. Rendering System</h3>
+                <p><strong>File:</strong> <code>kernel/browser/render.asm</code></p>
+                <p><strong>Purpose:</strong> Low-level rendering primitives for UI elements.</p>
+                <p><strong>Components:</strong></p>
+                <ul>
+                    <li><strong>Framebuffer Management</strong>
+                        <ul>
+                            <li>Direct memory access to VESA framebuffer</li>
+                            <li>Double buffering</li>
+                            <li>Dirty region tracking</li>
+                        </ul>
+                    </li>
+                    <li><strong>Graphics Primitives</strong>
+                        <ul>
+                            <li>Rectangle fill/draw</li>
+                            <li>Line drawing (Bresenham)</li>
+                            <li>Circle/ellipse drawing</li>
+                            <li>Text rendering (bitmap fonts)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Image Rendering</strong>
+                        <ul>
+                            <li>PNG decoding (simplified)</li>
+                            <li>ICO decoding</li>
+                            <li>Image scaling</li>
+                        </ul>
+                    </li>
+                    <li><strong>Compositing</strong>
+                        <ul>
+                            <li>Alpha blending</li>
+                            <li>Layer management</li>
+                            <li>Clipping regions</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <div class="code-block">
+                    <pre>kernel/browser/
+├── engine.asm          # Core browser engine
+├── nodejs.asm         # Node.js integration
+├── render.asm          # Rendering system
+├── events.asm          # Event system
+├── network.asm         # Network stack
+├── storage.asm        # Storage system
+├── dom.asm            # DOM implementation
+├── fonts.asm          # Font rendering
+├── images.asm         # Image decoding
+└── api.asm            # Browser APIs</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>API Design</h2>
+                
+                <h3>Browser Engine API</h3>
+                <div class="code-block">
+                    <pre>; Initialize browser engine
+browser_init:
+    ; Initialize all subsystems
+    ; Returns: success/error code
+
+; Load Node.js application
+browser_load_app path, callback:
+    ; Load Node.js app from path
+    ; Execute and register callback
+
+; Render frame
+browser_render:
+    ; Render current DOM to framebuffer
+    ; Handle dirty regions
+
+; Handle input
+browser_handle_input event:
+    ; Process input event
+    ; Distribute to handlers</pre>
+                </div>
+
+                <h3>Node.js Bridge API</h3>
+                <div class="code-block">
+                    <pre>; Spawn Node.js process
+nodejs_spawn path, args, env:
+    ; Create Node.js process
+    ; Returns: process ID
+
+; Execute Node.js code
+nodejs_execute code, context:
+    ; Execute JavaScript code
+    ; Returns: result
+
+; Load Node.js module
+nodejs_load_module path:
+    ; Load and execute module
+    ; Returns: module exports</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Existing Systems</h2>
+                <ul>
+                    <li><strong>Kernel Integration:</strong>
+                        <ul>
+                            <li>Uses existing VESA framebuffer driver</li>
+                            <li>Uses existing filesystem driver</li>
+                            <li>Uses existing process management</li>
+                            <li>Uses existing syscall interface</li>
+                        </ul>
+                    </li>
+                    <li><strong>Node.js Integration:</strong>
+                        <ul>
+                            <li>Loads Node.js from <code>/usr/lib/nodejs/bin/node</code></li>
+                            <li>Uses existing IPC mechanisms</li>
+                            <li>Integrates with window manager</li>
+                            <li>Uses existing event system</li>
+                        </ul>
+                    </li>
+                    <li><strong>GUI System Integration:</strong>
+                        <ul>
+                            <li>Works with fwcompositor</li>
+                            <li>Integrates with window manager</li>
+                            <li>Uses existing input system</li>
+                            <li>Shares rendering primitives</li>
+                        </ul>
+                    </li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Implementation Phases</h2>
+                <ol>
+                    <li><strong>Phase 1: Core Engine</strong>
+                        <ul>
+                            <li>Basic DOM structure</li>
+                            <li>Simple rendering (rectangles, text)</li>
+                            <li>Event system foundation</li>
+                            <li>Node.js process spawning</li>
+                        </ul>
+                    </li>
+                    <li><strong>Phase 2: Rendering</strong>
+                        <ul>
+                            <li>Complete graphics primitives</li>
+                            <li>Image rendering</li>
+                            <li>Font rendering</li>
+                            <li>Compositing</li>
+                        </ul>
+                    </li>
+                    <li><strong>Phase 3: Node.js Integration</strong>
+                        <ul>
+                            <li>Module loading</li>
+                            <li>API bridge</li>
+                            <li>Event integration</li>
+                            <li>IPC communication</li>
+                        </ul>
+                    </li>
+                    <li><strong>Phase 4: Network & Storage</strong>
+                        <ul>
+                            <li>HTTP client</li>
+                            <li>Resource loading</li>
+                            <li>Local storage</li>
+                            <li>Session storage</li>
+                        </ul>
+                    </li>
+                    <li><strong>Phase 5: Complete Browser</strong>
+                        <ul>
+                            <li>Full DOM implementation</li>
+                            <li>Complete API set</li>
+                            <li>Performance optimization</li>
+                            <li>Testing and debugging</li>
+                        </ul>
+                    </li>
+                </ol>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

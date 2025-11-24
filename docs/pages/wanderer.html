@@ -26,11 +26,19 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="file-type-associations.html">File Type Associations</a></li>
+                <li><a href="icon-system.html">Icon System</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -53,6 +61,21 @@
             <section class="section">
                 <h2>Overview</h2>
                 <p>Wanderer is the FreeWorld file manager, similar to Windows Explorer or Linux Nautilus. It provides tools for controlling all file and folder operations, similar to how classic DOS and Linux handle file management.</p>
+                
+                <div class="alert alert-success">
+                    <strong>Status:</strong> ✅ Complete - Full file management with file type associations, icon support, and graphical interface
+                </div>
+
+                <h3>Key Features</h3>
+                <ul>
+                    <li><strong>File Type Associations</strong>: Automatic icon and application mapping for 100+ file types</li>
+                    <li><strong>Icon Display</strong>: Real icon files with emoji fallbacks</li>
+                    <li><strong>Open With</strong>: Double-click files to open with default applications</li>
+                    <li><strong>File Operations</strong>: Create, delete, move, copy, rename files and folders</li>
+                    <li><strong>Navigation</strong>: Back, forward, up, and path navigation</li>
+                    <li><strong>Context Menus</strong>: Right-click context menus for files and folders</li>
+                    <li><strong>Trash Integration</strong>: Deleted files moved to trash system</li>
+                </ul>
             </section>
 
             <section class="section">
@@ -82,14 +105,35 @@
             </section>
 
             <section class="section">
+                <h2>File Type Associations</h2>
+                <p>Wanderer uses the <a href="file-type-associations.html">File Type Associations</a> system to:</p>
+                <ul>
+                    <li>Display appropriate icons for each file type</li>
+                    <li>Determine default applications for opening files</li>
+                    <li>Show file type descriptions</li>
+                    <li>Map MIME types to file extensions</li>
+                </ul>
+                <p>See <a href="file-type-associations.html">File Type Associations</a> for complete details on supported file types.</p>
+
+                <h2>Icon System</h2>
+                <p>Wanderer uses the <a href="icon-system.html">Icon System</a> to display icons:</p>
+                <ul>
+                    <li>Real icon files from <code>usr/share/icons/64x64/</code></li>
+                    <li>Emoji fallbacks when icon files are not found</li>
+                    <li>Automatic icon switching (e.g., trash empty vs. full)</li>
+                    <li>HTTP icon serving for web-based GUI</li>
+                </ul>
+                <p>See <a href="icon-system.html">Icon System</a> for complete details on icon management.</p>
+
                 <h2>Directory Listing Format</h2>
-                <p>Wanderer displays directory listings in a formatted table:</p>
+                <p>Wanderer displays directory listings with icons and file information:</p>
                 <div class="code-block">
-                    <pre>Name                           Type           Size
+                    <pre>Icon  Name                           Size           Modified
 ------------------------------------------------------------
-file1.txt                     File           1024 bytes
-folder1                        Directory      4096 bytes</pre>
+📄   file1.txt                     1024 bytes     2024-01-01 12:00:00
+📁   folder1                        4096 bytes     2024-01-01 12:00:00</pre>
                 </div>
+                <p>In the graphical interface, icons are displayed as images from the icon system.</p>
             </section>
 
             <section class="section">
@@ -146,13 +190,43 @@ folder1                        Directory      4096 bytes</pre>
             </section>
 
             <section class="section">
-                <h2>Future Features</h2>
+                <h2>File Operations</h2>
+                <p>Wanderer provides comprehensive file operations through the FileManager class:</p>
                 <ul>
-                    <li>Interactive mode with navigation</li>
-                    <li>File operations (copy, move, delete)</li>
-                    <li>Directory operations (create, remove)</li>
-                    <li>File search functionality</li>
-                    <li>Graphical interface (future)</li>
+                    <li><strong>Create</strong>: Create files and folders</li>
+                    <li><strong>Delete</strong>: Delete files and folders (moves to trash)</li>
+                    <li><strong>Move</strong>: Move files and folders</li>
+                    <li><strong>Copy</strong>: Copy files and folders</li>
+                    <li><strong>Rename</strong>: Rename files and folders</li>
+                    <li><strong>Properties</strong>: View file properties and metadata</li>
+                    <li><strong>Clipboard</strong>: Cut, copy, and paste operations</li>
+                    <li><strong>Search</strong>: Search for files and folders</li>
+                </ul>
+
+                <h2>Navigation</h2>
+                <p>Wanderer provides full navigation capabilities:</p>
+                <ul>
+                    <li><strong>Back</strong>: Navigate to previous directory</li>
+                    <li><strong>Forward</strong>: Navigate to next directory</li>
+                    <li><strong>Up</strong>: Navigate to parent directory</li>
+                    <li><strong>Path Navigation</strong>: Navigate to specific path</li>
+                    <li><strong>History</strong>: Maintains navigation history</li>
+                </ul>
+
+                <h2>Context Menus</h2>
+                <p>Wanderer provides context menus for files, folders, and the desktop:</p>
+                <ul>
+                    <li><strong>File Context Menu</strong>: Open, Open With, Cut, Copy, Delete, Rename, Properties</li>
+                    <li><strong>Folder Context Menu</strong>: Open, Open With, Cut, Copy, Delete, Rename, Properties</li>
+                    <li><strong>Desktop Context Menu</strong>: New Folder, New File, Paste, View, Sort By, Refresh, Properties</li>
+                </ul>
+
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="file-type-associations.html">File Type Associations</a> - File type registry and associations</li>
+                    <li><a href="icon-system.html">Icon System</a> - Icon management and display</li>
+                    <li><a href="filesystem.html">Filesystem API</a> - File system operations</li>
+                    <li><a href="desktop.html">Desktop</a> - Desktop integration</li>
                 </ul>
             </section>
 

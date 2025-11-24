@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Graphics System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Graphics System - FreeWorld OS</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/drivers/vesa.asm, kernel/graphics/<br>
+                    <strong>Type:</strong> Assembly Graphics Driver + C/Node.js Bridge<br>
+                    <strong>Purpose:</strong> VESA framebuffer, graphics primitives, and Node.js integration<br>
+                    <strong>Status:</strong> ✅ Complete
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld Graphics System provides complete graphics support from kernel to user space. It includes VESA framebuffer support, graphics primitives, and a bridge layer connecting the kernel graphics driver to the Node.js window system.</p>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> Complete graphics system with kernel driver, graphics primitives, and Node.js bridge. Total: ~1,200+ lines of code.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>VESA Graphics Driver</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/vesa.asm</code> (~400 lines)</p>
+                <p>The VESA driver provides direct framebuffer access for graphics mode. See <a href="drivers.html#vesa">Device Drivers documentation</a> for complete VESA driver details.</p>
+                
+                <h3>Graphics Mode</h3>
+                <ul>
+                    <li><strong>Resolution:</strong> 1024x768</li>
+                    <li><strong>Color Depth:</strong> 32-bit (ARGB)</li>
+                    <li><strong>Mode Number:</strong> 0x118</li>
+                    <li><strong>Framebuffer:</strong> Linear (direct memory access)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Graphics Bridge (graphics_bridge.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/graphics/graphics_bridge.asm</code> (~200 lines)</p>
+                <p>C-callable functions that wrap the VESA driver for use from C and Node.js:</p>
+                
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>C Signature</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>graphics_init</code></td>
+                            <td>Initialize graphics mode</td>
+                            <td><code>int graphics_init(void)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_get_framebuffer</code></td>
+                            <td>Get framebuffer address</td>
+                            <td><code>void* graphics_get_framebuffer(void)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_get_size</code></td>
+                            <td>Get screen dimensions</td>
+                            <td><code>void graphics_get_size(int* width, int* height)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_draw_pixel</code></td>
+                            <td>Draw pixel</td>
+                            <td><code>void graphics_draw_pixel(int x, int y, unsigned int color)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_draw_line</code></td>
+                            <td>Draw line</td>
+                            <td><code>void graphics_draw_line(int x1, int y1, int x2, int y2, unsigned int color)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_draw_rect</code></td>
+                            <td>Draw filled rectangle</td>
+                            <td><code>void graphics_draw_rect(int x, int y, int width, int height, unsigned int color)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_clear_screen</code></td>
+                            <td>Clear screen</td>
+                            <td><code>void graphics_clear_screen(unsigned int color)</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>graphics_blit</code></td>
+                            <td>Copy buffer to framebuffer</td>
+                            <td><code>void graphics_blit(int x, int y, int width, int height, void* buffer)</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Node.js Bridge</h2>
+                <p><strong>Location:</strong> <code>kernel/graphics/node_bridge.c</code>, <code>system/graphics-bridge.js</code></p>
+                <p>Bridge layer connecting kernel graphics to Node.js window system:</p>
+                
+                <h3>C Bridge (node_bridge.c)</h3>
+                <p>Provides Node.js-callable functions:</p>
+                <ul>
+                    <li><code>node_graphics_init</code> - Initialize graphics and return framebuffer info</li>
+                    <li><code>node_graphics_blit_window</code> - Blit window buffer to screen</li>
+                    <li><code>node_graphics_draw_pixel</code> - Draw pixel (for testing)</li>
+                    <li><code>node_graphics_draw_rect</code> - Draw rectangle</li>
+                    <li><code>node_graphics_clear</code> - Clear screen</li>
+                </ul>
+
+                <h3>JavaScript Bridge (graphics-bridge.js)</h3>
+                <p>Node.js module providing graphics operations:</p>
+                <div class="code-block">
+                    <pre>const graphicsBridge = require('./graphics-bridge');
+
+// Initialize graphics
+graphicsBridge.init();
+
+// Get framebuffer info
+const info = graphicsBridge.getFramebufferInfo();
+console.log(`Framebuffer: ${info.width}x${info.height}`);
+
+// Blit window to framebuffer
+graphicsBridge.blitWindow(x, y, width, height, buffer);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Compositor</h2>
+                <p>The graphics bridge is integrated with the Node.js compositor (<code>system/compositor.js</code>):</p>
+                <div class="code-block">
+                    <pre>const graphicsBridge = require('./graphics-bridge');
+
+class Compositor {
+    render() {
+        // Initialize graphics if needed
+        if (!graphicsBridge.initialized) {
+            graphicsBridge.init();
+        }
+        
+        // Clear screen
+        graphicsBridge.clear(0xFF000000);  // Black
+        
+        // Blit all windows to framebuffer
+        for (const window of windows) {
+            if (window.visible && window.dirty) {
+                graphicsBridge.blitWindow(
+                    window.x, window.y,
+                    window.width, window.height,
+                    window.dc.buffer
+                );
+                window.dirty = false;
+            }
+        }
+    }
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Device Context</h2>
+                <p>The Device Context (<code>system/dc.js</code>) now uses actual RGBA buffers:</p>
+                <div class="code-block">
+                    <pre>class DeviceContext {
+    constructor(width, height) {
+        // Create RGBA buffer for window content
+        this.buffer = Buffer.alloc(width * height * 4);
+        this.buffer.fill(0);  // Initialize to transparent black
+    }
+    
+    drawPixel(x, y) {
+        // Write pixel to buffer (RGBA format)
+        const offset = (y * this.width + x) * 4;
+        this.buffer[offset] = (color >> 16) & 0xFF;      // R
+        this.buffer[offset + 1] = (color >> 8) & 0xFF;  // G
+        this.buffer[offset + 2] = color & 0xFF;          // B
+        this.buffer[offset + 3] = (color >> 24) & 0xFF;   // A
+    }
+}</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Initialize Graphics Mode</h3>
+                <div class="code-block">
+                    <pre>; In assembly
+call graphics_init
+cmp eax, 0
+jne graphics_error
+
+; In C
+if (graphics_init() != 0) {
+    // Error initializing graphics
+}
+
+; In Node.js
+if (!graphicsBridge.init()) {
+    console.error('Failed to initialize graphics');
+}</pre>
+                </div>
+
+                <h3>Draw to Framebuffer</h3>
+                <div class="code-block">
+                    <pre>; Draw a pixel
+mov eax, 100   ; X
+mov ebx, 100   ; Y
+mov ecx, 0xFFFFFFFF  ; White
+call graphics_draw_pixel
+
+; Draw a rectangle
+mov eax, 50    ; X
+mov ebx, 50    ; Y
+mov ecx, 200   ; Width
+mov edx, 100   ; Height
+mov esi, 0xFF0000FF  ; Blue
+call graphics_draw_rect</pre>
+                </div>
+
+                <h3>Blit Window Buffer</h3>
+                <div class="code-block">
+                    <pre>// In Node.js compositor
+const window = getWindow(hwnd);
+graphicsBridge.blitWindow(
+    window.x,           // X position
+    window.y,           // Y position
+    window.width,      // Width
+    window.height,      // Height
+    window.dc.buffer    // RGBA buffer
+);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Graphics Pipeline</h2>
+                <p>The complete graphics pipeline:</p>
+                <ol>
+                    <li><strong>Application</strong> draws to Device Context (DC) buffer</li>
+                    <li><strong>Compositor</strong> collects all window buffers</li>
+                    <li><strong>Graphics Bridge</strong> blits window buffers to framebuffer</li>
+                    <li><strong>VESA Driver</strong> provides direct framebuffer access</li>
+                    <li><strong>Hardware</strong> displays framebuffer on screen</li>
+                </ol>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

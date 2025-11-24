@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FWMIC - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>FWMIC - FreeWorld Management Instrumentation and Control</h1>
+                <div class="meta">
+                    <strong>Location:</strong> shell/fwmic.c, shell/fwmic.h<br>
+                    <strong>Type:</strong> C Management System<br>
+                    <strong>Purpose:</strong> WMI-like system for accessing management data<br>
+                    <strong>Status:</strong> ✅ Complete - Basic providers implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>FWMIC (FreeWorld Management Instrumentation and Control) is a WMI-like system that provides a consistent model for accessing management data from the operating system, hardware, and applications. It enables:</p>
+                <ul>
+                    <li><strong>Hardware Inventory:</strong> Computer system, processor, memory, disk information</li>
+                    <li><strong>Software Inventory:</strong> OS version, BIOS information, installed software</li>
+                    <li><strong>Event Notification:</strong> System events and notifications</li>
+                    <li><strong>Security Configuration:</strong> Security settings and auditing</li>
+                    <li><strong>Health and Status Reporting:</strong> System health monitoring</li>
+                    <li><strong>Remote Management:</strong> Remote system management capabilities</li>
+                    <li><strong>Scripting and Automation:</strong> WQL-like query language</li>
+                    <li><strong>Third-Party Integration:</strong> Extensible provider architecture</li>
+                </ul>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> FWMIC core engine and basic providers are complete. Extensible architecture allows adding new providers.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Architecture</h2>
+                
+                <h3>Core Components</h3>
+                <ul>
+                    <li><strong>FWMIC Engine:</strong> Query engine and provider management</li>
+                    <li><strong>Providers:</strong> Data source implementations (ComputerSystem, Processor, Memory, etc.)</li>
+                    <li><strong>Objects:</strong> Data instances with properties</li>
+                    <li><strong>Query Language:</strong> WQL-like query syntax</li>
+                </ul>
+
+                <h3>Data Structures</h3>
+                <div class="code-block">
+                    <pre>// FWMIC Object Types
+typedef enum {
+    FWMIC_OBJECT_COMPUTERSYSTEM,
+    FWMIC_OBJECT_PROCESSOR,
+    FWMIC_OBJECT_MEMORY,
+    FWMIC_OBJECT_DISK,
+    FWMIC_OBJECT_NETWORK,
+    FWMIC_OBJECT_SERVICE,
+    FWMIC_OBJECT_PROCESS,
+    FWMIC_OBJECT_OS,
+    FWMIC_OBJECT_BIOS,
+    FWMIC_OBJECT_SOFTWARE
+} fwmic_object_type_t;
+
+// FWMIC Property
+typedef struct fwmic_property {
+    char* name;
+    char* value;
+    struct fwmic_property* next;
+} fwmic_property_t;
+
+// FWMIC Object Instance
+typedef struct fwmic_object {
+    fwmic_object_type_t type;
+    fwmic_property_t* properties;
+    struct fwmic_object* next;
+} fwmic_object_t;
+
+// FWMIC Provider Interface
+typedef struct fwmic_provider {
+    const char* name;
+    fwmic_object_type_t object_type;
+    int (*enumerate)(fwmic_object_t** objects);
+    int (*get_property)(fwmic_object_t* obj, const char* prop_name, char* value, size_t value_size);
+    int (*set_property)(fwmic_object_t* obj, const char* prop_name, const char* value);
+    struct fwmic_provider* next;
+} fwmic_provider_t;</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Built-in Providers</h2>
+                
+                <h3>ComputerSystem Provider</h3>
+                <p>Provides computer system information:</p>
+                <ul>
+                    <li><code>Name</code>: Computer name/hostname</li>
+                    <li><code>NumberOfProcessors</code>: Number of processors</li>
+                </ul>
+
+                <h3>Processor Provider</h3>
+                <p>Provides processor information:</p>
+                <ul>
+                    <li><code>NumberOfCores</code>: Number of CPU cores</li>
+                    <li><code>ProcessorType</code>: Processor type</li>
+                    <li><code>Architecture</code>: CPU architecture (x86_64, etc.)</li>
+                </ul>
+
+                <h3>Memory Provider</h3>
+                <p>Provides memory information:</p>
+                <ul>
+                    <li><code>TotalPhysicalMemory</code>: Total physical memory</li>
+                    <li><code>AvailablePhysicalMemory</code>: Available physical memory</li>
+                </ul>
+
+                <h3>OS Provider</h3>
+                <p>Provides operating system information:</p>
+                <ul>
+                    <li><code>Name</code>: OS name</li>
+                    <li><code>Version</code>: OS version</li>
+                    <li><code>Manufacturer</code>: OS manufacturer</li>
+                    <li><code>HostOSVersion</code>: Host OS version (if running in compatibility mode)</li>
+                </ul>
+
+                <h3>BIOS Provider</h3>
+                <p>Provides BIOS information:</p>
+                <ul>
+                    <li><code>Manufacturer</code>: BIOS manufacturer</li>
+                    <li><code>Version</code>: BIOS version</li>
+                    <li><code>ReleaseDate</code>: BIOS release date</li>
+                </ul>
+
+                <h3>Disk Provider</h3>
+                <p>Provides disk information (stub implementation):</p>
+                <ul>
+                    <li>Disk enumeration and properties (to be implemented)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>API Functions</h2>
+                
+                <h3>Engine Management</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>fwmic_init()</code></td>
+                            <td>Initialize FWMIC engine and register built-in providers</td>
+                            <td>fwmic_engine_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_shutdown(engine)</code></td>
+                            <td>Shutdown FWMIC engine and cleanup</td>
+                            <td>void</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_register_provider(engine, provider)</code></td>
+                            <td>Register a custom provider</td>
+                            <td>int (0 on success)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Query Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>fwmic_query(engine, query, results)</code></td>
+                            <td>Execute WQL-like query</td>
+                            <td>int (0 on success)</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_free_objects(objects)</code></td>
+                            <td>Free query results</td>
+                            <td>void</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Provider Creation</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>fwmic_create_computersystem_provider()</code></td>
+                            <td>Create ComputerSystem provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_create_processor_provider()</code></td>
+                            <td>Create Processor provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_create_memory_provider()</code></td>
+                            <td>Create Memory provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_create_disk_provider()</code></td>
+                            <td>Create Disk provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_create_os_provider()</code></td>
+                            <td>Create OS provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                        <tr>
+                            <td><code>fwmic_create_bios_provider()</code></td>
+                            <td>Create BIOS provider</td>
+                            <td>fwmic_provider_t*</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Command-Line Interface</h2>
+                <p>FWMIC can be used from the shell via the <code>FWMIC</code> command:</p>
+                
+                <h3>Usage</h3>
+                <div class="code-block">
+                    <pre>fwmic [options] &lt;command&gt;
+
+Options:
+  /query &lt;query&gt;    Execute WQL-like query
+
+Examples:
+  fwmic /query "SELECT * FROM OS"
+  fwmic /query "SELECT Name FROM ComputerSystem"
+  fwmic /query "SELECT * FROM Processor"</pre>
+                </div>
+
+                <h3>Query Syntax</h3>
+                <p>FWMIC supports WQL-like query syntax:</p>
+                <ul>
+                    <li><code>SELECT * FROM &lt;ObjectType&gt;</code> - Get all properties</li>
+                    <li><code>SELECT &lt;Property&gt; FROM &lt;ObjectType&gt;</code> - Get specific property</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>C API Usage</h3>
+                <div class="code-block">
+                    <pre>// Initialize FWMIC
+fwmic_engine_t* engine = fwmic_init();
+
+// Query OS information
+fwmic_object_t* results = NULL;
+fwmic_query(engine, "SELECT * FROM OS", &results);
+
+// Process results
+fwmic_object_t* obj = results;
+while (obj) {
+    fwmic_property_t* prop = obj->properties;
+    while (prop) {
+        printf("%s: %s\n", prop->name, prop->value);
+        prop = prop->next;
+    }
+    obj = obj->next;
+}
+
+// Cleanup
+fwmic_free_objects(results);
+fwmic_shutdown(engine);</pre>
+                </div>
+
+                <h3>Shell Usage</h3>
+                <div class="code-block">
+                    <pre>FREE WORLD> fwmic /query "SELECT * FROM OS"
+Name: FreeWorld Operating System
+Version: 0.1.0
+Manufacturer: FreeWorld Project
+
+FREE WORLD> fwmic /query "SELECT Name FROM ComputerSystem"
+Name: hostname</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Extending FWMIC</h2>
+                <p>To add a new provider:</p>
+                <ol>
+                    <li>Create an enumeration function that returns <code>fwmic_object_t*</code></li>
+                    <li>Create a provider structure using <code>fwmic_create_provider()</code></li>
+                    <li>Register the provider with <code>fwmic_register_provider()</code></li>
+                </ol>
+                <p><strong>Status:</strong> ✅ Extensible architecture ready for custom providers</p>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

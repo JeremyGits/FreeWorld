@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-Client Area - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Non-Client Area</h1>
+            <p class="subtitle">Window borders, title bars, and system controls</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="nonclient.html">Non-Client Area</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The Non-Client Area refers to the parts of a window that are managed by the system rather than the application, including title bars, borders, and control buttons.</p>
+            </section>
+
+            <section>
+                <h2>Components</h2>
+                <ul>
+                    <li><strong>Title Bar</strong> - Top bar with window title and controls</li>
+                    <li><strong>Borders</strong> - Window frame for resizing</li>
+                    <li><strong>Control Buttons</strong> - Close, minimize, maximize buttons</li>
+                    <li><strong>System Menu</strong> - Window menu icon</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering</h2>
+                <p>The Non-Client Area is rendered by the kernel GUI system using functions in <code>kernel/gui/window_controls.asm</code> and <code>kernel/gui/window.asm</code>.</p>
+                
+                <h3>Title Bar</h3>
+                <ul>
+                    <li>Blue background (Windows 10 style)</li>
+                    <li>White text for window title</li>
+                    <li>Height: 30 pixels</li>
+                </ul>
+
+                <h3>Control Buttons</h3>
+                <ul>
+                    <li>Close button (red X)</li>
+                    <li>Minimize button (horizontal line)</li>
+                    <li>Maximize button (square)</li>
+                    <li>Size: 30x30 pixels each</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Hit Testing</h2>
+                <p>The system performs hit testing to determine if mouse clicks are in the Non-Client Area, enabling window dragging, resizing, and control button activation.</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Event System</h1>
+            <p class="subtitle">Central event bus for component communication</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Event System (EventBus)</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/event-bus.js</code><br>
+                    <strong>Type:</strong> Core System Component<br>
+                    <strong>Purpose:</strong> Central event system for decoupled component communication
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The EventBus is FreeWorld OS's central event system, similar to OS message queues. It enables completely decoupled communication between components, allowing them to work together without direct dependencies.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Architecture:</strong> The EventBus follows a publish-subscribe pattern, similar to how Windows uses message queues and Linux uses event loops.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Key Features</h2>
+                <ul>
+                    <li><strong>Decoupled Communication:</strong> Components communicate via events, not direct calls</li>
+                    <li><strong>Event Types:</strong> Structured event types (e.g., <code>input.mousedown</code>, <code>drag.start</code>)</li>
+                    <li><strong>Priority System:</strong> Events can have priorities for ordered processing</li>
+                    <li><strong>Async Processing:</strong> Events are queued and processed asynchronously</li>
+                    <li><strong>Event Cancellation:</strong> Events can be cancelled or propagation stopped</li>
+                    <li><strong>Global Listeners:</strong> Listen to all events for debugging/monitoring</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Event Types</h2>
+                
+                <h3>Input Events</h3>
+                <ul>
+                    <li><code>input.mousedown</code> - Mouse button pressed</li>
+                    <li><code>input.mouseup</code> - Mouse button released</li>
+                    <li><code>input.mousemove</code> - Mouse moved</li>
+                    <li><code>input.click</code> - Mouse clicked</li>
+                    <li><code>input.dblclick</code> - Mouse double-clicked</li>
+                    <li><code>input.contextmenu</code> - Right-click context menu</li>
+                    <li><code>input.keydown</code> - Key pressed</li>
+                    <li><code>input.keyup</code> - Key released</li>
+                </ul>
+
+                <h3>Drag & Drop Events</h3>
+                <ul>
+                    <li><code>drag.start</code> - Drag operation started</li>
+                    <li><code>drag.begin</code> - Drag threshold crossed (actual drag)</li>
+                    <li><code>drag.move</code> - Element being dragged</li>
+                    <li><code>drag.enter</code> - Entered drop target</li>
+                    <li><code>drag.leave</code> - Left drop target</li>
+                    <li><code>drag.drop</code> - Dropped on target</li>
+                    <li><code>drag.end</code> - Drag operation ended</li>
+                </ul>
+
+                <h3>Window Events</h3>
+                <ul>
+                    <li><code>window.create</code> - Window created</li>
+                    <li><code>window.close</code> - Window closed</li>
+                    <li><code>window.focus</code> - Window focused</li>
+                    <li><code>window.blur</code> - Window lost focus</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage</h2>
+                
+                <h3>Initialization</h3>
+                <pre><code>const eventBus = new EventBus();
+window.freeworldEventBus = eventBus; // Make globally available</code></pre>
+
+                <h3>Subscribing to Events</h3>
+                <pre><code>// Subscribe to an event type
+const unsubscribe = eventBus.on('input.mousedown', (event) => {
+    console.log('Mouse down at:', event.data.x, event.data.y);
+});
+
+// Subscribe with options
+eventBus.on('drag.start', (event) => {
+    // Handle drag start
+}, {
+    priority: 10,  // Higher priority = processed first
+    once: false    // Remove after first call
+});
+
+// Unsubscribe
+unsubscribe();</code></pre>
+
+                <h3>Emitting Events</h3>
+                <pre><code>// Emit an event
+eventBus.emit('input.mousedown', {
+    x: 100,
+    y: 200,
+    button: 'left',
+    target: element
+}, {
+    source: 'InputManager',
+    cancelable: true
+});</code></pre>
+
+                <h3>Global Listeners</h3>
+                <pre><code>// Listen to all events (for debugging)
+eventBus.onAll((event) => {
+    console.log('Event:', event.type, event.data);
+});</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Components</h2>
+                
+                <h3>InputManager</h3>
+                <p>The InputManager captures all mouse/keyboard input and emits standardized events to the EventBus.</p>
+                
+                <h3>DragDropSystem</h3>
+                <p>The DragDropSystem subscribes to input events and emits drag/drop events, completely decoupled from other components.</p>
+                
+                <h3>GUI Server</h3>
+                <p>The GUI server subscribes to events it needs (drag events, context menu events) and responds accordingly.</p>
+            </section>
+
+            <section class="section">
+                <h2>Benefits</h2>
+                <ul>
+                    <li><strong>Modularity:</strong> Components can be added/removed without breaking others</li>
+                    <li><strong>Testability:</strong> Components can be tested in isolation</li>
+                    <li><strong>Debugging:</strong> All events flow through one system, easy to monitor</li>
+                    <li><strong>Extensibility:</strong> New components can subscribe to existing events</li>
+                    <li><strong>OS-like Architecture:</strong> Similar to how real OSes handle messages/events</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

@@ -3,155 +3,68 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>freeworldlogon.exe - FreeWorld OS Documentation</title>
+    <title>FreeWorld Logon (freeworldlogon.exe) - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
     <div class="container">
+        <header>
+            <h1>FreeWorld Logon (freeworldlogon.exe)</h1>
+            <p class="subtitle">User authentication and session initialization</p>
+        </header>
+
         <nav class="sidebar">
             <h2>Navigation</h2>
             <ul class="nav-menu">
                 <li><a href="../index.html">Home</a></li>
-                <li class="nav-section">Boot Components</li>
-                <li><a href="bootmgr.html">BOOTMGR</a></li>
-                <li><a href="bcd.html">BCD</a></li>
-                <li><a href="freeload.html">freeload.exe</a></li>
-                <li class="nav-section">Core System</li>
-                <li><a href="kernel.html">fwoskrnl.exe</a></li>
-                <li><a href="hal.html">hal.dll</a></li>
-                <li class="nav-section">Services</li>
-                <li><a href="smss.html">smss.exe</a></li>
-                <li><a href="csrss.html">csrss.exe</a></li>
-                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
-                <li class="nav-section">User Interface</li>
-                <li><a href="shell.html">Shell</a></li>
-                <li><a href="wanderer.html">Wanderer</a></li>
-                <li class="nav-section">Node.js System</li>
-                <li><a href="window.html">Window API</a></li>
-                <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
-                <li class="nav-section">Reference</li>
-                <li><a href="naming-conventions.html">Naming Conventions</a></li>
-                <li><a href="boot-process.html">Boot Process</a></li>
-                <li><a href="architecture.html">Architecture</a></li>
-                <li><a href="syscalls.html">System Calls</a></li>
-                <li><a href="variables.html">Variables & Constants</a></li>
+                <li><a href="kernel.html">Kernel</a></li>
+                <li><a href="freeworldlogon.html">FreeWorld Logon</a></li>
             </ul>
         </nav>
 
-        <main class="content">
-            <div class="page-header">
-                <h1>freeworldlogon.exe - FreeWorld Login Manager</h1>
-                <div class="meta">
-                    <strong>Location:</strong> services/freeworldlogon/freeworldlogon.c<br>
-                    <strong>Type:</strong> C Executable<br>
-                    <strong>Purpose:</strong> Manages user authentication and session startup
-                </div>
-            </div>
-
-            <section class="section">
+        <main>
+            <section>
                 <h2>Overview</h2>
-                <p>freeworldlogon.exe manages the user login process. It prompts for username and password, authenticates the user, and starts the user shell.</p>
+                <p>FreeWorld Logon is the authentication service that displays the login screen and manages user sessions, similar to Windows Winlogon.</p>
             </section>
 
-            <section class="section">
-                <h2>Main Function</h2>
-                <div class="code-block">
-                    <pre>int main(int argc, char** argv) {
-    printf("FreeWorld Login Manager v0.1\n");
-    printf("================================\n");
-    
-    char username[256];
-    char password[256];
-    
-    printf("Username: ");
-    fgets(username, sizeof(username), stdin);
-    username[strcspn(username, "\n")] = 0; // Remove newline
-    
-    printf("Password: ");
-    // In a real implementation, this would hide input
-    fgets(password, sizeof(password), stdin);
-    password[strcspn(password, "\n")] = 0;
-    
-    // Authenticate user (placeholder)
-    printf("Authenticating...\n");
-    
-    // Start user shell
-    printf("Starting shell...\n");
-    system("shell.exe");
-    
-    return 0;
-}</pre>
-                </div>
+            <section>
+                <h2>Functions</h2>
+                <ul>
+                    <li>Display login screen</li>
+                    <li>User authentication</li>
+                    <li>Password verification</li>
+                    <li>Session creation</li>
+                    <li>Desktop environment startup</li>
+                </ul>
             </section>
 
-            <section class="section">
-                <h2>Variables</h2>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Variable</th>
-                            <th>Type</th>
-                            <th>Size</th>
-                            <th>Description</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>username</code></td>
-                            <td>char[256]</td>
-                            <td>256 bytes</td>
-                            <td>User input buffer for username</td>
-                        </tr>
-                        <tr>
-                            <td><code>password</code></td>
-                            <td>char[256]</td>
-                            <td>256 bytes</td>
-                            <td>User input buffer for password</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </section>
-
-            <section class="section">
+            <section>
                 <h2>Login Process</h2>
                 <ol>
-                    <li>Display login banner</li>
-                    <li>Prompt for username</li>
-                    <li>Prompt for password (currently visible, should be hidden)</li>
-                    <li>Authenticate user (placeholder implementation)</li>
-                    <li>Start user shell (shell.exe)</li>
+                    <li>Display login screen</li>
+                    <li>Capture username and password</li>
+                    <li>Verify credentials</li>
+                    <li>Create user session</li>
+                    <li>Start user shell/desktop</li>
                 </ol>
             </section>
 
-            <section class="section">
-                <h2>Future Implementation</h2>
+            <section>
+                <h2>Security</h2>
                 <ul>
-                    <li><strong>Password Hiding:</strong> Hide password input during typing</li>
-                    <li><strong>User Database:</strong> Read from /etc/passwd or similar</li>
-                    <li><strong>Password Hashing:</strong> Verify password against hash</li>
-                    <li><strong>Session Management:</strong> Create user session</li>
-                    <li><strong>Multiple Users:</strong> Support for multiple user accounts</li>
+                    <li>Password hashing (SHA-256)</li>
+                    <li>Account lockout after failed attempts</li>
+                    <li>Session token generation</li>
+                    <li>Secure credential storage</li>
                 </ul>
             </section>
 
-            <section class="section">
-                <h2>Integration Points</h2>
-                <ul>
-                    <li><strong>smss.exe:</strong> Started by Session Manager</li>
-                    <li><strong>shell.exe:</strong> Starts user shell after authentication</li>
-                    <li><strong>/etc/passwd:</strong> User database (future)</li>
-                </ul>
+            <section>
+                <h2>Implementation</h2>
+                <p>FreeWorld Logon is implemented as a Node.js application with a graphical login interface using the kernel GUI system.</p>
             </section>
         </main>
     </div>
-
-    <footer>
-        <p>FreeWorld OS Documentation v0.1.0</p>
-    </footer>
-
-    <script src="../navigation.js"></script>
 </body>
 </html>
-

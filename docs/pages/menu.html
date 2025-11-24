@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Menu System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Menu System</h1>
+            <p class="subtitle">Application menus, context menus, and menu bars</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="menu.html">Menu System</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The Menu System provides application menus, context menus, and menu bars for user interaction, similar to Windows menu functionality.</p>
+            </section>
+
+            <section>
+                <h2>Menu Types</h2>
+                <ul>
+                    <li><strong>Menu Bar</strong> - Horizontal menu at top of window</li>
+                    <li><strong>Context Menu</strong> - Right-click popup menu</li>
+                    <li><strong>System Menu</strong> - Window control menu</li>
+                    <li><strong>Dropdown Menu</strong> - Menu from menu bar item</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Menu Structure</h2>
+                <pre><code>Menu {
+    items: MenuItem[]
+    style: MenuStyle
+}
+
+MenuItem {
+    text: string
+    action: function
+    submenu: Menu (optional)
+    shortcut: string (optional)
+    enabled: boolean
+    checked: boolean (optional)
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>API</h2>
+                <ul>
+                    <li><code>createMenu()</code> - Create new menu</li>
+                    <li><code>addMenuItem(menu, text, action)</code> - Add item to menu</li>
+                    <li><code>showContextMenu(x, y, menu)</code> - Show context menu</li>
+                    <li><code>setMenuBar(window, menu)</code> - Set window menu bar</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

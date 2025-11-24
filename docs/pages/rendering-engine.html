@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Native Rendering Engine - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Rendering System</li>
+                <li><a href="rendering-engine.html">Native Rendering Engine</a></li>
+                <li><a href="browser-engine.html">ASM Browser Engine (Legacy)</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Native Rendering Engine</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete - All 5 Phases Implemented<br>
+                    <strong>Purpose:</strong> Hybrid rendering engine for native UI rendering and Node.js application execution
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Native Rendering Engine is a <strong>hybrid architecture</strong> rendering system that combines:</p>
+                <ul>
+                    <li><strong>ASM (Assembly)</strong> for performance-critical hot paths</li>
+                    <li><strong>C/C++</strong> for complex algorithms and maintainability</li>
+                    <li><strong>Node.js</strong> for application runtime and UI framework</li>
+                </ul>
+                <div class="alert alert-info">
+                    <strong>Important:</strong> This is NOT a web browser. It's a <strong>native rendering and application runtime engine</strong> for the FreeWorld OS.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Architecture: Three-Layer Design</h2>
+                
+                <h3>Core Layer (ASM) - `kernel/graphics/render_core.asm`</h3>
+                <p><strong>Purpose:</strong> Maximum performance for pixel-level operations</p>
+                <ul>
+                    <li>Framebuffer management (direct VESA access)</li>
+                    <li>High-performance blitting (fast, scaled, color-key)</li>
+                    <li>Advanced primitives (circle, filled circle, line)</li>
+                    <li>Clipping calculations</li>
+                    <li>Fast rectangle fill</li>
+                    <li>Color blending operations</li>
+                </ul>
+                <p><strong>Performance:</strong> Optimized assembly for hot paths</p>
+
+                <h3>Rendering Engine (C) - `kernel/graphics/render_engine.c`</h3>
+                <p><strong>Purpose:</strong> Complex rendering algorithms and effects</p>
+                <ul>
+                    <li>Multi-layer compositing</li>
+                    <li>12 blend modes (normal, multiply, screen, overlay, darken, lighten, etc.)</li>
+                    <li>Per-pixel alpha blending</li>
+                    <li>Double buffering with vsync</li>
+                    <li>Rendering pipeline hooks (pre/post render)</li>
+                    <li>Advanced transformations (rotate around point, scale around point)</li>
+                    <li>Enhanced dirty region tracking</li>
+                </ul>
+
+                <h3>Font System (C) - `kernel/graphics/font_loader.c`</h3>
+                <p><strong>Purpose:</strong> Font loading and text rendering</p>
+                <ul>
+                    <li>Bitmap font loading (8x8 default)</li>
+                    <li>Font metrics calculation</li>
+                    <li>Text rendering to framebuffer</li>
+                    <li>Font management and caching</li>
+                </ul>
+                <p><strong>Status:</strong> Basic fonts working, TTF/OTF support can be added</p>
+
+                <h3>Image System (C) - `kernel/graphics/image_decoder.c`</h3>
+                <p><strong>Purpose:</strong> Image loading, scaling, and operations</p>
+                <ul>
+                    <li>BMP decoder (full support)</li>
+                    <li>Enhanced ICO loader (PNG + BMP)</li>
+                    <li>Format detection (PNG, JPEG, ICO, BMP)</li>
+                    <li>Multiple scaling algorithms (nearest, bilinear)</li>
+                    <li>Image operations (crop, rotate)</li>
+                    <li>Image caching (LRU, 32 entries)</li>
+                </ul>
+
+                <h3>Layout Engine (C) - `kernel/graphics/layout_engine.c`</h3>
+                <p><strong>Purpose:</strong> UI component positioning and layout</p>
+                <ul>
+                    <li>7 layout algorithms (absolute, vbox, hbox, grid, flow, border, flexbox)</li>
+                    <li>Alignment system (start, center, end, stretch)</li>
+                    <li>Spacing system (padding, margin)</li>
+                    <li>Constraint solving</li>
+                    <li>Size calculations (preferred, min, max)</li>
+                    <li>Layout utilities (bounds, remove, clear)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Phase 1: Core Rendering (ASM) - Complete ✅</h2>
+                <p><strong>File:</strong> <code>kernel/graphics/render_core.asm</code></p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><strong>Framebuffer Management:</strong> Direct access to VESA framebuffer</li>
+                    <li><strong>High-Performance Blitting:</strong>
+                        <ul>
+                            <li>Fast memory copy (optimized 32-bit operations)</li>
+                            <li>Scaled blitting (nearest-neighbor, fixed-point math)</li>
+                            <li>Color-key blitting (transparency support)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Advanced Primitives:</strong>
+                        <ul>
+                            <li>Circle drawing (midpoint algorithm, 8-point symmetry)</li>
+                            <li>Filled circles (horizontal scan with integer sqrt)</li>
+                            <li>Line drawing (optimized Bresenham's algorithm)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Clipping:</strong> Rectangle clipping calculations</li>
+                    <li><strong>Color Operations:</strong> Color blending with alpha</li>
+                </ul>
+
+                <h3>API</h3>
+                <pre><code>// Framebuffer
+void* render_get_framebuffer(void);
+uint32_t render_get_width(void);
+uint32_t render_get_height(void);
+uint32_t render_get_pitch(void);
+
+// Blitting
+void render_blit_fast(void* dest, const void* src, size_t size);
+void render_blit_scaled(...);
+void render_blit_colorkey(...);
+
+// Primitives
+void render_fill_rect_fast(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color);
+void render_draw_circle(uint32_t cx, uint32_t cy, uint32_t radius, uint32_t color);
+void render_fill_circle(uint32_t cx, uint32_t cy, uint32_t radius, uint32_t color);
+void render_draw_line(uint32_t x1, uint32_t y1, uint32_t x2, uint32_t y2, uint32_t color);
+
+// Color
+uint32_t render_blend_colors(uint32_t color1, uint32_t color2, uint8_t alpha);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Phase 2: Rendering Engine (C) - Complete ✅</h2>
+                <p><strong>File:</strong> <code>kernel/graphics/render_engine.c</code></p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><strong>Compositing:</strong> Multi-layer compositing system</li>
+                    <li><strong>Blend Modes (12 modes):</strong>
+                        <ul>
+                            <li>Normal, Multiply, Screen, Overlay</li>
+                            <li>Darken, Lighten, Color Dodge, Color Burn</li>
+                            <li>Hard Light, Soft Light, Difference, Exclusion</li>
+                        </ul>
+                    </li>
+                    <li><strong>Double Buffering:</strong>
+                        <ul>
+                            <li>Front/back buffer management</li>
+                            <li>Buffer swapping</li>
+                            <li>VSync support</li>
+                        </ul>
+                    </li>
+                    <li><strong>Pipeline Hooks:</strong> Pre-render and post-render callbacks</li>
+                    <li><strong>Transformations:</strong>
+                        <ul>
+                            <li>Rotation around arbitrary point</li>
+                            <li>Scale around arbitrary point</li>
+                            <li>Rectangle transformation (bounding box)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Dirty Regions:</strong> Enhanced tracking and merging</li>
+                </ul>
+
+                <h3>API</h3>
+                <pre><code>// Compositing
+void render_composite_layers(render_layer_t* layers, size_t count, void* output_fb);
+
+// Blend Modes
+void render_blend_layer_mode(..., render_blend_mode_t mode, ...);
+
+// Double Buffering
+int render_double_buffer_init(uint32_t w, uint32_t h, uint32_t pitch);
+void* render_get_back_buffer(void);
+void render_swap_buffers(void);
+void render_set_vsync(bool enabled);
+
+// Transformations
+void render_transform_rotate_around(..., float cx, float cy);
+void render_transform_scale_around(..., float cx, float cy);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Phase 3: Font System (C) - Complete ✅</h2>
+                <p><strong>File:</strong> <code>kernel/graphics/font_loader.c</code></p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>Bitmap font loading (8x8 default)</li>
+                    <li>Font metrics (width, height, ascent, descent)</li>
+                    <li>Text rendering to framebuffer</li>
+                    <li>Font management and caching</li>
+                </ul>
+
+                <h3>API</h3>
+                <pre><code>render_font_t* render_font_load(const char* path);
+void render_font_render_text(render_font_t* font, void* fb, 
+                             uint32_t x, uint32_t y, 
+                             const char* text, uint32_t color);
+void render_font_get_metrics(render_font_t* font, 
+                              uint32_t* width, uint32_t* height, 
+                              uint32_t* ascent, uint32_t* descent);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Phase 4: Image System (C) - Complete ✅</h2>
+                <p><strong>File:</strong> <code>kernel/graphics/image_decoder.c</code></p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><strong>Format Support:</strong>
+                        <ul>
+                            <li>BMP decoder (full support)</li>
+                            <li>Enhanced ICO loader (PNG + BMP)</li>
+                            <li>Format detection (PNG, JPEG, ICO, BMP)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Scaling Algorithms:</strong>
+                        <ul>
+                            <li>Nearest-neighbor (fast, pixel-perfect)</li>
+                            <li>Bilinear (smooth, better quality)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Image Operations:</strong>
+                        <ul>
+                            <li>Image cropping</li>
+                            <li>Image rotation (90, 180, 270 degrees)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Caching:</strong> LRU cache (32 entries)</li>
+                </ul>
+
+                <h3>API</h3>
+                <pre><code>// Loading
+render_image_t* render_image_load_memory(const uint8_t* data, size_t size, 
+                                         render_image_format_t format);
+
+// Scaling
+render_image_t* render_image_scale(render_image_t* src, 
+                                   uint32_t new_width, uint32_t new_height);
+render_image_t* render_image_scale_algorithm(render_image_t* src,
+                                             uint32_t new_width, uint32_t new_height,
+                                             render_scale_algorithm_t algorithm);
+
+// Operations
+render_image_t* render_image_crop(render_image_t* src, 
+                                  uint32_t x, uint32_t y,
+                                  uint32_t width, uint32_t height);
+render_image_t* render_image_rotate(render_image_t* src, int degrees);
+
+// Caching
+void render_image_cache_add(const char* key, render_image_t* image);
+render_image_t* render_image_cache_get(const char* key);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Phase 5: Layout Engine (C) - Complete ✅</h2>
+                <p><strong>File:</strong> <code>kernel/graphics/layout_engine.c</code></p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li><strong>Layout Algorithms (7 types):</strong>
+                        <ul>
+                            <li>Absolute (no layout)</li>
+                            <li>VBox (vertical stacking)</li>
+                            <li>HBox (horizontal arrangement)</li>
+                            <li>Grid (grid arrangement)</li>
+                            <li>Flow (text-like wrapping)</li>
+                            <li>Border (center, top, bottom, left, right)</li>
+                            <li>Flexbox (horizontal/vertical with justify options)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Alignment System:</strong>
+                        <ul>
+                            <li>Start, Center, End, Stretch</li>
+                            <li>Independent X and Y alignment</li>
+                        </ul>
+                    </li>
+                    <li><strong>Spacing System:</strong>
+                        <ul>
+                            <li>Padding (top, right, bottom, left)</li>
+                            <li>Margin (top, right, bottom, left)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Utilities:</strong>
+                        <ul>
+                            <li>Get bounds (bounding box)</li>
+                            <li>Remove component</li>
+                            <li>Clear layout</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <h3>API</h3>
+                <pre><code>// Layout Algorithms
+void render_layout_absolute(render_layout_t* layout);
+void render_layout_vbox(render_layout_t* layout, uint32_t spacing);
+void render_layout_hbox(render_layout_t* layout, uint32_t spacing);
+void render_layout_grid(render_layout_t* layout, uint32_t cols, uint32_t spacing);
+void render_layout_flow(render_layout_t* layout, uint32_t spacing);
+void render_layout_flexbox(render_layout_t* layout, bool horizontal, 
+                          uint32_t spacing, uint32_t justify_content);
+
+// Alignment
+void render_layout_align_component(render_component_t* comp,
+                                   uint32_t container_width, uint32_t container_height,
+                                   render_align_t align_x, render_align_t align_y);
+
+// Spacing
+void render_layout_apply_spacing(render_component_t* comp,
+                                  const render_padding_t* padding,
+                                  const render_margin_t* margin);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The rendering engine integrates with:</p>
+                <ul>
+                    <li><strong>VESA Driver:</strong> Direct framebuffer access</li>
+                    <li><strong>Graphics Bridge:</strong> Node.js integration</li>
+                    <li><strong>GUI System:</strong> Window management and components</li>
+                    <li><strong>Kernel:</strong> System calls and memory management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Performance</h2>
+                <ul>
+                    <li><strong>ASM Hot Paths:</strong> Maximum performance for pixel operations</li>
+                    <li><strong>C Algorithms:</strong> Efficient and maintainable</li>
+                    <li><strong>Double Buffering:</strong> Eliminates tearing, enables smooth animation</li>
+                    <li><strong>Caching:</strong> Reduces redundant operations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <pre><code>kernel/graphics/
+├── render_core.asm          # Phase 1 - Core (ASM)
+├── render_core.h             # Phase 1 - API
+├── render_engine.c           # Phase 2 - Engine (C)
+├── render_engine.h           # Phase 2 - API
+├── font_loader.c              # Phase 3 - Fonts (C)
+├── font_loader.h              # Phase 3 - API
+├── image_decoder.c            # Phase 4 - Images (C)
+├── image_decoder.h            # Phase 4 - API
+├── layout_engine.c            # Phase 5 - Layout (C)
+├── layout_engine.h            # Phase 5 - API
+├── render.h                   # Main integration
+├── render.c                   # Main integration
+└── Makefile                   # Build system</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Phase 1 (ASM Core)</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Phase 2 (C Engine)</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Phase 3 (Fonts)</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Phase 4 (Images)</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Phase 5 (Layout)</strong><br>
+                        ✅ Complete
+                    </div>
+                </div>
+                <p><strong>Total:</strong> ~2,500 lines of production code</p>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li>TTF/OTF font support</li>
+                    <li>PNG/JPEG decoders (full implementation)</li>
+                    <li>Bicubic scaling</li>
+                    <li>Hardware acceleration</li>
+                    <li>Advanced layouts (Flexbox enhancements)</li>
+                    <li>Vector graphics (SVG support)</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>

@@ -26,11 +26,17 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -58,12 +64,21 @@
                 
                 <h3>Layer 1: Boot Layer (ASM/C/C++)</h3>
                 <ul>
-                    <li><strong>BOOTMGR:</strong> Boot manager (Assembly)</li>
+                    <li><strong>BOOTMGR:</strong> Boot manager (Assembly, 16-bit real mode)</li>
                     <li><strong>BCD:</strong> Boot Configuration Data (C)</li>
                     <li><strong>freeload.exe:</strong> OS loader (C)</li>
-                    <li><strong>fwoskrnl.exe:</strong> Kernel executive (C)</li>
+                    <li><strong>fwoskrnl.exe:</strong> Kernel executive
+                        <ul>
+                            <li><strong>kernel_entry.asm:</strong> Assembly boot code (16-bit → 32-bit → 64-bit transition)</li>
+                            <li><strong>fwoskrnl.c:</strong> C kernel executive (32-bit protected mode, transitioning to 64-bit)</li>
+                            <li><strong>arch/x64/:</strong> 64-bit architecture support (long mode transition, 64-bit kernel)</li>
+                        </ul>
+                    </li>
                     <li><strong>hal.dll:</strong> Hardware Abstraction Layer (C)</li>
                 </ul>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> Protected mode and long mode transitions are working. The kernel successfully transitions from 16-bit real mode to 32-bit protected mode, and then to 64-bit long mode. Full 64-bit support is implemented.
+                </div>
 
                 <h3>Layer 2: System Services (C)</h3>
                 <ul>
@@ -91,11 +106,42 @@
             <section class="section">
                 <h2>Supported Architectures</h2>
                 <ul>
-                    <li><strong>x86_64:</strong> Primary architecture</li>
-                    <li><strong>ARM64:</strong> ARM 64-bit support</li>
-                    <li><strong>RISC-V:</strong> RISC-V architecture support</li>
+                    <li><strong>x86_64:</strong> Primary architecture
+                        <ul>
+                            <li>Boot: 16-bit real mode (x86 compatibility)</li>
+                            <li>Kernel: 32-bit protected mode (current implementation)</li>
+                            <li>Future: 64-bit long mode</li>
+                        </ul>
+                    </li>
+                    <li><strong>ARM64:</strong> ARM 64-bit support (planned)</li>
+                    <li><strong>RISC-V:</strong> RISC-V architecture support (planned)</li>
                     <li><strong>Future:</strong> Extensible for new architectures</li>
                 </ul>
+            </section>
+
+            <section class="section">
+                <h2>CPU Modes & Transitions</h2>
+                <h3>Boot Sequence</h3>
+                <ol>
+                    <li><strong>Real Mode (16-bit):</strong>
+                        <ul>
+                            <li>BIOS loads boot sector at 0x7C00</li>
+                            <li>BOOTMGR executes in 16-bit real mode</li>
+                            <li>Kernel entry point starts in 16-bit real mode</li>
+                        </ul>
+                    </li>
+                    <li><strong>Protected Mode (32-bit):</strong>
+                        <ul>
+                            <li>GDT setup (flat memory model, 4GB segments)</li>
+                            <li>A20 line enable</li>
+                            <li>CR0.PE bit set</li>
+                            <li>32-bit far jump to protected mode entry point</li>
+                            <li>Segment registers reloaded with protected mode selectors</li>
+                            <li>IDT initialized</li>
+                        </ul>
+                    </li>
+                    <li><strong>Long Mode (64-bit):</strong> Planned for future</li>
+                </ol>
             </section>
 
             <section class="section">

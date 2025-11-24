@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel GUI System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Kernel GUI System</h1>
+            <p class="subtitle">Low-level graphics rendering engine and windowing system</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="window.html">Window Management</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The Kernel GUI System provides the foundation for graphical rendering in FreeWorld OS. It operates at the kernel level, directly accessing the VESA framebuffer to draw windows, UI components, and handle user input.</p>
+                
+                <p>The system is implemented in x86-64 assembly for maximum performance and direct hardware access. It provides:</p>
+                <ul>
+                    <li>Direct framebuffer rendering (pixels, lines, rectangles, circles)</li>
+                    <li>Window drawing with title bars, borders, and controls</li>
+                    <li>Complete bitmap font rendering (all ASCII characters)</li>
+                    <li>Dialog and message box system</li>
+                    <li>UI components (buttons, labels, input fields) with full interaction</li>
+                    <li>Mouse and keyboard event handling</li>
+                    <li>Windows-style message loop</li>
+                    <li>Window management (z-order, focus, procedures)</li>
+                    <li>Window manipulation (drag, resize)</li>
+                    <li>Double buffering for smooth rendering</li>
+                    <li>Clipping regions for window content</li>
+                    <li>Mouse cursor rendering</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Architecture</h2>
+                <p>The Kernel GUI System consists of several modules:</p>
+                
+                <h3>Renderer (kernel/gui/renderer.asm)</h3>
+                <p>The core rendering engine that provides low-level graphics primitives:</p>
+                <ul>
+                    <li><code>gui_renderer_init()</code> - Initializes framebuffer access</li>
+                    <li><code>gui_clear_screen()</code> - Clears screen with color</li>
+                    <li><code>gui_draw_pixel()</code> - Draws a single pixel</li>
+                    <li><code>gui_draw_hline()</code> - Draws horizontal line</li>
+                    <li><code>gui_draw_vline()</code> - Draws vertical line</li>
+                    <li><code>gui_draw_rect()</code> - Draws filled rectangle</li>
+                    <li><code>gui_draw_rect_outline()</code> - Draws rectangle outline</li>
+                    <li><code>gui_blit()</code> - Copies buffer to framebuffer</li>
+                </ul>
+
+                <h3>Window System (kernel/gui/window.asm)</h3>
+                <p>Provides window drawing capabilities:</p>
+                <ul>
+                    <li><code>gui_draw_window()</code> - Draws complete window (title bar, border, content)</li>
+                    <li><code>gui_draw_window_title()</code> - Draws window title bar</li>
+                </ul>
+                <p>Window features:</p>
+                <ul>
+                    <li>Title bar with blue background (Windows 10 style)</li>
+                    <li>Gray border (1 pixel)</li>
+                    <li>Light gray background</li>
+                    <li>Configurable position and size</li>
+                </ul>
+
+                <h3>Font Rendering (kernel/gui/font.asm)</h3>
+                <p>Bitmap font system for text display:</p>
+                <ul>
+                    <li><code>gui_draw_char()</code> - Draws single character</li>
+                    <li><code>gui_draw_string()</code> - Draws null-terminated string</li>
+                </ul>
+                <p>Features:</p>
+                <ul>
+                    <li>8x8 pixel bitmap font</li>
+                    <li>ASCII character set (32-127)</li>
+                    <li>Configurable text color</li>
+                </ul>
+
+                <h3>Dialog System (kernel/gui/dialog.asm)</h3>
+                <p>Message boxes and dialogs:</p>
+                <ul>
+                    <li><code>gui_message_box()</code> - Shows modal message box</li>
+                </ul>
+                <p>Dialog types:</p>
+                <ul>
+                    <li>INFO - Information dialog</li>
+                    <li>WARNING - Warning dialog</li>
+                    <li>ERROR - Error dialog</li>
+                    <li>QUESTION - Yes/No question dialog</li>
+                </ul>
+
+                <h3>UI Components (kernel/gui/components.asm)</h3>
+                <p>Standard UI elements:</p>
+                <ul>
+                    <li><code>gui_draw_button()</code> - Draws button (normal/hover/pressed states)</li>
+                    <li><code>gui_draw_label()</code> - Draws text label</li>
+                    <li><code>gui_draw_input()</code> - Draws text input field</li>
+                </ul>
+
+                <h3>Event System (kernel/gui/events.asm)</h3>
+                <p>Handles user input events:</p>
+                <ul>
+                    <li><code>gui_process_mouse_event()</code> - Processes mouse events</li>
+                    <li><code>gui_process_keyboard_event()</code> - Processes keyboard events</li>
+                    <li><code>gui_hit_test()</code> - Finds window at coordinates</li>
+                    <li><code>gui_get_mouse_pos()</code> - Gets current mouse position</li>
+                    <li><code>gui_is_mouse_button_pressed()</code> - Checks mouse button state</li>
+                </ul>
+
+                <h3>Message Loop (kernel/gui/messageloop.asm)</h3>
+                <p>Windows-style message processing:</p>
+                <ul>
+                    <li><code>gui_post_message()</code> - Posts message to queue</li>
+                    <li><code>gui_get_message()</code> - Retrieves message from queue</li>
+                    <li><code>gui_message_loop()</code> - Main message loop</li>
+                    <li><code>gui_dispatch_message()</code> - Dispatches message to window</li>
+                </ul>
+                <p>Message types (Windows-compatible):</p>
+                <ul>
+                    <li>WM_PAINT (0x000F) - Window needs repainting</li>
+                    <li>WM_MOUSEMOVE (0x0200) - Mouse moved</li>
+                    <li>WM_LBUTTONDOWN (0x0201) - Left mouse button pressed</li>
+                    <li>WM_LBUTTONUP (0x0202) - Left mouse button released</li>
+                    <li>WM_KEYDOWN (0x0100) - Key pressed</li>
+                    <li>WM_KEYUP (0x0101) - Key released</li>
+                    <li>WM_CHAR (0x0102) - Character input</li>
+                    <li>WM_CLOSE (0x0010) - Window close requested</li>
+                </ul>
+
+                <h3>Initialization (kernel/gui/gui_init.asm)</h3>
+                <p>GUI subsystem initialization:</p>
+                <ul>
+                    <li><code>gui_init()</code> - Initializes GUI subsystem</li>
+                    <li><code>gui_draw_desktop()</code> - Draws desktop background and taskbar</li>
+                    <li><code>gui_start()</code> - Starts GUI and enters message loop</li>
+                </ul>
+
+                <h3>Startup (kernel/gui/startup.asm)</h3>
+                <p>Graphical environment startup:</p>
+                <ul>
+                    <li><code>gui_start_graphical_environment()</code> - Main entry point for graphical boot</li>
+                    <li><code>gui_show_welcome_window()</code> - Shows welcome window on startup</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Integration</h2>
+                <p>The Kernel GUI System integrates with:</p>
+                
+                <h3>VESA Driver</h3>
+                <p>The renderer uses VESA driver functions to access the framebuffer:</p>
+                <ul>
+                    <li><code>vesa_get_framebuffer_64()</code> - Gets framebuffer address</li>
+                    <li><code>vesa_get_width_64()</code> - Gets screen width</li>
+                    <li><code>vesa_get_height_64()</code> - Gets screen height</li>
+                    <li><code>vesa_get_bpp_64()</code> - Gets bits per pixel</li>
+                    <li><code>vesa_get_pitch_64()</code> - Gets bytes per scanline</li>
+                </ul>
+
+                <h3>Kernel Initialization</h3>
+                <p>The GUI system is initialized in <code>kernel_subsystems_init_64()</code>:</p>
+                <pre><code>call gui_init
+call gui_start_graphical_environment</code></pre>
+
+                <h3>Node.js Integration</h3>
+                <p>Once the filesystem and process execution are working, the GUI system will launch Node.js:</p>
+                <ul>
+                    <li>Loads <code>/usr/lib/nodejs/bin/node</code> from disk</li>
+                    <li>Executes with <code>/system/index.js</code> as argument</li>
+                    <li>Node.js then starts the high-level GUI framework</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Rendering Context</h2>
+                <p>The renderer maintains a global rendering context:</p>
+                <pre><code>render_context:
+    .framebuffer: dq 0    ; Framebuffer address
+    .width: dd 0          ; Screen width in pixels
+    .height: dd 0         ; Screen height in pixels
+    .bpp: dd 0            ; Bits per pixel
+    .pitch: dd 0          ; Bytes per scanline</code></pre>
+            </section>
+
+            <section>
+                <h2>Color Format</h2>
+                <p>Colors are stored in ARGB format (32-bit):</p>
+                <ul>
+                    <li>Bits 31-24: Alpha (0xFF = opaque)</li>
+                    <li>Bits 23-16: Red</li>
+                    <li>Bits 15-8: Green</li>
+                    <li>Bits 7-0: Blue</li>
+                </ul>
+                <p>Example colors:</p>
+                <ul>
+                    <li><code>0xFFF0F0F0</code> - Light gray (window background)</li>
+                    <li><code>0xFF0078D4</code> - Blue (title bar)</li>
+                    <li><code>0xFF808080</code> - Gray (border)</li>
+                    <li><code>0xFFFFFFFF</code> - White (text)</li>
+                    <li><code>0xFF000000</code> - Black (text)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Build System</h2>
+                <p>The GUI system is built as part of the kernel with 19 modules:</p>
+                <pre><code>GUI_OBJS = gui/renderer.o gui/window.o gui/font.o gui/font_complete.o \
+           gui/dialog.o gui/components.o gui/events.o gui/messageloop.o \
+           gui/window_manager.o gui/window_controls.o gui/cursor.o \
+           gui/clipping.o gui/graphics_primitives.o gui/double_buffer.o \
+           gui/window_manipulation.o gui/component_interaction.o \
+           gui/driver_integration.o gui/gui_init.o gui/startup.o</code></pre>
+                <p>All modules are compiled as 64-bit ELF objects and linked into the kernel.</p>
+            </section>
+
+            <section>
+                <h2>Double Buffering</h2>
+        <p>The double buffering system provides smooth rendering by drawing to an off-screen buffer and then swapping it with the front buffer. This eliminates flickering and provides a better user experience.</p>
+        <ul>
+            <li><code>gui_init_double_buffer()</code> - Initializes double buffering and allocates back buffer</li>
+            <li><code>gui_get_back_buffer()</code> - Returns pointer to back buffer for rendering</li>
+            <li><code>gui_swap_buffers()</code> - Swaps back buffer to front buffer (displays rendered content)</li>
+            <li><code>gui_is_double_buffer_enabled()</code> - Checks if double buffering is active</li>
+            <li><code>gui_disable_double_buffer()</code> - Disables double buffering and frees back buffer</li>
+        </ul>
+
+        <h2>Window Manipulation</h2>
+        <p>Window manipulation allows users to move and resize windows interactively using the mouse.</p>
+        <ul>
+            <li><code>gui_start_window_drag()</code> - Starts window drag operation (move)</li>
+            <li><code>gui_update_window_drag()</code> - Updates window position during drag</li>
+            <li><code>gui_stop_window_drag()</code> - Stops window drag operation</li>
+            <li><code>gui_is_window_dragging()</code> - Checks if window is currently being dragged</li>
+            <li><code>gui_hit_test_resize_handle()</code> - Detects if mouse is over a window resize handle</li>
+        </ul>
+        <p>Windows can be moved by clicking and dragging the title bar. Resize handles are located at the four corners of windows.</p>
+
+        <h2>Component Interaction</h2>
+        <p>Component interaction makes UI elements (buttons, inputs, etc.) actually functional and responsive to user input.</p>
+        <ul>
+            <li><code>gui_handle_button_click()</code> - Handles button click events</li>
+            <li><code>gui_set_button_state()</code> - Sets button visual state (normal, hover, pressed)</li>
+            <li><code>gui_set_input_focus()</code> - Sets focus to an input field</li>
+            <li><code>gui_process_component_keyboard()</code> - Processes keyboard input for focused components</li>
+            <li><code>gui_hit_test_component()</code> - Detects which component is at given coordinates</li>
+        </ul>
+        <p>Components respond to mouse clicks and keyboard input, posting appropriate Windows messages (WM_COMMAND, WM_CHAR, etc.) to their parent windows.</p>
+            </section>
+
+            <section>
+                <h2>Window Management (kernel/gui/window_manager.asm)</h2>
+                <p>Complete window management system with z-order, focus, and window procedures:</p>
+                <ul>
+                    <li><code>gui_window_manager_init()</code> - Initializes window manager</li>
+                    <li><code>gui_create_window()</code> - Creates a new window</li>
+                    <li><code>gui_get_window()</code> - Gets window by handle</li>
+                    <li><code>gui_set_focus()</code> - Sets window focus</li>
+                    <li><code>gui_bring_to_front()</code> - Brings window to front</li>
+                    <li><code>gui_destroy_window()</code> - Destroys a window</li>
+                    <li><code>gui_find_window_at()</code> - Finds window at coordinates</li>
+                    <li><code>gui_draw_all_windows()</code> - Draws all visible windows</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Window Controls (kernel/gui/window_controls.asm)</h2>
+                <p>Window control buttons (close, minimize, maximize):</p>
+                <ul>
+                    <li><code>gui_draw_window_controls()</code> - Draws window control buttons</li>
+                    <li><code>gui_hit_test_window_controls()</code> - Detects which control button was clicked</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Cursor Rendering (kernel/gui/cursor.asm)</h2>
+                <p>Mouse cursor display system:</p>
+                <ul>
+                    <li><code>gui_draw_cursor()</code> - Draws mouse cursor at position</li>
+                    <li><code>gui_update_cursor()</code> - Updates cursor position</li>
+                    <li><code>gui_show_cursor()</code> - Shows cursor</li>
+                    <li><code>gui_hide_cursor()</code> - Hides cursor</li>
+                    <li><code>gui_get_cursor_pos()</code> - Gets current cursor position</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Clipping (kernel/gui/clipping.asm)</h2>
+                <p>Clipping regions for window content:</p>
+                <ul>
+                    <li><code>gui_set_clip_region()</code> - Sets clipping region</li>
+                    <li><code>gui_clear_clip_region()</code> - Clears clipping region</li>
+                    <li><code>gui_is_point_clipped()</code> - Checks if point is clipped</li>
+                    <li><code>gui_clip_rect()</code> - Clips rectangle to region</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Graphics Primitives (kernel/gui/graphics_primitives.asm)</h2>
+                <p>Additional graphics primitives:</p>
+                <ul>
+                    <li><code>gui_draw_circle()</code> - Draws circle outline</li>
+                    <li><code>gui_draw_circle_filled()</code> - Draws filled circle</li>
+                    <li><code>gui_draw_line()</code> - Draws line using Bresenham's algorithm</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Driver Integration (kernel/gui/driver_integration.asm)</h2>
+                <p>Connects keyboard and mouse drivers to GUI event system:</p>
+                <ul>
+                    <li><code>gui_process_keyboard_input()</code> - Processes keyboard input from driver</li>
+                    <li><code>gui_process_mouse_input()</code> - Processes mouse input from driver</li>
+                    <li><code>gui_init_driver_integration()</code> - Initializes driver integration</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li>Transparency and alpha blending</li>
+                    <li>Hardware acceleration support</li>
+                    <li>Multiple graphics modes</li>
+                    <li>Icon rendering system</li>
+                    <li>Window animations</li>
+                    <li>Theme support</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

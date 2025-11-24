@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clipboard & Drag & Drop - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Clipboard & Drag & Drop</h1>
+            <p class="subtitle">System-wide clipboard and drag-and-drop functionality</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The Clipboard and Drag & Drop system provides inter-application data transfer capabilities, similar to Windows clipboard functionality.</p>
+            </section>
+
+            <section>
+                <h2>Clipboard</h2>
+                <h3>Data Formats</h3>
+                <ul>
+                    <li><strong>Text</strong> - Plain text data</li>
+                    <li><strong>Rich Text</strong> - Formatted text with styles</li>
+                    <li><strong>Images</strong> - Bitmap and vector graphics</li>
+                    <li><strong>Files</strong> - File paths and references</li>
+                    <li><strong>Custom</strong> - Application-specific formats</li>
+                </ul>
+
+                <h3>Operations</h3>
+                <ul>
+                    <li><code>clipboard.copy(data, format)</code> - Copy to clipboard</li>
+                    <li><code>clipboard.paste(format)</code> - Paste from clipboard</li>
+                    <li><code>clipboard.clear()</code> - Clear clipboard</li>
+                    <li><code>clipboard.hasFormat(format)</code> - Check if format available</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Drag & Drop</h2>
+                <h3>Overview</h3>
+                <p>Drag and drop functionality allows users to move files, icons, and other UI elements by dragging them with the mouse. The DragDropSystem is a standalone component that works with the EventBus for decoupled communication.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Architecture:</strong> DragDropSystem subscribes to <code>input.mousedown</code>, <code>input.mousemove</code>, and <code>input.mouseup</code> events from the EventBus, and emits <code>drag.start</code>, <code>drag.move</code>, <code>drag.end</code>, and <code>drag.drop</code> events.
+                </div>
+                
+                <h3>EventBus Events</h3>
+                <ul>
+                    <li><code>drag.start</code> - Drag operation begins (mousedown detected)</li>
+                    <li><code>drag.begin</code> - Drag threshold crossed (actual drag started)</li>
+                    <li><code>drag.move</code> - Element being dragged</li>
+                    <li><code>drag.enter</code> - Dragged item enters drop target</li>
+                    <li><code>drag.leave</code> - Dragged item leaves drop target</li>
+                    <li><code>drag.drop</code> - Item dropped on target</li>
+                    <li><code>drag.end</code> - Drag operation ends</li>
+                </ul>
+
+                <h3>Usage</h3>
+                <pre><code>// Enable drag for an element
+dragDropSystem.enableDrag(element, {
+    iconId: 'my-icon',
+    iconType: 'application'
+});
+
+// Register drop target
+dragDropSystem.registerDropTarget(desktop, {
+    onDragEnter: (event) => { /* highlight drop zone */ },
+    onDragLeave: (event) => { /* remove highlight */ },
+    onDrop: (event) => { /* handle drop */ }
+});
+
+// Subscribe to drag events via EventBus
+eventBus.on('drag.end', (event) => {
+    if (event.data.wasDragging) {
+        // Save position, etc.
+    }
+});</code></pre>
+
+                <h3>Integration</h3>
+                <p>The DragDropSystem is completely decoupled:</p>
+                <ul>
+                    <li>No direct DOM event listeners (except initialization)</li>
+                    <li>Subscribes to input events via EventBus</li>
+                    <li>Emits drag/drop events via EventBus</li>
+                    <li>Can be used by any component that subscribes to drag events</li>
+                    <li>Works independently of gui-server</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

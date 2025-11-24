@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File Type Associations - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>File Type Associations</h1>
+            <p class="subtitle">File type registry, MIME types, and application associations</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="icon-system.html">Icon System</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <section>
+                <h2>Overview</h2>
+                <p>The File Type Associations system provides comprehensive file type registration, MIME type mapping, default application associations, and icon mappings for the FreeWorld OS file system.</p>
+                
+                <div class="alert alert-success">
+                    <strong>Status:</strong> ✅ Complete - 100+ file types registered with MIME types, icons, and default applications
+                </div>
+
+                <h2>Components</h2>
+                
+                <h3>FileTypeRegistry</h3>
+                <p><strong>Location:</strong> <code>system/file-type-associations.js</code></p>
+                <p>The main registry class that manages all file type associations.</p>
+                
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>100+ File Types</strong>: Comprehensive coverage of common file extensions</li>
+                    <li><strong>MIME Type Mapping</strong>: Standard MIME type associations for each extension</li>
+                    <li><strong>Default Applications</strong>: Maps file types to their default opening applications</li>
+                    <li><strong>Icon Associations</strong>: Links file types to their display icons</li>
+                    <li><strong>File Descriptions</strong>: Human-readable descriptions for each file type</li>
+                </ul>
+
+                <h4>Methods:</h4>
+                <div class="code-block">
+                    <pre><code>// Register a new file type
+register(extension, mimeType, iconName, defaultApp, description)
+
+// Get association for file extension
+getAssociation(extension) → FileTypeAssociation
+
+// Get icon URL for file extension
+getIconURL(extension) → string
+
+// Get default application for file extension
+getDefaultApp(extension) → string|null
+
+// Get MIME type for file extension
+getMimeType(extension) → string
+
+// Get description for file extension
+getDescription(extension) → string
+
+// Check if extension is supported
+isSupported(extension) → boolean
+
+// Get all registered extensions
+getAllExtensions() → string[]
+
+// Get all associations
+getAllAssociations() → FileTypeAssociation[]</code></pre>
+                </div>
+
+                <h3>FileTypeAssociation</h3>
+                <p>Represents a single file type association with the following properties:</p>
+                <ul>
+                    <li><code>extension</code>: File extension (e.g., '.txt', '.zip')</li>
+                    <li><code>mimeType</code>: MIME type (e.g., 'text/plain', 'application/zip')</li>
+                    <li><code>iconName</code>: Name of icon file (e.g., 'PostItNote', 'ArchiveIcon')</li>
+                    <li><code>defaultApp</code>: Default application name (e.g., 'Notepad', 'ImageViewer')</li>
+                    <li><code>description</code>: Human-readable description (e.g., 'Text Document', 'ZIP Archive')</li>
+                </ul>
+
+                <h2>Supported File Types</h2>
+                
+                <h3>Archive Files</h3>
+                <ul>
+                    <li><code>.zip</code> - ZIP Archive (application/zip) → ArchiveIcon</li>
+                    <li><code>.rar</code> - RAR Archive (application/x-rar-compressed) → ArchiveIcon</li>
+                    <li><code>.7z</code> - 7-Zip Archive (application/x-7z-compressed) → ArchiveIcon</li>
+                    <li><code>.tar</code> - TAR Archive (application/x-tar) → ArchiveIcon</li>
+                    <li><code>.gz</code> - GZIP Archive (application/gzip) → ArchiveIcon</li>
+                </ul>
+
+                <h3>Text Files</h3>
+                <ul>
+                    <li><code>.txt</code> - Text Document (text/plain) → PostItNote → Notepad</li>
+                    <li><code>.md</code> - Markdown Document (text/markdown) → PostItNote → Notepad</li>
+                    <li><code>.log</code> - Log File (text/plain) → PostItNote → Notepad</li>
+                    <li><code>.readme</code> - Readme File (text/plain) → PostItNote → Notepad</li>
+                </ul>
+
+                <h3>Code Files</h3>
+                <ul>
+                    <li><code>.js</code> - JavaScript File (application/javascript) → Editor</li>
+                    <li><code>.ts</code> - TypeScript File (application/typescript) → Editor</li>
+                    <li><code>.c</code> - C Source File (text/x-c) → Editor</li>
+                    <li><code>.cpp</code> - C++ Source File (text/x-c++) → Editor</li>
+                    <li><code>.h</code> - C Header File (text/x-c) → Editor</li>
+                    <li><code>.hpp</code> - C++ Header File (text/x-c++) → Editor</li>
+                    <li><code>.asm</code> - Assembly File (text/x-asm) → Editor</li>
+                    <li><code>.py</code> - Python Script (text/x-python) → Editor</li>
+                    <li><code>.java</code> - Java Source File (text/x-java) → Editor</li>
+                    <li><code>.cs</code> - C# Source File (text/x-csharp) → Editor</li>
+                    <li><code>.php</code> - PHP Script (application/x-php) → Editor</li>
+                    <li><code>.rb</code> - Ruby Script (text/x-ruby) → Editor</li>
+                    <li><code>.go</code> - Go Source File (text/x-go) → Editor</li>
+                    <li><code>.rs</code> - Rust Source File (text/x-rust) → Editor</li>
+                </ul>
+
+                <h3>Web Files</h3>
+                <ul>
+                    <li><code>.html</code> / <code>.htm</code> - HTML Document (text/html) → Browser</li>
+                    <li><code>.css</code> - CSS Stylesheet (text/css) → Editor</li>
+                    <li><code>.scss</code> - SCSS Stylesheet (text/x-scss) → Editor</li>
+                    <li><code>.json</code> - JSON File (application/json) → Editor</li>
+                    <li><code>.xml</code> - XML Document (application/xml) → Editor</li>
+                    <li><code>.yaml</code> / <code>.yml</code> - YAML File (application/x-yaml) → Editor</li>
+                </ul>
+
+                <h3>Image Files</h3>
+                <ul>
+                    <li><code>.png</code> - PNG Image (image/png) → ImageViewer</li>
+                    <li><code>.jpg</code> / <code>.jpeg</code> - JPEG Image (image/jpeg) → ImageViewer</li>
+                    <li><code>.gif</code> - GIF Image (image/gif) → ImageViewer</li>
+                    <li><code>.bmp</code> - Bitmap Image (image/bmp) → ImageViewer</li>
+                    <li><code>.svg</code> - SVG Image (image/svg+xml) → ImageViewer</li>
+                    <li><code>.ico</code> - Icon File (image/x-icon) → ImageViewer</li>
+                    <li><code>.webp</code> - WebP Image (image/webp) → ImageViewer</li>
+                    <li><code>.tiff</code> / <code>.tif</code> - TIFF Image (image/tiff) → ImageViewer</li>
+                </ul>
+
+                <h3>Audio Files</h3>
+                <ul>
+                    <li><code>.mp3</code> - MP3 Audio (audio/mpeg) → MediaPlayer</li>
+                    <li><code>.wav</code> - WAV Audio (audio/wav) → MediaPlayer</li>
+                    <li><code>.ogg</code> - OGG Audio (audio/ogg) → MediaPlayer</li>
+                    <li><code>.flac</code> - FLAC Audio (audio/flac) → MediaPlayer</li>
+                    <li><code>.aac</code> - AAC Audio (audio/aac) → MediaPlayer</li>
+                    <li><code>.m4a</code> - M4A Audio (audio/mp4) → MediaPlayer</li>
+                    <li><code>.wma</code> - WMA Audio (audio/x-ms-wma) → MediaPlayer</li>
+                </ul>
+
+                <h3>Video Files</h3>
+                <ul>
+                    <li><code>.mp4</code> - MP4 Video (video/mp4) → MediaPlayer</li>
+                    <li><code>.avi</code> - AVI Video (video/x-msvideo) → MediaPlayer</li>
+                    <li><code>.mkv</code> - MKV Video (video/x-matroska) → MediaPlayer</li>
+                    <li><code>.mov</code> - QuickTime Video (video/quicktime) → MediaPlayer</li>
+                    <li><code>.wmv</code> - WMV Video (video/x-ms-wmv) → MediaPlayer</li>
+                    <li><code>.flv</code> - Flash Video (video/x-flv) → MediaPlayer</li>
+                    <li><code>.webm</code> - WebM Video (video/webm) → MediaPlayer</li>
+                </ul>
+
+                <h3>Document Files</h3>
+                <ul>
+                    <li><code>.pdf</code> - PDF Document (application/pdf) → PDFViewer</li>
+                    <li><code>.doc</code> / <code>.docx</code> - Word Document → WordProcessor</li>
+                    <li><code>.xls</code> / <code>.xlsx</code> - Excel Spreadsheet → Spreadsheet</li>
+                    <li><code>.ppt</code> / <code>.pptx</code> - PowerPoint Presentation → Presentation</li>
+                    <li><code>.odt</code> - OpenDocument Text → WordProcessor</li>
+                    <li><code>.ods</code> - OpenDocument Spreadsheet → Spreadsheet</li>
+                    <li><code>.odp</code> - OpenDocument Presentation → Presentation</li>
+                </ul>
+
+                <h3>Executable Files</h3>
+                <ul>
+                    <li><code>.exe</code> - Executable File (application/x-msdownload)</li>
+                    <li><code>.dll</code> - Dynamic Link Library (application/x-msdownload)</li>
+                    <li><code>.so</code> - Shared Object (application/x-sharedlib)</li>
+                    <li><code>.dylib</code> - Dynamic Library (application/x-mach-binary)</li>
+                    <li><code>.app</code> - Application Bundle (application/x-executable)</li>
+                </ul>
+
+                <h3>Script Files</h3>
+                <ul>
+                    <li><code>.sh</code> - Shell Script (application/x-sh) → Terminal</li>
+                    <li><code>.bat</code> - Batch File (application/x-msdos-program) → Terminal</li>
+                    <li><code>.cmd</code> - Command File (application/x-msdos-program) → Terminal</li>
+                    <li><code>.ps1</code> - PowerShell Script (application/x-powershell) → Terminal</li>
+                </ul>
+
+                <h3>Configuration Files</h3>
+                <ul>
+                    <li><code>.ini</code> - Configuration File (text/plain) → Editor</li>
+                    <li><code>.conf</code> - Configuration File (text/plain) → Editor</li>
+                    <li><code>.config</code> - Configuration File (text/plain) → Editor</li>
+                    <li><code>.cfg</code> - Configuration File (text/plain) → Editor</li>
+                    <li><code>.properties</code> - Properties File (text/plain) → Editor</li>
+                </ul>
+
+                <h3>Data Files</h3>
+                <ul>
+                    <li><code>.db</code> - Database File (application/x-sqlite3)</li>
+                    <li><code>.sqlite</code> - SQLite Database (application/x-sqlite3)</li>
+                    <li><code>.sql</code> - SQL Script (application/x-sql) → Editor</li>
+                    <li><code>.csv</code> - CSV File (text/csv) → Spreadsheet</li>
+                </ul>
+
+                <h3>Font Files</h3>
+                <ul>
+                    <li><code>.ttf</code> - TrueType Font (font/ttf)</li>
+                    <li><code>.otf</code> - OpenType Font (font/otf)</li>
+                    <li><code>.woff</code> - Web Open Font (font/woff)</li>
+                    <li><code>.woff2</code> - Web Open Font 2 (font/woff2)</li>
+                </ul>
+
+                <h3>System Files</h3>
+                <ul>
+                    <li><code>.sys</code> - System File (application/x-msdownload) → ThisPC</li>
+                    <li><code>.drv</code> - Driver File (application/x-msdownload) → ThisPC</li>
+                    <li><code>.inf</code> - Setup Information (text/plain) → Editor</li>
+                </ul>
+
+                <h3>Other Files</h3>
+                <ul>
+                    <li><code>.bin</code> - Binary File (application/octet-stream)</li>
+                    <li><code>.dat</code> - Data File (application/octet-stream)</li>
+                    <li><code>.tmp</code> - Temporary File (application/octet-stream)</li>
+                    <li><code>.bak</code> - Backup File (application/octet-stream)</li>
+                </ul>
+
+                <h2>Icon Mappings</h2>
+                <p>File types are mapped to specific icon files located in <code>usr/share/icons/64x64/</code>:</p>
+                <ul>
+                    <li><strong>ArchiveIcon</strong> → <code>.zip</code>, <code>.rar</code>, <code>.7z</code>, <code>.tar</code>, <code>.gz</code></li>
+                    <li><strong>PostItNote</strong> → <code>.txt</code>, <code>.md</code>, <code>.log</code>, <code>.readme</code></li>
+                    <li><strong>Mail</strong> → <code>.eml</code>, <code>.msg</code>, <code>.mbox</code></li>
+                    <li><strong>ThisPC</strong> → <code>.sys</code>, <code>.dll</code>, <code>.drv</code> (system files)</li>
+                    <li><strong>Trashcan</strong> → Trash (empty)</li>
+                    <li><strong>TrashcanFull</strong> → Trash (full)</li>
+                    <li><strong>driveicondark</strong> → Drives</li>
+                </ul>
+
+                <h2>Integration</h2>
+                
+                <h3>File Manager Integration</h3>
+                <p>The <code>FileManager</code> class uses the <code>FileTypeRegistry</code> to:</p>
+                <ul>
+                    <li>Get icons for file listings</li>
+                    <li>Determine default applications for file opening</li>
+                    <li>Display file type descriptions</li>
+                </ul>
+
+                <h3>File Browser Integration</h3>
+                <p>The <code>FileBrowser</code> component uses file type associations to:</p>
+                <ul>
+                    <li>Display appropriate icons for each file type</li>
+                    <li>Enable double-click to open files with default applications</li>
+                    <li>Show file type information in properties dialogs</li>
+                </ul>
+
+                <h3>Application Launcher Integration</h3>
+                <p>The <code>ApplicationLauncherService</code> uses file type associations to:</p>
+                <ul>
+                    <li>Launch default applications when opening files</li>
+                    <li>Handle "Open With" functionality</li>
+                    <li>Register file associations with applications</li>
+                </ul>
+
+                <h2>API Endpoints</h2>
+                <p>The GUI server provides the following API endpoints for file type associations:</p>
+                
+                <h3>Open File With Application</h3>
+                <div class="code-block">
+                    <pre><code>POST /api/file/open-with
+{
+    "path": "/path/to/file.txt",
+    "extension": ".txt"
+}
+
+Response:
+{
+    "success": true,
+    "opened": true,
+    "processId": 123,
+    "hwnd": 456
+}</code></pre>
+                </div>
+
+                <h2>Usage Examples</h2>
+                
+                <h3>Get Icon for File Extension</h3>
+                <div class="code-block">
+                    <pre><code>const FileTypeRegistry = require('./file-type-associations');
+
+const registry = new FileTypeRegistry();
+const iconURL = registry.getIconURL('.txt');
+// Returns: '/usr/share/icons/64x64/PostItNote.png' or emoji fallback</code></pre>
+                </div>
+
+                <h3>Get Default Application</h3>
+                <div class="code-block">
+                    <pre><code>const defaultApp = registry.getDefaultApp('.txt');
+// Returns: 'Notepad'</code></pre>
+                </div>
+
+                <h3>Get MIME Type</h3>
+                <div class="code-block">
+                    <pre><code>const mimeType = registry.getMimeType('.txt');
+// Returns: 'text/plain'</code></pre>
+                </div>
+
+                <h3>Check if Extension is Supported</h3>
+                <div class="code-block">
+                    <pre><code>if (registry.isSupported('.zip')) {
+    console.log('ZIP files are supported');
+}</code></pre>
+                </div>
+
+                <h2>Adding New File Types</h2>
+                <p>To add a new file type association:</p>
+                <div class="code-block">
+                    <pre><code>const registry = new FileTypeRegistry();
+
+registry.register(
+    '.myext',                    // Extension
+    'application/x-mytype',      // MIME type
+    'MyIcon',                    // Icon name
+    'MyApp',                     // Default application
+    'My Custom File Type'        // Description
+);</code></pre>
+                </div>
+
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="icon-system.html">Icon System</a> - Icon management and serving</li>
+                    <li><a href="wanderer.html">Wanderer</a> - File manager that uses file type associations</li>
+                    <li><a href="filesystem.html">Filesystem API</a> - File system operations</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

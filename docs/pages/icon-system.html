@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Icon System</h1>
+            <p class="subtitle">Icon management, serving, and fallback system</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="file-type-associations.html">File Type Associations</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <section>
+                <h2>Overview</h2>
+                <p>The Icon System provides comprehensive icon management, including icon file lookup, serving via HTTP, and emoji fallbacks for FreeWorld OS.</p>
+                
+                <div class="alert alert-success">
+                    <strong>Status:</strong> ✅ Complete - Icon management, serving, and fallback system fully implemented
+                </div>
+
+                <h2>Components</h2>
+                
+                <h3>IconManager</h3>
+                <p><strong>Location:</strong> <code>system/icon-manager.js</code></p>
+                <p>The main icon management class that handles icon paths, lookup, and serving.</p>
+                
+                <h4>Key Features:</h4>
+                <ul>
+                    <li><strong>Multiple Icon Paths</strong>: Searches multiple directories for icons</li>
+                    <li><strong>Size Variants</strong>: Supports 64x64, scalable, and default sizes</li>
+                    <li><strong>Format Support</strong>: PNG, ICO, SVG, JPG, JPEG</li>
+                    <li><strong>Name Variants</strong>: Tries multiple naming conventions (lowercase, uppercase, capitalized)</li>
+                    <li><strong>Caching</strong>: Caches icon paths for performance</li>
+                    <li><strong>Emoji Fallbacks</strong>: Falls back to emoji if icon file not found</li>
+                </ul>
+
+                <h4>Icon Directories</h4>
+                <p>The system searches for icons in the following directories (in order of priority):</p>
+                <ul>
+                    <li><code>usr/share/icons/64x64/</code> - Main icon directory (64x64 pixels)</li>
+                    <li><code>usr/share/icons/scalable/</code> - SVG icons (scalable)</li>
+                    <li><code>usr/share/icons/default/</code> - Default icon directory</li>
+                    <li><code>icons/</code> - Root level icons directory</li>
+                </ul>
+
+                <h4>Methods:</h4>
+                <div class="code-block">
+                    <pre><code>// Get icon path (file system path)
+getIconPath(iconName, iconType = 'application', size = 64) → string
+
+// Get icon URL (for web display)
+getIconURL(iconName, iconType = 'application', size = 64) → string
+
+// Get icon file content
+getIconFileContent(iconPath) → Buffer|null
+
+// Get MIME type for icon file
+getIconMimeType(iconPath) → string
+
+// Register additional icon directory
+addIconPath(iconPath)</code></pre>
+                </div>
+
+                <h3>File Type Icon Mappings</h3>
+                <p><strong>Location:</strong> <code>system/file-type-icons.js</code></p>
+                <p>Maps file extensions and types to specific icon file names.</p>
+                
+                <h4>Icon Mappings:</h4>
+                <ul>
+                    <li><strong>ArchiveIcon</strong> → Archive files (.zip, .rar, .7z, .tar, .gz)</li>
+                    <li><strong>PostItNote</strong> → Text files (.txt, .md, .log, .readme)</li>
+                    <li><strong>Mail</strong> → Email files (.eml, .msg, .mbox)</li>
+                    <li><strong>ThisPC</strong> → System files (.sys, .dll, .drv)</li>
+                    <li><strong>Trashcan</strong> → Trash (empty)</li>
+                    <li><strong>TrashcanFull</strong> → Trash (full)</li>
+                    <li><strong>driveicondark</strong> → Drives</li>
+                </ul>
+
+                <h2>Icon File Structure</h2>
+                
+                <h3>Directory Layout</h3>
+                <div class="code-block">
+                    <pre><code>usr/
+  share/
+    icons/
+      64x64/          # 64x64 pixel icons
+        ArchiveIcon.png
+        ArchiveIcon.ico
+        PostItNote.png
+        PostItNote.ico
+        Mail.png
+        Mail.ico
+        ThisPC.png
+        ThisPC.ico
+        Trashcan.png
+        Trashcan.ico
+        TrashcanFull.png
+        TrashcanFull.ico
+        driveicondark.png
+        driveicondark.ico
+        wanderer.png
+        folder.png
+        file.png
+      scalable/       # SVG icons (scalable)
+        *.svg
+      default/        # Default icons
+        *.png
+        *.ico
+icons/                # Root level icons
+  *.png
+  *.ico</code></pre>
+                </div>
+
+                <h3>Supported Formats</h3>
+                <ul>
+                    <li><strong>PNG</strong> - Portable Network Graphics (recommended)</li>
+                    <li><strong>ICO</strong> - Windows Icon Format</li>
+                    <li><strong>SVG</strong> - Scalable Vector Graphics</li>
+                    <li><strong>JPG/JPEG</strong> - JPEG images</li>
+                </ul>
+
+                <h3>Naming Conventions</h3>
+                <p>The system tries multiple naming variants when looking for icons:</p>
+                <ul>
+                    <li>Lowercase: <code>archiveicon.png</code></li>
+                    <li>Original case: <code>ArchiveIcon.png</code></li>
+                    <li>Capitalized: <code>Archiveicon.png</code></li>
+                    <li>Uppercase: <code>ARCHIVEICON.png</code></li>
+                    <li>With type suffix: <code>ArchiveIcon_application.png</code></li>
+                </ul>
+
+                <h2>Icon Lookup Process</h2>
+                <p>When requesting an icon, the system follows this process:</p>
+                <ol>
+                    <li><strong>Check Cache</strong>: First checks if icon path is cached</li>
+                    <li><strong>Search Directories</strong>: Searches each icon directory in priority order</li>
+                    <li><strong>Try Size Variants</strong>: Tries 64x64, scalable, and default sizes</li>
+                    <li><strong>Try Name Variants</strong>: Tries different naming conventions</li>
+                    <li><strong>Try Extensions</strong>: Tries .png, .ico, .svg, .jpg, .jpeg</li>
+                    <li><strong>Emoji Fallback</strong>: Returns emoji if no icon file found</li>
+                </ol>
+
+                <h2>Default Icons</h2>
+                <p>The system provides emoji fallbacks for common icon types:</p>
+                <ul>
+                    <li><strong>folder</strong> → 📁</li>
+                    <li><strong>file</strong> → 📄</li>
+                    <li><strong>application</strong> → ⚙️</li>
+                    <li><strong>trash</strong> → 🗑️</li>
+                    <li><strong>trash-full</strong> → 🗑️</li>
+                    <li><strong>wanderer</strong> → 📁</li>
+                    <li><strong>ArchiveIcon</strong> → 📦</li>
+                    <li><strong>PostItNote</strong> → 📄</li>
+                    <li><strong>Mail</strong> → ✉️</li>
+                    <li><strong>ThisPC</strong> → 🖥️</li>
+                    <li><strong>Trashcan</strong> → 🗑️</li>
+                    <li><strong>TrashcanFull</strong> → 🗑️</li>
+                    <li><strong>driveicondark</strong> → 💾</li>
+                </ul>
+
+                <h2>HTTP Icon Serving</h2>
+                <p>The GUI server provides an HTTP endpoint for serving icon files:</p>
+                
+                <h3>Icon Endpoint</h3>
+                <div class="code-block">
+                    <pre><code>GET /icons/*
+
+Example:
+GET /icons/usr/share/icons/64x64/ArchiveIcon.png
+
+Response:
+Content-Type: image/png
+[Icon file content]</code></pre>
+                </div>
+
+                <h3>MIME Types</h3>
+                <p>The system automatically detects MIME types based on file extension:</p>
+                <ul>
+                    <li><code>.png</code> → <code>image/png</code></li>
+                    <li><code>.ico</code> → <code>image/x-icon</code></li>
+                    <li><code>.svg</code> → <code>image/svg+xml</code></li>
+                    <li><code>.jpg</code> / <code>.jpeg</code> → <code>image/jpeg</code></li>
+                    <li>Default → <code>application/octet-stream</code></li>
+                </ul>
+
+                <h2>Integration</h2>
+                
+                <h3>Desktop Icons</h3>
+                <p>Desktop icons use the IconManager to get icon URLs:</p>
+                <div class="code-block">
+                    <pre><code>const iconManager = new IconManager();
+const wandererIcon = iconManager.getIconURL('wanderer', 'application', 64);
+const trashIcon = iconManager.getIconURL('Trashcan', 'trash', 64);</code></pre>
+                </div>
+
+                <h3>File Browser</h3>
+                <p>The file browser uses icons from the FileTypeRegistry, which in turn uses IconManager:</p>
+                <div class="code-block">
+                    <pre><code>const fileTypeRegistry = new FileTypeRegistry();
+const iconURL = fileTypeRegistry.getIconURL('.txt');
+// Returns: '/icons/usr/share/icons/64x64/PostItNote.png' or emoji</code></pre>
+                </div>
+
+                <h3>File Type Associations</h3>
+                <p>File type associations map extensions to icon names, which are then resolved by IconManager:</p>
+                <div class="code-block">
+                    <pre><code>// File type registry maps .txt → PostItNote
+// IconManager resolves PostItNote → /icons/usr/share/icons/64x64/PostItNote.png</code></pre>
+                </div>
+
+                <h2>Usage Examples</h2>
+                
+                <h3>Get Icon URL</h3>
+                <div class="code-block">
+                    <pre><code>const IconManager = require('./icon-manager');
+
+const iconManager = new IconManager();
+const iconURL = iconManager.getIconURL('ArchiveIcon', 'file', 64);
+// Returns: '/icons/usr/share/icons/64x64/ArchiveIcon.png' or emoji</code></pre>
+                </div>
+
+                <h3>Get Icon Path</h3>
+                <div class="code-block">
+                    <pre><code>const iconPath = iconManager.getIconPath('wanderer', 'application', 64);
+// Returns: 'usr/share/icons/64x64/wanderer.png' or emoji</code></pre>
+                </div>
+
+                <h3>Add Custom Icon Directory</h3>
+                <div class="code-block">
+                    <pre><code>iconManager.addIconPath('/custom/icons');
+// Now searches /custom/icons first</code></pre>
+                </div>
+
+                <h3>Get Icon File Content</h3>
+                <div class="code-block">
+                    <pre><code>const iconPath = iconManager.getIconPath('ArchiveIcon', 'file', 64);
+const content = iconManager.getIconFileContent(iconPath);
+// Returns: Buffer with icon file content or null</code></pre>
+                </div>
+
+                <h2>Trash Icon Switching</h2>
+                <p>The system automatically switches between empty and full trash icons:</p>
+                <div class="code-block">
+                    <pre><code>const trashCount = trashSystem.getCount();
+if (trashCount > 0) {
+    iconURL = iconManager.getIconURL('TrashcanFull', 'trash', 64);
+} else {
+    iconURL = iconManager.getIconURL('Trashcan', 'trash', 64);
+}</code></pre>
+                </div>
+
+                <h2>Icon Caching</h2>
+                <p>The IconManager caches icon paths to improve performance:</p>
+                <ul>
+                    <li>Cache key format: <code>iconName:iconType:size</code></li>
+                    <li>Cache stores resolved icon paths or emoji fallbacks</li>
+                    <li>Cache persists for the lifetime of the IconManager instance</li>
+                </ul>
+
+                <h2>Adding New Icons</h2>
+                <p>To add a new icon to the system:</p>
+                <ol>
+                    <li>Place the icon file in <code>usr/share/icons/64x64/</code></li>
+                    <li>Use a descriptive name (e.g., <code>MyApp.png</code>)</li>
+                    <li>The system will automatically find it using name variants</li>
+                    <li>For file type associations, update <code>file-type-icons.js</code></li>
+                </ol>
+
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="file-type-associations.html">File Type Associations</a> - How file types map to icons</li>
+                    <li><a href="wanderer.html">Wanderer</a> - File manager that displays icons</li>
+                    <li><a href="desktop.html">Desktop</a> - Desktop icon management</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

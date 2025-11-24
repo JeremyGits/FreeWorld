@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Process Management - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Process Management - FreeWorld OS</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/process/<br>
+                    <strong>Type:</strong> Assembly Process Manager<br>
+                    <strong>Purpose:</strong> Process and thread creation, scheduling, context switching<br>
+                    <strong>Status:</strong> ✅ Complete
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld Process Management system provides complete process and thread management for the kernel. It supports process creation, termination, scheduling, and context switching.</p>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> Process and thread management is complete. Total: ~650 lines of production-ready code.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Process Manager (process.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/process/process.asm</code> (~450 lines)</p>
+                <p>Complete process management system:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>Process creation and termination</li>
+                    <li>Process table (64 processes max)</li>
+                    <li>Context switching (save/restore CPU state)</li>
+                    <li>Round-robin scheduler</li>
+                    <li>Process states (running, ready, blocked, zombie, terminated)</li>
+                    <li>Process priority support</li>
+                    <li>Parent-child relationships</li>
+                </ul>
+
+                <h3>Process States</h3>
+                <ul>
+                    <li><code>PROCESS_STATE_RUNNING</code>: Currently executing</li>
+                    <li><code>PROCESS_STATE_READY</code>: Ready to run, waiting for CPU</li>
+                    <li><code>PROCESS_STATE_BLOCKED</code>: Waiting for I/O or event</li>
+                    <li><code>PROCESS_STATE_ZOMBIE</code>: Terminated, waiting for parent to collect</li>
+                    <li><code>PROCESS_STATE_TERMINATED</code>: Fully terminated and cleaned up</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_process_manager</code></td>
+                            <td>Initialize process management system</td>
+                            <td>None</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>create_process</code></td>
+                            <td>Create a new process</td>
+                            <td>EAX = entry point, EBX = stack pointer, ECX = name</td>
+                            <td>EAX = process ID, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>terminate_process</code></td>
+                            <td>Terminate a process</td>
+                            <td>EAX = process ID, EBX = exit code</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_current_process_id</code></td>
+                            <td>Get current process ID</td>
+                            <td>None</td>
+                            <td>EAX = process ID</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_process</code></td>
+                            <td>Get process structure by ID</td>
+                            <td>EAX = process ID</td>
+                            <td>EAX = process structure pointer, or 0 if not found</td>
+                        </tr>
+                        <tr>
+                            <td><code>switch_to_process</code></td>
+                            <td>Switch to a different process (context switch)</td>
+                            <td>EAX = process ID</td>
+                            <td>None (does not return to caller)</td>
+                        </tr>
+                        <tr>
+                            <td><code>schedule</code></td>
+                            <td>Round-robin scheduler - find next ready process</td>
+                            <td>None</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Process Structure</h3>
+                <p>Each process has a 256-byte structure containing:</p>
+                <ul>
+                    <li>Process ID (4 bytes)</li>
+                    <li>State (4 bytes)</li>
+                    <li>Priority (4 bytes)</li>
+                    <li>Stack pointer (ESP) (4 bytes)</li>
+                    <li>Base pointer (EBP) (4 bytes)</li>
+                    <li>Instruction pointer (EIP) (4 bytes)</li>
+                    <li>Page directory (CR3) (4 bytes)</li>
+                    <li>Memory base address (4 bytes)</li>
+                    <li>Memory size (4 bytes)</li>
+                    <li>Process name (32 bytes)</li>
+                    <li>Parent process ID (4 bytes)</li>
+                    <li>Exit code (4 bytes)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Thread Manager (thread.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/process/thread.asm</code> (~200 lines)</p>
+                <p>Lightweight thread management within processes:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>Thread creation within processes</li>
+                    <li>Thread table (16 threads per process)</li>
+                    <li>Thread termination</li>
+                    <li>Per-thread stack allocation</li>
+                    <li>Thread state tracking</li>
+                </ul>
+
+                <h3>Thread States</h3>
+                <ul>
+                    <li><code>THREAD_STATE_RUNNING</code>: Currently executing</li>
+                    <li><code>THREAD_STATE_READY</code>: Ready to run</li>
+                    <li><code>THREAD_STATE_BLOCKED</code>: Waiting for event</li>
+                    <li><code>THREAD_STATE_TERMINATED</code>: Terminated</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>create_thread</code></td>
+                            <td>Create a new thread in a process</td>
+                            <td>EAX = process ID, EBX = entry point, ECX = stack size</td>
+                            <td>EAX = thread ID, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>terminate_thread</code></td>
+                            <td>Terminate a thread</td>
+                            <td>EAX = process ID, EBX = thread ID</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_thread</code></td>
+                            <td>Get thread structure</td>
+                            <td>EAX = process ID, EBX = thread ID</td>
+                            <td>EAX = thread structure pointer, or 0 if not found</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>Process management is integrated into the kernel via <code>kernel/integration.asm</code>:</p>
+                <div class="code-block">
+                    <pre>; In kernel_subsystems_init:
+call init_process_manager  ; Initialize process manager
+; Creates kernel process (PID 0)</pre>
+                </div>
+                <p><strong>Status:</strong> ✅ Integrated - Process manager initialized during kernel boot</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Create Process</h3>
+                <div class="code-block">
+                    <pre>; Create a new process
+mov eax, process_entry_point  ; Entry point
+mov ebx, process_stack_top     ; Stack pointer
+mov ecx, process_name          ; Process name string
+call create_process
+cmp eax, -1
+je create_error
+; EAX contains process ID</pre>
+                </div>
+
+                <h3>Switch Process</h3>
+                <div class="code-block">
+                    <pre>; Switch to a different process
+mov eax, target_process_id
+call switch_to_process
+; Execution continues in target process</pre>
+                </div>
+
+                <h3>Schedule</h3>
+                <div class="code-block">
+                    <pre>; Run scheduler to find next ready process
+call schedule
+; If a ready process is found, switches to it</pre>
+                </div>
+
+                <h3>Create Thread</h3>
+                <div class="code-block">
+                    <pre>; Create a thread in current process
+mov eax, [current_process_id]
+mov ebx, thread_entry_point
+mov ecx, 0x10000  ; 64KB stack
+call create_thread
+cmp eax, -1
+je thread_error
+; EAX contains thread ID</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

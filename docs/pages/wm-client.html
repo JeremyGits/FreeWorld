@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Manager Client - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Window Manager Client</h1>
+                <p class="subtitle">Node.js IPC client for communicating with fwcompositor service</p>
+            </div>
+
+            <section>
+                <h2>Overview</h2>
+                <p>The <strong>Window Manager Client</strong> (<code>system/wm-client.js</code>) is a Node.js library that provides an IPC client for applications to communicate with the <code>fwcompositor</code> window manager service.</p>
+                
+                <div class="alert alert-success">
+                    <strong>Status:</strong> ✅ <strong>Implemented</strong> - The client library is complete and ready to use once the fwcompositor service is implemented.
+                </div>
+            </section>
+
+            <section>
+                <h2>Usage</h2>
+                
+                <h3>Basic Example</h3>
+                <pre><code>const WindowManagerClient = require('./wm-client');
+
+// Create client instance
+const wm = new WindowManagerClient();
+
+// Connect to fwcompositor service
+await wm.connect();
+
+// Create a window
+const hwnd = await wm.createWindow('My Application', 800, 600);
+
+// Show and position window
+await wm.showWindow(hwnd);
+await wm.moveWindow(hwnd, 100, 100);
+
+// Get window buffer and draw to it
+const buffer = await wm.getWindowBuffer(hwnd);
+// ... draw to buffer using DeviceContext ...
+await wm.updateWindow(hwnd, buffer);
+
+// Cleanup
+wm.disconnect();</code></pre>
+            </section>
+
+            <section>
+                <h2>API Reference</h2>
+                
+                <h3>Constructor</h3>
+                <pre><code>const wm = new WindowManagerClient();</code></pre>
+                <p>Creates a new window manager client instance. Automatically detects the appropriate socket type based on the operating system.</p>
+
+                <h3>Connection Methods</h3>
+                
+                <h4><code>async connect()</code></h4>
+                <p>Connects to the fwcompositor service. Automatically tries Unix socket first, then falls back to TCP.</p>
+                <pre><code>await wm.connect();
+// Connected to fwcompositor via Unix socket
+// or
+// Connected to fwcompositor via TCP (127.0.0.1:8080)</code></pre>
+
+                <h4><code>disconnect()</code></h4>
+                <p>Disconnects from the fwcompositor service.</p>
+                <pre><code>wm.disconnect();</code></pre>
+
+                <h3>Window Management Methods</h3>
+                
+                <h4><code>async createWindow(title, width, height, flags = 0)</code></h4>
+                <p>Creates a new window and returns its HWND.</p>
+                <ul>
+                    <li><strong>title:</strong> Window title string</li>
+                    <li><strong>width:</strong> Window width in pixels</li>
+                    <li><strong>height:</strong> Window height in pixels</li>
+                    <li><strong>flags:</strong> Window creation flags (optional)</li>
+                    <li><strong>Returns:</strong> HWND (window handle string)</li>
+                </ul>
+                <pre><code>const hwnd = await wm.createWindow('My App', 800, 600);
+// Returns: "FW_HWND_abc123"</code></pre>
+
+                <h4><code>async destroyWindow(hwnd)</code></h4>
+                <p>Destroys a window.</p>
+                <pre><code>await wm.destroyWindow(hwnd);</code></pre>
+
+                <h4><code>async moveWindow(hwnd, x, y)</code></h4>
+                <p>Moves a window to a new position.</p>
+                <pre><code>await wm.moveWindow(hwnd, 100, 100);</code></pre>
+
+                <h4><code>async resizeWindow(hwnd, width, height)</code></h4>
+                <p>Resizes a window.</p>
+                <pre><code>await wm.resizeWindow(hwnd, 1024, 768);</code></pre>
+
+                <h4><code>async showWindow(hwnd)</code></h4>
+                <p>Shows a window.</p>
+                <pre><code>await wm.showWindow(hwnd);</code></pre>
+
+                <h4><code>async hideWindow(hwnd)</code></h4>
+                <p>Hides a window.</p>
+                <pre><code>await wm.hideWindow(hwnd);</code></pre>
+
+                <h4><code>async setFocus(hwnd)</code></h4>
+                <p>Sets keyboard focus to a window.</p>
+                <pre><code>await wm.setFocus(hwnd);</code></pre>
+
+                <h4><code>async getWindowInfo(hwnd)</code></h4>
+                <p>Gets information about a window.</p>
+                <pre><code>const info = await wm.getWindowInfo(hwnd);
+// Returns: {
+//   hwnd: "FW_HWND_abc123",
+//   title: "My App",
+//   x: 100,
+//   y: 100,
+//   width: 800,
+//   height: 600,
+//   visible: true
+// }</code></pre>
+
+                <h4><code>async listWindows()</code></h4>
+                <p>Lists all windows.</p>
+                <pre><code>const windows = await wm.listWindows();
+// Returns: Array of window info objects</code></pre>
+
+                <h3>Buffer Management Methods</h3>
+                
+                <h4><code>async updateWindow(hwnd, buffer, x = 0, y = 0, width = null, height = null)</code></h4>
+                <p>Updates a window's buffer content. The buffer can be a Buffer, Array, or base64 string.</p>
+                <pre><code>// Update entire window
+await wm.updateWindow(hwnd, pixelBuffer);
+
+// Update specific region
+await wm.updateWindow(hwnd, pixelBuffer, 10, 10, 100, 100);</code></pre>
+
+                <h4><code>async getWindowBuffer(hwnd)</code></h4>
+                <p>Gets a window's drawing buffer.</p>
+                <pre><code>const buffer = await wm.getWindowBuffer(hwnd);</code></pre>
+            </section>
+
+            <section>
+                <h2>Connection Details</h2>
+                
+                <h3>Socket Detection</h3>
+                <p>The client automatically detects the appropriate connection method:</p>
+                <ul>
+                    <li><strong>Linux/WSL:</strong> Tries Unix socket <code>/tmp/fwcompositor.sock</code> first, falls back to TCP</li>
+                    <li><strong>Windows:</strong> Uses TCP <code>127.0.0.1:8080</code> or named pipe</li>
+                    <li><strong>macOS:</strong> Tries Unix socket first, falls back to TCP</li>
+                </ul>
+
+                <h3>Protocol</h3>
+                <p>The client uses <strong>JSON-RPC 2.0</strong> protocol:</p>
+                <ul>
+                    <li>Each request has a unique ID</li>
+                    <li>Responses match request IDs</li>
+                    <li>Errors are returned in standard JSON-RPC format</li>
+                    <li>5-second timeout per request</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Error Handling</h2>
+                
+                <h3>Connection Errors</h3>
+                <pre><code>try {
+    await wm.connect();
+} catch (error) {
+    if (error.code === 'ENOENT') {
+        console.error('fwcompositor service not running');
+    } else if (error.code === 'ECONNREFUSED') {
+        console.error('Connection refused - service may not be running');
+    } else {
+        console.error('Connection error:', error);
+    }
+}</code></pre>
+
+                <h3>Request Errors</h3>
+                <pre><code>try {
+    const hwnd = await wm.createWindow('My App', 800, 600);
+} catch (error) {
+    if (error.message === 'Request timeout') {
+        console.error('Service did not respond in time');
+    } else {
+        console.error('RPC error:', error);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Integration with Existing Code</h2>
+                
+                <h3>Updating window.js</h3>
+                <p>The existing <code>system/window.js</code> can be updated to use the client:</p>
+                <pre><code>const WindowManagerClient = require('./wm-client');
+
+class WindowManager {
+    constructor() {
+        this.client = new WindowManagerClient();
+        this.connected = false;
+    }
+    
+    async init() {
+        await this.client.connect();
+        this.connected = true;
+    }
+    
+    async createWindow(title, width, height) {
+        if (!this.connected) await this.init();
+        const hwnd = await this.client.createWindow(title, width, height);
+        return new Window(hwnd, this.client);
+    }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="windowing-architecture.html">Windowing Architecture</a> - Overall architecture</li>
+                    <li><a href="fwcompositor.html">fwcompositor Service</a> - Window manager service</li>
+                    <li><a href="window.html">Window Management</a> - Window API</li>
+                    <li><a href="compositor.html">Compositor</a> - Compositing system</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+</body>
+</html>
+

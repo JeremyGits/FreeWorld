@@ -26,11 +26,17 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -92,8 +98,27 @@ org 0x7C00      ; BIOS loads boot sector at 0x7C00</pre>
 
                 <h3>Functions</h3>
                 
+                <h4>init_serial</h4>
+                <p>Initializes serial port COM1 at 0x3F8 for debugging output:</p>
+                <div class="code-block">
+                    <pre>init_serial:
+    ; Set baud rate to 38400 (divisor 0x0003)
+    ; Configure: 8 bits, no parity, 1 stop bit
+    ; Enable FIFO</pre>
+                </div>
+                <p><strong>Purpose:</strong> Enables serial port debugging output alongside video output.</p>
+
+                <h4>print_serial</h4>
+                <p>Prints a character to the serial port (COM1):</p>
+                <div class="code-block">
+                    <pre>print_serial:
+    ; Wait for transmit ready
+    ; Send character to COM1 data port</pre>
+                </div>
+                <p><strong>Purpose:</strong> Outputs debug information to serial port for QEMU debugging.</p>
+
                 <h4>print_string</h4>
-                <p>Displays a null-terminated string using BIOS interrupt 0x10:</p>
+                <p>Displays a null-terminated string using BIOS interrupt 0x10 and serial port:</p>
                 <div class="code-block">
                     <pre>print_string:
     lodsb            ; Load byte from [SI] into AL, increment SI
@@ -107,12 +132,27 @@ done:
                 </div>
 
                 <h4>load_kernel</h4>
-                <p>Placeholder function for kernel loading logic (to be implemented):</p>
+                <p>Loads the kernel from disk using BIOS interrupt 0x13:</p>
                 <div class="code-block">
                     <pre>load_kernel:
-    ; Kernel loading logic will be implemented
-    ret</pre>
+    mov ah, 0x02     ; Read sectors function
+    mov al, 16       ; Number of sectors to read (8KB)
+    mov ch, 0        ; Cylinder 0
+    mov cl, 2        ; Sector 2 (boot sector is sector 1)
+    mov dh, 0        ; Head 0
+    mov dl, 0        ; Drive 0 (floppy A:)
+    mov bx, 0x1000   ; Segment
+    mov es, bx
+    mov bx, 0x0000   ; Offset
+    int 0x13         ; BIOS disk interrupt
+    jc load_error    ; Jump if error (carry flag set)
+    
+    ; Verify kernel magic number
+    ; Compare first 8 bytes with "FREEWORL"
+    ; If mismatch, jump to magic_error</pre>
                 </div>
+                <p><strong>Purpose:</strong> Loads the kernel binary from disk sector 2 into memory at 0x1000:0x0000 (linear address 0x10000).</p>
+                <p><strong>Error Handling:</strong> Checks for disk read errors and verifies kernel magic number before jumping to kernel.</p>
             </section>
 
             <section class="section">
@@ -234,10 +274,24 @@ nasm -f bin bootmgr.asm -o BOOTMGR.bin</pre>
             <section class="section">
                 <h2>Integration Points</h2>
                 <ul>
-                    <li><strong>BCD:</strong> BOOTMGR may read BCD to determine boot configuration</li>
-                    <li><strong>freeload.exe:</strong> BOOTMGR may load freeload.exe as the next stage loader</li>
-                    <li><strong>Kernel:</strong> BOOTMGR loads and transfers control to fwoskrnl.exe</li>
+                    <li><strong>BIOS/UEFI:</strong> Loaded by BIOS at 0x7C00</li>
+                    <li><strong>Kernel:</strong> Loads and transfers control to kernel at 0x1000:0x0000 (linear 0x10000)</li>
+                    <li><strong>Serial Port:</strong> Outputs debug information to COM1 (0x3F8) for QEMU debugging</li>
+                    <li><strong>BCD:</strong> May read BCD configuration (future)</li>
                 </ul>
+            </section>
+
+            <section class="section">
+                <h2>Debug Output</h2>
+                <p>BOOTMGR outputs messages to both video (BIOS INT 0x10) and serial port (COM1):</p>
+                <ul>
+                    <li><strong>"FreeWorld Boot Manager v0.1"</strong> - Initial boot message</li>
+                    <li><strong>"Loading kernel..."</strong> - Before loading kernel</li>
+                    <li><strong>"Kernel loaded."</strong> - After successful kernel load</li>
+                    <li><strong>"Error loading kernel!"</strong> - If disk read fails</li>
+                    <li><strong>"Invalid kernel magic!"</strong> - If kernel signature doesn't match</li>
+                </ul>
+                <p>Serial port output is particularly useful for debugging in QEMU with <code>-serial stdio</code>.</p>
             </section>
         </main>
     </div>

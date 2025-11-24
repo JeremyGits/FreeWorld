@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windowing Architecture - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="architecture.html">Architecture</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Windowing System Architecture</h1>
+                <p class="subtitle">Native windowing system with kernel integration and IPC communication</p>
+            </div>
+
+            <section>
+                <h2>Overview</h2>
+                <p>FreeWorld uses a <strong>native windowing system</strong> with kernel-level graphics and a central window manager service. This architecture is similar to how X11, Wayland, and Windows DWM work.</p>
+                
+                <div class="architecture-diagram">
+                    <pre>
+┌─────────────────────────────────────────────────────────┐
+│  Node.js Applications (User Space)                      │
+│  - Desktop apps                                         │
+│  - System utilities                                      │
+│  - User programs                                        │
+└──────────────────┬──────────────────────────────────────┘
+                   │ IPC (Unix Socket / TCP Port)
+                   │ Protocol: JSON-RPC or Binary Protocol
+┌──────────────────▼──────────────────────────────────────┐
+│  Window Manager Service (fwcompositor)                  │
+│  - Window management                                     │
+│  - Compositing                                           │
+│  - Input routing                                         │
+│  - IPC server (listens on port 8080 or /tmp/fwcompositor)│
+└──────────────────┬──────────────────────────────────────┘
+                   │ Syscalls
+                   │ - SYS_GRAPHICS_* (custom syscalls)
+                   │ - SYS_MMAP (framebuffer access)
+┌──────────────────▼──────────────────────────────────────┐
+│  Kernel Graphics Layer                                  │
+│  - VESA framebuffer driver                              │
+│  - Graphics syscalls                                     │
+│  - Direct framebuffer access                            │
+│  - Hardware abstraction                                  │
+└──────────────────┬──────────────────────────────────────┘
+                   │ Hardware
+┌──────────────────▼──────────────────────────────────────┐
+│  Graphics Hardware (VGA/VESA)                           │
+└─────────────────────────────────────────────────────────┘
+                    </pre>
+                </div>
+            </section>
+
+            <section>
+                <h2>Architecture Layers</h2>
+                
+                <h3>1. Kernel Graphics Layer</h3>
+                <p><strong>Location:</strong> <code>kernel/gui/</code></p>
+                <p><strong>Purpose:</strong> Low-level graphics primitives, framebuffer management</p>
+                
+                <h4>Key Functions:</h4>
+                <ul>
+                    <li><code>gui_renderer_init()</code> - Initialize VESA framebuffer</li>
+                    <li><code>gui_draw_pixel()</code> - Draw pixel to framebuffer</li>
+                    <li><code>gui_draw_rect()</code> - Draw rectangle</li>
+                    <li><code>gui_draw_window()</code> - Draw window with title bar</li>
+                    <li><code>gui_blit()</code> - Copy buffer to framebuffer</li>
+                    <li><code>gui_swap_buffers()</code> - Double buffering</li>
+                </ul>
+                
+                <h4>System Calls:</h4>
+                <ul>
+                    <li><code>SYS_GRAPHICS_INIT</code> - Initialize graphics</li>
+                    <li><code>SYS_GRAPHICS_GET_FB</code> - Get framebuffer address</li>
+                    <li><code>SYS_GRAPHICS_BLIT</code> - Blit buffer to screen</li>
+                    <li><code>SYS_MMAP</code> - Map framebuffer to user space</li>
+                </ul>
+
+                <h3>2. Window Manager Service</h3>
+                <p><strong>Location:</strong> <code>services/fwcompositor/</code></p>
+                <p><strong>Purpose:</strong> Central window management, compositing, IPC server</p>
+                
+                <h4>Responsibilities:</h4>
+                <ul>
+                    <li>Window creation/destruction</li>
+                    <li>Window positioning and sizing</li>
+                    <li>Z-order management</li>
+                    <li>Compositing (blending windows)</li>
+                    <li>Input event routing</li>
+                    <li>IPC server for applications</li>
+                </ul>
+                
+                <p>See <a href="fwcompositor.html">fwcompositor Service</a> for detailed documentation.</p>
+
+                <h3>3. Node.js Client Library</h3>
+                <p><strong>Location:</strong> <code>system/wm-client.js</code></p>
+                <p><strong>Purpose:</strong> IPC client for Node.js applications to communicate with window manager</p>
+                
+                <h4>Usage Example:</h4>
+                <pre><code>const WindowManager = require('./wm-client');
+
+const wm = new WindowManager();
+await wm.connect(); // Connect to fwcompositor service
+
+const hwnd = await wm.createWindow('My App', 800, 600);
+await wm.showWindow(hwnd);
+await wm.moveWindow(hwnd, 100, 100);
+
+// Draw to window buffer
+const buffer = await wm.getWindowBuffer(hwnd);
+// ... draw to buffer ...
+await wm.updateWindow(hwnd, buffer); // Send buffer to compositor</code></pre>
+                
+                <p>See <a href="wm-client.html">Window Manager Client</a> for detailed API documentation.</p>
+            </section>
+
+            <section>
+                <h2>Application Flow</h2>
+                
+                <h3>1. Application Starts</h3>
+                <ol>
+                    <li>Application connects to <code>fwcompositor</code> service via IPC</li>
+                    <li>Requests window creation</li>
+                    <li>Receives HWND (window handle)</li>
+                </ol>
+
+                <h3>2. Application Draws</h3>
+                <ol>
+                    <li>Gets window buffer from window manager</li>
+                    <li>Draws to buffer (using DeviceContext)</li>
+                    <li>Sends buffer back to window manager</li>
+                </ol>
+
+                <h3>3. Window Manager</h3>
+                <ol>
+                    <li>Receives buffer from application</li>
+                    <li>Composites all windows (blends them)</li>
+                    <li>Sends final composite to kernel</li>
+                    <li>Kernel blits to framebuffer</li>
+                </ol>
+
+                <h3>4. Input Events</h3>
+                <ol>
+                    <li>Kernel receives keyboard/mouse input</li>
+                    <li>Kernel sends to window manager via syscall</li>
+                    <li>Window manager routes to correct window</li>
+                    <li>Window manager sends event to application via IPC</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>IPC Communication</h2>
+                
+                <h3>Socket Location</h3>
+                <ul>
+                    <li><strong>Unix Domain Socket:</strong> <code>/tmp/fwcompositor.sock</code> (Linux/WSL)</li>
+                    <li><strong>TCP Port:</strong> <code>127.0.0.1:8080</code> (fallback)</li>
+                    <li><strong>Named Pipe:</strong> <code>\\.\pipe\fwcompositor</code> (Windows)</li>
+                </ul>
+
+                <h3>Protocol</h3>
+                <ul>
+                    <li><strong>Format:</strong> JSON-RPC 2.0 or custom binary protocol</li>
+                    <li><strong>Transport:</strong> Unix socket (preferred) or TCP</li>
+                    <li><strong>Encoding:</strong> UTF-8 JSON or binary</li>
+                </ul>
+
+                <h3>Example Request/Response</h3>
+                
+                <h4>Create Window:</h4>
+                <pre><code>Request:
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "method": "CreateWindow",
+  "params": {
+    "title": "My Application",
+    "width": 800,
+    "height": 600,
+    "flags": 0
+  }
+}
+
+Response:
+{
+  "jsonrpc": "2.0",
+  "id": 1,
+  "result": {
+    "hwnd": "FW_HWND_abc123",
+    "status": "ok"
+  }
+}</code></pre>
+
+                <h4>Update Window Buffer:</h4>
+                <pre><code>Request:
+{
+  "jsonrpc": "2.0",
+  "id": 2,
+  "method": "UpdateWindow",
+  "params": {
+    "hwnd": "FW_HWND_abc123",
+    "buffer": "&lt;base64 encoded pixel data&gt;",
+    "x": 0,
+    "y": 0,
+    "width": 800,
+    "height": 600
+  }
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Benefits</h2>
+                <ul>
+                    <li><strong>Native Windows:</strong> Real windows, not web-based</li>
+                    <li><strong>Kernel Integration:</strong> Direct framebuffer access</li>
+                    <li><strong>Centralized Management:</strong> One service manages all windows</li>
+                    <li><strong>IPC Communication:</strong> Clean separation between apps and window manager</li>
+                    <li><strong>Scalable:</strong> Multiple apps can connect simultaneously</li>
+                    <li><strong>Secure:</strong> Window manager controls access to graphics</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Similar Systems</h2>
+                <ul>
+                    <li><strong>X11:</strong> X server manages windows, apps connect via X protocol</li>
+                    <li><strong>Wayland:</strong> Compositor manages windows, apps use Wayland protocol</li>
+                    <li><strong>Windows DWM:</strong> Desktop Window Manager handles compositing</li>
+                    <li><strong>macOS Quartz:</strong> Window Server manages windows</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Implementation Status</h2>
+                <div class="status-grid">
+                    <div class="status-item">
+                        <h4>Kernel Graphics Layer</h4>
+                        <p class="status-badge status-complete">✅ Complete</p>
+                        <p>VESA framebuffer, graphics primitives, window drawing</p>
+                    </div>
+                    <div class="status-item">
+                        <h4>Window Manager Service</h4>
+                        <p class="status-badge status-pending">⏳ Planned</p>
+                        <p>fwcompositor service needs to be implemented</p>
+                    </div>
+                    <div class="status-item">
+                        <h4>Node.js Client Library</h4>
+                        <p class="status-badge status-complete">✅ Complete</p>
+                        <p>IPC client library implemented</p>
+                    </div>
+                    <div class="status-item">
+                        <h4>Graphics Syscalls</h4>
+                        <p class="status-badge status-pending">⏳ Planned</p>
+                        <p>Kernel graphics syscalls need to be added</p>
+                    </div>
+                </div>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="fwcompositor.html">fwcompositor Service</a> - Window manager service details</li>
+                    <li><a href="wm-client.html">Window Manager Client</a> - Node.js IPC client API</li>
+                    <li><a href="gui-kernel.html">Kernel GUI System</a> - Low-level graphics functions</li>
+                    <li><a href="compositor.html">Compositor</a> - Window compositing system</li>
+                    <li><a href="window.html">Window Management</a> - Window API and management</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+</body>
+</html>
+

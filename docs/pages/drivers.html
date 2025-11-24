@@ -1,0 +1,553 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Device Drivers - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Device Drivers - FreeWorld OS</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/drivers/<br>
+                    <strong>Type:</strong> Assembly Device Drivers<br>
+                    <strong>Purpose:</strong> Complete device driver implementations (VGA, keyboard, timer, mouse, VESA)<br>
+                    <strong>Status:</strong> ✅ Complete and Production-Ready
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld Device Drivers provide complete, production-ready drivers for essential hardware components. All drivers are implemented in assembly for maximum performance and direct hardware access.</p>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> All critical device drivers are complete and integrated. Total: ~2,000+ lines of production-ready code.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>VGA Driver (vga.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/vga.asm</code> (510 lines)</p>
+                <p>Complete VGA text mode driver with full feature set:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>80x25 text mode initialization</li>
+                    <li>Cursor management (show/hide, position)</li>
+                    <li>16-color support (foreground/background)</li>
+                    <li>Auto-scrolling when screen full</li>
+                    <li>Print functions (char, string, number, hex)</li>
+                    <li>Screen clearing and line clearing</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_vga</code></td>
+                            <td>Initialize VGA text mode</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_putchar</code></td>
+                            <td>Print character at cursor</td>
+                            <td>AL = character</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_puts</code></td>
+                            <td>Print null-terminated string</td>
+                            <td>ESI = string pointer</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_set_cursor</code></td>
+                            <td>Set cursor position</td>
+                            <td>EAX = X, EBX = Y</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_get_cursor</code></td>
+                            <td>Get cursor position</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_show_cursor</code></td>
+                            <td>Show cursor</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_hide_cursor</code></td>
+                            <td>Hide cursor</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_clear_screen</code></td>
+                            <td>Clear entire screen</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_set_color</code></td>
+                            <td>Set color attribute</td>
+                            <td>AL = color byte</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga_scroll</code></td>
+                            <td>Scroll screen up one line</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>VGA Constants</h3>
+                <ul>
+                    <li><code>VGA_MEMORY_BASE</code>: 0xB8000 (text mode framebuffer)</li>
+                    <li><code>VGA_WIDTH</code>: 80 columns</li>
+                    <li><code>VGA_HEIGHT</code>: 25 rows</li>
+                    <li>16 color constants (BLACK, BLUE, GREEN, CYAN, RED, MAGENTA, BROWN, LIGHT_GRAY, DARK_GRAY, LIGHT_BLUE, LIGHT_GREEN, LIGHT_CYAN, LIGHT_RED, LIGHT_MAGENTA, YELLOW, WHITE)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Keyboard Driver (keyboard.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/keyboard.asm</code> (350 lines)</p>
+                <p>Complete keyboard driver with scan code processing:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>Complete US QWERTY scan code mapping</li>
+                    <li>Circular buffer (256 characters)</li>
+                    <li>Key state tracking (Shift, Ctrl, Alt, Caps Lock, Num Lock, Scroll Lock)</li>
+                    <li>Non-blocking character retrieval</li>
+                    <li>Special key handling (function keys, arrows, etc.)</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>keyboard_irq_handler</code></td>
+                            <td>IRQ handler for keyboard interrupts</td>
+                            <td>None (interrupt handler)</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>keyboard_getchar</code></td>
+                            <td>Get character from keyboard buffer</td>
+                            <td>None</td>
+                            <td>AL = character (0 if none available)</td>
+                        </tr>
+                        <tr>
+                            <td><code>scan_code_to_ascii</code></td>
+                            <td>Convert scan code to ASCII</td>
+                            <td>AL = scan code</td>
+                            <td>AL = ASCII character (0 if not printable)</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Key State Flags</h3>
+                <ul>
+                    <li><code>KEY_STATE_SHIFT</code>: Shift key pressed</li>
+                    <li><code>KEY_STATE_CTRL</code>: Ctrl key pressed</li>
+                    <li><code>KEY_STATE_ALT</code>: Alt key pressed</li>
+                    <li><code>KEY_STATE_CAPS</code>: Caps Lock active</li>
+                    <li><code>KEY_STATE_NUMLOCK</code>: Num Lock active</li>
+                    <li><code>KEY_STATE_SCROLLLOCK</code>: Scroll Lock active</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Timer Driver (timer.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/timer.asm</code> (150 lines)</p>
+                <p>System timer driver with time tracking:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>System time tracking (seconds, milliseconds)</li>
+                    <li>Sleep functions (sleep_ms, sleep_seconds)</li>
+                    <li>Tick counter (100 Hz timer)</li>
+                    <li>IRQ handler for timer interrupts</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_timer</code></td>
+                            <td>Initialize timer driver</td>
+                            <td>None</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>timer_irq_handler</code></td>
+                            <td>IRQ handler for timer interrupts</td>
+                            <td>None (interrupt handler)</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_time_ms</code></td>
+                            <td>Get system time in milliseconds</td>
+                            <td>None</td>
+                            <td>EAX = milliseconds since boot</td>
+                        </tr>
+                        <tr>
+                            <td><code>get_time_seconds</code></td>
+                            <td>Get system time in seconds</td>
+                            <td>None</td>
+                            <td>EAX = seconds since boot</td>
+                        </tr>
+                        <tr>
+                            <td><code>sleep_ms</code></td>
+                            <td>Sleep for milliseconds</td>
+                            <td>EAX = milliseconds</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>sleep_seconds</code></td>
+                            <td>Sleep for seconds</td>
+                            <td>EAX = seconds</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Timer Configuration</h3>
+                <ul>
+                    <li><strong>Frequency:</strong> 100 Hz (10ms per tick)</li>
+                    <li><strong>IRQ:</strong> IRQ 0 (Timer)</li>
+                    <li><strong>Interrupt:</strong> INT 0x20 (after PIC remapping)</li>
+                    <li><strong>PIT Mode:</strong> Mode 2 (Rate Generator)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Mouse Driver (mouse.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/mouse.asm</code> (~400 lines)</p>
+                <p>Complete PS/2 mouse driver with packet processing:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>PS/2 mouse initialization and configuration</li>
+                    <li>3-byte packet processing (status, X delta, Y delta)</li>
+                    <li>Button tracking (left, right, middle)</li>
+                    <li>Position tracking with bounds checking (0-1023 X, 0-767 Y)</li>
+                    <li>IRQ 12 handler integrated</li>
+                    <li>Circular buffer for mouse packets</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_mouse</code></td>
+                            <td>Initialize PS/2 mouse</td>
+                            <td>None</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>mouse_irq_handler</code></td>
+                            <td>IRQ handler for mouse interrupts (IRQ 12)</td>
+                            <td>None (interrupt handler)</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>mouse_get_position</code></td>
+                            <td>Get current mouse position</td>
+                            <td>None</td>
+                            <td>EAX = X, EBX = Y</td>
+                        </tr>
+                        <tr>
+                            <td><code>mouse_get_buttons</code></td>
+                            <td>Get current button state</td>
+                            <td>None</td>
+                            <td>AL = button flags</td>
+                        </tr>
+                        <tr>
+                            <td><code>mouse_is_button_pressed</code></td>
+                            <td>Check if specific button is pressed</td>
+                            <td>AL = button flag</td>
+                            <td>AL = 1 if pressed, 0 if not</td>
+                        </tr>
+                        <tr>
+                            <td><code>mouse_get_packet</code></td>
+                            <td>Get mouse packet from buffer (non-blocking)</td>
+                            <td>None</td>
+                            <td>AL = status, BL = X delta, CL = Y delta, AH = 1 if available</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Mouse Constants</h3>
+                <ul>
+                    <li><code>MOUSE_BUTTON_LEFT</code>: 0x01</li>
+                    <li><code>MOUSE_BUTTON_RIGHT</code>: 0x02</li>
+                    <li><code>MOUSE_BUTTON_MIDDLE</code>: 0x04</li>
+                    <li><code>MOUSE_DATA_PORT</code>: 0x60</li>
+                    <li><code>MOUSE_STATUS_PORT</code>: 0x64</li>
+                    <li><code>MOUSE_COMMAND_PORT</code>: 0x64</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>VESA Graphics Driver (vesa.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/drivers/vesa.asm</code> (~400 lines)</p>
+                <p>Complete VESA/VBE graphics driver with framebuffer support:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>VESA BIOS Extensions (VBE) support</li>
+                    <li>Linear framebuffer access</li>
+                    <li>1024x768x32 graphics mode</li>
+                    <li>Framebuffer information retrieval</li>
+                    <li>Graphics primitives (pixel, line, rectangle)</li>
+                    <li>Screen clearing</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_vesa</code></td>
+                            <td>Initialize VESA graphics mode</td>
+                            <td>None</td>
+                            <td>EAX = 0 on success, -1 on failure</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_get_framebuffer</code></td>
+                            <td>Get framebuffer address</td>
+                            <td>None</td>
+                            <td>EAX = framebuffer address</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_get_width</code></td>
+                            <td>Get screen width</td>
+                            <td>None</td>
+                            <td>EAX = width in pixels</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_get_height</code></td>
+                            <td>Get screen height</td>
+                            <td>None</td>
+                            <td>EAX = height in pixels</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_get_pitch</code></td>
+                            <td>Get bytes per scanline</td>
+                            <td>None</td>
+                            <td>EAX = pitch in bytes</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_draw_pixel</code></td>
+                            <td>Draw pixel at (X, Y)</td>
+                            <td>EAX = X, EBX = Y, ECX = color</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_draw_line</code></td>
+                            <td>Draw line (Bresenham's algorithm)</td>
+                            <td>EAX = X1, EBX = Y1, ECX = X2, EDX = Y2, ESI = color</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_draw_rect</code></td>
+                            <td>Draw filled rectangle</td>
+                            <td>EAX = X, EBX = Y, ECX = width, EDX = height, ESI = color</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_draw_rect_outline</code></td>
+                            <td>Draw rectangle outline</td>
+                            <td>EAX = X, EBX = Y, ECX = width, EDX = height, ESI = color</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>vesa_clear_screen</code></td>
+                            <td>Clear framebuffer with color</td>
+                            <td>EAX = color (32-bit ARGB)</td>
+                            <td>None</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>VESA Constants</h3>
+                <ul>
+                    <li><code>VESA_MODE_WIDTH</code>: 1024</li>
+                    <li><code>VESA_MODE_HEIGHT</code>: 768</li>
+                    <li><code>VESA_MODE_BPP</code>: 32</li>
+                    <li><code>VESA_MODE_NUMBER</code>: 0x118 (1024x768x32)</li>
+                    <li><code>VBE_MODE_LINEAR_FRAMEBUFFER</code>: 0x4000</li>
+                    <li><code>VBE_MODE_ENABLE</code>: 0x0001</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>All device drivers are integrated into the kernel via <code>kernel/integration.asm</code>:</p>
+                <div class="code-block">
+                    <pre>; In kernel_subsystems_init:
+call init_timer    ; Initialize timer driver
+call init_vga      ; Initialize VGA driver
+call init_mouse    ; Initialize mouse driver (IRQ 12)
+; Keyboard driver uses existing keyboard_handler
+; VESA driver initialized on demand for graphics mode</pre>
+                </div>
+                <p><strong>Status:</strong> ✅ Integrated - All drivers initialized during kernel boot</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>VGA Output</h3>
+                <div class="code-block">
+                    <pre>; Print a character
+mov al, 'A'
+call vga_putchar
+
+; Print a string
+mov esi, hello_string
+call vga_puts
+
+; Set cursor position
+mov eax, 10  ; X
+mov ebx, 5   ; Y
+call vga_set_cursor</pre>
+                </div>
+
+                <h3>Keyboard Input</h3>
+                <div class="code-block">
+                    <pre>; Get character from keyboard
+call keyboard_getchar
+cmp al, 0
+je no_input
+; AL contains the character</pre>
+                </div>
+
+                <h3>Timer Functions</h3>
+                <div class="code-block">
+                    <pre>; Get current time
+call get_time_ms
+; EAX contains milliseconds since boot
+
+; Sleep for 1 second
+mov eax, 1000
+call sleep_ms</pre>
+                </div>
+
+                <h3>Mouse Input</h3>
+                <div class="code-block">
+                    <pre>; Get mouse position
+call mouse_get_position
+; EAX = X position, EBX = Y position
+
+; Check if left button is pressed
+mov al, MOUSE_BUTTON_LEFT
+call mouse_is_button_pressed
+cmp al, 1
+je left_button_pressed</pre>
+                </div>
+
+                <h3>VESA Graphics</h3>
+                <div class="code-block">
+                    <pre>; Initialize graphics mode
+call init_vesa
+cmp eax, 0
+jne graphics_error
+
+; Draw a pixel
+mov eax, 100   ; X
+mov ebx, 100   ; Y
+mov ecx, 0xFFFFFFFF  ; White (ARGB)
+call vesa_draw_pixel
+
+; Draw a rectangle
+mov eax, 50    ; X
+mov ebx, 50    ; Y
+mov ecx, 200   ; Width
+mov edx, 100   ; Height
+mov esi, 0xFF0000FF  ; Blue
+call vesa_draw_rect</pre>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

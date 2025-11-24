@@ -24,23 +24,46 @@
                 <li class="nav-section">Core System</li>
                 <li><a href="pages/kernel.html">fwoskrnl.exe</a></li>
                 <li><a href="pages/hal.html">hal.dll</a></li>
+                <li><a href="pages/io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="pages/memory.html">Memory Management</a></li>
+                <li><a href="pages/drivers.html">Device Drivers</a></li>
+                <li><a href="pages/process.html">Process Management</a></li>
+                <li><a href="pages/resource-manager.html">Resource Manager</a></li>
+                <li><a href="pages/filesystem-kernel.html">File System</a></li>
+                <li><a href="pages/graphics.html">Graphics System</a></li>
                 <li class="nav-section">Services</li>
+                <li><a href="pages/fwcompositor.html">fwcompositor</a></li>
                 <li><a href="pages/smss.html">smss.exe</a></li>
                 <li><a href="pages/csrss.html">csrss.exe</a></li>
                 <li><a href="pages/freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="pages/networkd.html">networkd</a></li>
+                <li><a href="pages/logd.html">logd</a></li>
+                <li><a href="pages/securityd.html">securityd</a></li>
+                <li><a href="pages/display-manager.html">display-manager</a></li>
                 <li class="nav-section">User Interface</li>
                 <li><a href="pages/shell.html">Shell</a></li>
                 <li><a href="pages/wanderer.html">Wanderer</a></li>
+                <li><a href="pages/fwmic.html">FWMIC</a></li>
+                <li><a href="pages/file-type-associations.html">File Type Associations</a></li>
+                <li><a href="pages/icon-system.html">Icon System</a></li>
                 <li class="nav-section">GUI Subsystems</li>
+                <li><a href="pages/event-system.html">Event System</a></li>
+                <li><a href="pages/input-manager.html">Input Manager</a></li>
+                <li><a href="pages/windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="pages/gui-kernel.html">Kernel GUI System</a></li>
                 <li><a href="pages/dc.html">Device Context</a></li>
                 <li><a href="pages/compositor.html">Compositor</a></li>
                 <li><a href="pages/resources.html">Resource Manager</a></li>
-                <li><a href="pages/input.html">Input Manager</a></li>
                 <li><a href="pages/clipboard.html">Clipboard & Drag & Drop</a></li>
                 <li><a href="pages/window-relationships.html">Window Relationships</a></li>
                 <li><a href="pages/menu.html">Menu System</a></li>
                 <li><a href="pages/nonclient.html">Non-Client Area</a></li>
                 <li><a href="pages/controls.html">Standard Controls</a></li>
+                <li><a href="pages/window.html">Window Management</a></li>
+                <li><a href="pages/wm-client.html">Window Manager Client</a></li>
+                <li><a href="pages/graphics.html">Graphics System</a></li>
+                <li><a href="pages/drivers.html">Graphics Drivers</a></li>
+                <li><a href="pages/gui-integration.html">GUI Integration</a></li>
                 <li><a href="pages/timer.html">Timer Manager</a></li>
                 <li><a href="pages/property.html">Property Manager</a></li>
                 <li><a href="pages/hooks.html">Hook Manager</a></li>
@@ -59,9 +82,16 @@
                 <li><a href="pages/api.html">System API</a></li>
                 <li><a href="pages/filesystem.html">Filesystem API</a></li>
                 <li><a href="pages/integration.html">System Integration</a></li>
+                <li class="nav-section">Rendering System</li>
+                <li><a href="pages/rendering-engine.html">Native Rendering Engine</a></li>
+                <li><a href="pages/browser-engine.html">ASM Browser Engine (Legacy)</a></li>
+                <li><a href="pages/browser-nodejs.html">Node.js Integration</a></li>
+                <li><a href="pages/browser-rendering.html">Rendering System</a></li>
+                <li><a href="pages/browser-network.html">Network Stack</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="pages/naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="pages/boot-process.html">Boot Process</a></li>
+                <li><a href="pages/boot-analysis.html">Boot Analysis</a></li>
                 <li><a href="pages/architecture.html">Architecture</a></li>
                 <li><a href="pages/syscalls.html">System Calls</a></li>
                 <li><a href="pages/variables.html">Variables & Constants</a></li>
@@ -83,7 +113,50 @@
                     <div class="card">
                         <h4>Kernel & HAL</h4>
                         <p>Core system components and hardware abstraction</p>
+                        <p class="status-badge">✅ Protected Mode Working | ✅ 64-bit Long Mode</p>
                         <a href="pages/kernel.html">View Kernel →</a>
+                    </div>
+                    <div class="card">
+                        <h4>I/O Infrastructure</h4>
+                        <p>Complete serial ports, IRQ handling, and hardware I/O</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/io-infrastructure.html">View I/O Infrastructure →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Memory Management</h4>
+                        <p>Paging, frame allocator, and heap allocator</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/memory.html">View Memory Management →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Device Drivers</h4>
+                        <p>VGA, keyboard, timer, mouse, and VESA graphics drivers</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/drivers.html">View Device Drivers →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Process Management</h4>
+                        <p>Process and thread creation, scheduling, context switching</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/process.html">View Process Management →</a>
+                    </div>
+                    <div class="card">
+                        <h4>File System</h4>
+                        <p>Kernel file system driver for loading programs</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/filesystem-kernel.html">View File System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Graphics System</h4>
+                        <p>VESA framebuffer, graphics primitives, and Node.js bridge</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/graphics.html">View Graphics System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>FWMIC</h4>
+                        <p>FreeWorld Management Instrumentation and Control</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/fwmic.html">View FWMIC →</a>
                     </div>
                     <div class="card">
                         <h4>System Services</h4>
@@ -93,7 +166,26 @@
                     <div class="card">
                         <h4>User Interface</h4>
                         <p>Shell and file manager documentation</p>
+                        <p class="status-badge">✅ Complete</p>
                         <a href="pages/shell.html">View UI Components →</a>
+                    </div>
+                    <div class="card">
+                        <h4>File Type Associations</h4>
+                        <p>100+ file types with MIME types, icons, and default applications</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/file-type-associations.html">View File Types →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Icon System</h4>
+                        <p>Icon management, serving, and fallback system</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/icon-system.html">View Icon System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Windowing System</h4>
+                        <p>Native windowing architecture with kernel integration</p>
+                        <p class="status-badge">✅ Architecture Designed</p>
+                        <a href="pages/windowing-architecture.html">View Windowing System →</a>
                     </div>
                     <div class="card">
                         <h4>GUI Subsystems</h4>
@@ -111,6 +203,24 @@
                         <a href="pages/window.html">View Node.js System →</a>
                     </div>
                     <div class="card">
+                        <h4>Native Rendering Engine</h4>
+                        <p>Hybrid rendering engine for native UI and Node.js apps</p>
+                        <p class="status-badge">✅ All 5 Phases Complete</p>
+                        <a href="pages/rendering-engine.html">View Rendering Engine →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Resource Manager</h4>
+                        <p>Heuristic-based resource management for CPU, memory, I/O</p>
+                        <p class="status-badge">✅ Complete</p>
+                        <a href="pages/resource-manager.html">View Resource Manager →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Boot Analysis</h4>
+                        <p>Complete analysis of boot components and missing pieces</p>
+                        <p class="status-badge">📋 Analysis Complete</p>
+                        <a href="pages/boot-analysis.html">View Boot Analysis →</a>
+                    </div>
+                    <div class="card">
                         <h4>Reference</h4>
                         <p>Naming conventions, boot process, architecture</p>
                         <a href="pages/naming-conventions.html">View Reference →</a>
@@ -123,10 +233,112 @@
                     <li><strong>Low-level boot layer</strong>: ASM/C/C++ for boot components, kernel, and HAL</li>
                     <li><strong>High-level runtime</strong>: Node.js for desktop environment and applications</li>
                     <li><strong>Cross-platform support</strong>: Windows and Linux file operations</li>
-                    <li><strong>Architecture independence</strong>: x86_64, ARM64, RISC-V, and future architectures</li>
+                    <li><strong>Architecture support</strong>: Full x86_64 (64-bit) support with long mode transition, ARM64 and RISC-V planned</li>
+                    <li><strong>Executable format</strong>: Currently uses flat binary format (simple, fast, no parsing needed)</li>
                 </ul>
+                
+                <div class="alert alert-info">
+                    <strong>Note on .exe/.dll Extensions:</strong> FreeWorld OS uses `.exe` and `.dll` extensions as naming conventions only. The current format is flat binary (not PE format). See <a href="EXECUTABLE_FORMATS.md">EXECUTABLE_FORMATS.md</a> for details on format options and why you don't need to reverse engineer anything.
+                </div>
 
-                <h3>New GUI Subsystems</h3>
+                <h3>Boot System Status</h3>
+                <div class="alert alert-info">
+                    <strong>📋 Boot Analysis Complete</strong><br>
+                    Comprehensive analysis of boot components and missing pieces for full standalone/QEMU boot:
+                    <ul>
+                        <li>✅ BOOTMGR - Fully functional boot sector</li>
+                        <li>✅ Kernel Entry - Complete 16→32→64-bit transition</li>
+                        <li>❌ Filesystem Driver - Required for loading Node.js and libraries</li>
+                        <li>❌ ELF Loader - Required for loading executables</li>
+                        <li>❌ Process Execution (execve) - Required for launching Node.js</li>
+                        <li>❌ Root Filesystem Mounting - Required for system initialization</li>
+                        <li>❌ Init Process - Required for user-space startup</li>
+                    </ul>
+                    See <a href="pages/boot-analysis.html">Boot Analysis</a> for complete details.
+                </div>
+
+                <h3>Native Rendering Engine</h3>
+                <div class="alert alert-success">
+                    <strong>✅ All 5 Phases Complete</strong><br>
+                    Native rendering and application runtime engine (NOT a web browser):
+                    <ul>
+                        <li>✅ Phase 1: Core Rendering (ASM) - Primitives, blitting, clipping</li>
+                        <li>✅ Phase 2: Rendering Engine (C) - Compositing, blend modes, double buffering</li>
+                        <li>✅ Phase 3: Font System (C) - Font loading and text rendering</li>
+                        <li>✅ Phase 4: Image System (C) - BMP/ICO support, scaling, caching</li>
+                        <li>✅ Phase 5: Layout Engine (C) - 7 layout algorithms, alignment, spacing</li>
+                    </ul>
+                    <strong>Total:</strong> ~2,500 lines of production code. See <a href="pages/rendering-engine.html">Native Rendering Engine</a> for complete documentation.
+                </div>
+
+                <h3>Resource Manager</h3>
+                <div class="alert alert-success">
+                    <strong>✅ Complete</strong><br>
+                    Heuristic-based kernel resource management:
+                    <ul>
+                        <li>✅ CPU resource management (time slices, quotas, priorities)</li>
+                        <li>✅ Memory resource management (allocation checks, limits)</li>
+                        <li>✅ I/O resource management (bandwidth limits)</li>
+                        <li>✅ File descriptor management (FD limits, allocation)</li>
+                        <li>✅ System load calculation and monitoring</li>
+                        <li>✅ Resource policies (deterministic, battle-tested heuristics)</li>
+                    </ul>
+                    <strong>Total:</strong> ~1,000 lines of production code. See <a href="pages/resource-manager.html">Resource Manager</a> for complete documentation.
+                </div>
+
+                <h3>ASM Browser Engine (Legacy Concept)</h3>
+                <div class="alert alert-info">
+                    <strong>🔄 Architecture Designed (Superseded)</strong><br>
+                    Original pure assembly-language browser concept (superseded by hybrid approach):
+                    <ul>
+                        <li>Core browser engine with simplified DOM</li>
+                        <li>Node.js integration layer</li>
+                        <li>Rendering system with framebuffer access</li>
+                        <li>Event system for input handling</li>
+                        <li>Network stack for resource loading</li>
+                        <li>Storage system for local/session storage</li>
+                    </ul>
+                    See <a href="pages/browser-engine.html">ASM Browser Engine</a> for complete architecture.
+                </div>
+
+                <h3>Current Development Status</h3>
+                <div class="alert alert-success">
+                    <strong>✅ All Critical Subsystems: COMPLETE</strong><br>
+                    The kernel has all critical subsystems built and integrated:
+                    <ul>
+                        <li>✅ Protected mode transition (GDT, A20, CR0.PE)</li>
+                        <li>✅ 64-bit long mode transition (CPUID, 4-level paging, PAE, EFER)</li>
+                        <li>✅ Complete IDT setup (256 entries, all exception handlers)</li>
+                        <li>✅ PIC remapping (IRQ0-15 → INT 0x20-0x2F)</li>
+                        <li>✅ Memory management (paging, frame allocator, heap)</li>
+                        <li>✅ Device drivers (keyboard, timer, VGA, mouse, VESA)</li>
+                        <li>✅ Process/thread management (scheduling, context switching)</li>
+                        <li>✅ File system driver (open, read, write, seek)</li>
+                        <li>✅ Graphics system (VESA framebuffer, primitives, Node.js bridge)</li>
+                        <li>✅ Native Rendering Engine (all 5 phases complete)</li>
+                        <li>✅ Resource Manager (CPU, memory, I/O, FD management)</li>
+                        <li>✅ System call interface (INT 0x80)</li>
+                        <li>✅ I/O infrastructure (serial ports, IRQ handling)</li>
+                        <li>✅ Subsystem integration (kernel_subsystems_init)</li>
+                        <li>✅ Shell with command history and FWMIC</li>
+                    <li>✅ Desktop Container - Base container for desktop environment</li>
+                    <li>✅ Event Bus - Central event system for component communication</li>
+                    <li>✅ Input Manager - Unified input handling</li>
+                    <li>✅ Drag & Drop System - Standalone drag-drop component</li>
+                    </ul>
+                </div>
+
+                <h3>Native Windowing System</h3>
+                <p>FreeWorld OS uses a <strong>native windowing architecture</strong> similar to X11, Wayland, and Windows DWM:</p>
+                <ul>
+                    <li><strong>Kernel Graphics Layer</strong>: Direct VESA framebuffer access, graphics syscalls</li>
+                    <li><strong>Window Manager Service (fwcompositor)</strong>: Central window management, compositing, IPC server</li>
+                    <li><strong>Node.js Client Library</strong>: IPC client for applications to communicate with window manager</li>
+                    <li><strong>IPC Communication</strong>: Unix socket or TCP port for clean separation between apps and window manager</li>
+                </ul>
+                <p>See <a href="pages/windowing-architecture.html">Windowing Architecture</a> for complete details.</p>
+
+                <h3>GUI Subsystems</h3>
                 <p>FreeWorld OS includes comprehensive GUI subsystems for Win32-like functionality:</p>
                 <ul>
                     <li><strong>Rendering</strong>: Device Context (DC), Compositor with transparency and shadows</li>
@@ -147,6 +359,16 @@
                     <li><strong>Security</strong>: Security Manager with sessions, tokens, ACLs</li>
                     <li><strong>Error Handling</strong>: Error Manager with GetLastError, OutputDebugString</li>
                     <li><strong>Shell</strong>: Desktop, Taskbar, ShellExecute</li>
+                </ul>
+
+                <h3>File Type & Icon System</h3>
+                <p>Comprehensive file type and icon management:</p>
+                <ul>
+                    <li><strong>File Type Registry</strong>: 100+ file types with MIME types, icons, and default applications</li>
+                    <li><strong>Icon Management</strong>: Icon lookup, serving, and emoji fallbacks</li>
+                    <li><strong>File Associations</strong>: Automatic mapping of file extensions to icons and applications</li>
+                    <li><strong>Icon Directories</strong>: Multiple icon paths with size variants (64x64, scalable, default)</li>
+                    <li><strong>HTTP Icon Serving</strong>: Web-based icon serving for GUI applications</li>
                 </ul>
 
                 <div class="alert alert-warning">

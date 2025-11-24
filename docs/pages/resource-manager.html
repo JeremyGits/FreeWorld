@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel Resource Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Kernel Resource Manager</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete<br>
+                    <strong>Purpose:</strong> Heuristic-based resource management for CPU, memory, I/O, and file descriptors
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Kernel Resource Manager provides comprehensive, <strong>heuristic-based</strong> resource management for FreeWorld OS. It uses static, deterministic algorithms that are:</p>
+                <ul>
+                    <li><strong>Fast:</strong> Lightweight, fast execution in kernel critical path</li>
+                    <li><strong>Predictable:</strong> Deterministic behavior, easy to debug</li>
+                    <li><strong>Reliable:</strong> Battle-tested algorithms, well-understood</li>
+                    <li><strong>Simple:</strong> One-size-fits-all approach that works for most workloads</li>
+                </ul>
+                <div class="alert alert-info">
+                    <strong>Design Philosophy:</strong> Uses static heuristics based on decades of OS design experience. Architecture supports future AI/ML integration while maintaining deterministic core.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. Resource Manager (`kernel/resource/resource_manager.asm`)</h3>
+                <p>Core resource management functionality:</p>
+                <ul>
+                    <li><strong>CPU Management:</strong> Time slice calculation, CPU quotas</li>
+                    <li><strong>Memory Management:</strong> Allocation checks, usage tracking</li>
+                    <li><strong>I/O Management:</strong> Bandwidth limits, I/O quotas</li>
+                    <li><strong>File Descriptor Management:</strong> FD limits, allocation tracking</li>
+                    <li><strong>Priority Management:</strong> Process priorities, nice values</li>
+                    <li><strong>System Load:</strong> Load calculation and monitoring</li>
+                </ul>
+
+                <h3>2. Resource Policies (`kernel/resource/resource_policy.c`)</h3>
+                <p>Heuristic-based policies for resource allocation:</p>
+                <ul>
+                    <li><strong>CPU Scheduling Policies:</strong> Multi-factor time slice calculation</li>
+                    <li><strong>Memory Allocation Policies:</strong> Load-based throttling, priority-based limits</li>
+                    <li><strong>I/O Bandwidth Policies:</strong> Priority and load-based bandwidth limits</li>
+                    <li><strong>File Descriptor Policies:</strong> Dynamic FD limits based on system state</li>
+                    <li><strong>Priority Adjustment:</strong> Adaptive priority based on process behavior</li>
+                    <li><strong>Resource Reclamation:</strong> Policies for reclaiming resources from low-priority processes</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Resource Types</h2>
+                
+                <h3>CPU Resources</h3>
+                <ul>
+                    <li><strong>Time Slices:</strong> Calculated based on priority, nice value, system load</li>
+                    <li><strong>CPU Quotas:</strong> Percentage of CPU time available to process</li>
+                    <li><strong>Priority:</strong> 0-99 (higher = more CPU time)</li>
+                    <li><strong>Nice Value:</strong> -20 to 19 (lower = higher priority)</li>
+                </ul>
+
+                <h3>Memory Resources</h3>
+                <ul>
+                    <li><strong>Memory Limits:</strong> Per-process memory quotas</li>
+                    <li><strong>Allocation Checks:</strong> Heuristic-based allocation approval</li>
+                    <li><strong>Load-Based Throttling:</strong> Restrictive allocation during high load</li>
+                    <li><strong>Priority-Based Limits:</strong> Higher priority = larger allocations allowed</li>
+                </ul>
+
+                <h3>I/O Resources</h3>
+                <ul>
+                    <li><strong>Bandwidth Limits:</strong> Per-process I/O bandwidth quotas</li>
+                    <li><strong>Load-Based Throttling:</strong> Reduce I/O during high system load</li>
+                    <li><strong>Priority-Based Limits:</strong> Higher priority = higher bandwidth</li>
+                </ul>
+
+                <h3>File Descriptors</h3>
+                <ul>
+                    <li><strong>FD Limits:</strong> Per-process file descriptor limits</li>
+                    <li><strong>Dynamic Limits:</strong> Adjust based on priority and system load</li>
+                    <li><strong>Allocation Tracking:</strong> Monitor FD usage per process</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Heuristic Algorithms</h2>
+                
+                <h3>CPU Time Slice Calculation</h3>
+                <pre><code>base_timeslice = 10ms
+timeslice = base_timeslice + (priority * 100μs) + ((20 - nice) * 50μs)
+
+if (system_load > 50%) {
+    timeslice -= (timeslice * system_load) / 1000
+}
+
+if (cpu_time_used < 1s) {
+    timeslice *= 1.2  // Prevent starvation
+}
+
+clamp(timeslice, 1ms, 100ms)</code></pre>
+
+                <h3>Memory Allocation Policy</h3>
+                <ol>
+                    <li><strong>Hard Limit Check:</strong> Deny if would exceed process limit</li>
+                    <li><strong>System Load Throttling:</strong>
+                        <ul>
+                            <li>Load > 90%: Only allow if using < 25% of quota</li>
+                            <li>Load > 80%: Only allow if using < 50% of quota</li>
+                        </ul>
+                    </li>
+                    <li><strong>Large Allocation Check:</strong> Require higher priority for > 10% of quota</li>
+                    <li><strong>Fragmentation Check:</strong> Restrict large allocations during high load</li>
+                </ol>
+
+                <h3>System Load Calculation</h3>
+                <pre><code>load = (memory_usage * 50 / total_memory) + 
+       (active_processes * 30 / max_processes) + 
+       (cpu_usage * 20 / 100)
+clamp(load, 0, 100)</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>API Reference</h2>
+                
+                <h3>Initialization</h3>
+                <pre><code>int resource_manager_init(void);</code></pre>
+
+                <h3>CPU Management</h3>
+                <pre><code>uint32_t resource_get_cpu_quota(uint32_t process_id);
+uint64_t resource_calculate_timeslice(uint32_t process_id);</code></pre>
+
+                <h3>Memory Management</h3>
+                <pre><code>int resource_check_memory_allocation(uint32_t process_id, uint64_t size);
+void resource_update_memory(uint32_t process_id, int64_t delta);</code></pre>
+
+                <h3>File Descriptors</h3>
+                <pre><code>int resource_check_fd_allocation(uint32_t process_id);
+int32_t resource_allocate_fd(uint32_t process_id);</code></pre>
+
+                <h3>Priority Management</h3>
+                <pre><code>void resource_set_priority(uint32_t process_id, uint32_t priority);
+void resource_set_nice(uint32_t process_id, int32_t nice_value);</code></pre>
+
+                <h3>Statistics</h3>
+                <pre><code>void resource_get_stats(resource_stats_t* stats);
+uint32_t resource_calculate_system_load(void);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Resource Policies API</h2>
+                
+                <h3>CPU Scheduling</h3>
+                <pre><code>uint64_t resource_policy_calculate_timeslice(
+    uint32_t priority,
+    int32_t nice_value,
+    uint64_t cpu_time_used,
+    uint32_t system_load
+);</code></pre>
+
+                <h3>Memory Allocation</h3>
+                <pre><code>int resource_policy_check_memory_allocation(
+    uint64_t requested_size,
+    uint64_t memory_used,
+    uint64_t memory_max,
+    uint32_t system_load,
+    uint32_t priority
+);</code></pre>
+
+                <h3>I/O Bandwidth</h3>
+                <pre><code>uint64_t resource_policy_calculate_io_limit(
+    uint32_t priority,
+    uint32_t system_load,
+    uint64_t base_bandwidth
+);</code></pre>
+
+                <h3>File Descriptors</h3>
+                <pre><code>uint32_t resource_policy_calculate_fd_limit(
+    uint32_t priority,
+    uint32_t system_load
+);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Resource Manager integrates with:</p>
+                <ul>
+                    <li><strong>Scheduler:</strong> Provides time slice calculations</li>
+                    <li><strong>Memory Manager:</strong> Provides allocation checks</li>
+                    <li><strong>I/O Subsystem:</strong> Provides bandwidth limits</li>
+                    <li><strong>File System:</strong> Provides FD limits</li>
+                    <li><strong>Process Manager:</strong> Provides priority management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <pre><code>kernel/resource/
+├── resource_manager.asm      # Core ASM implementation
+├── resource_manager.h         # C API header
+├── resource_policy.c          # Heuristic policies
+├── resource_policy.h          # Policy API header
+├── Makefile                   # Build system
+└── README.md                  # Documentation</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Why Heuristics?</h2>
+                <ul>
+                    <li><strong>Performance:</strong> Lightweight, fast execution in kernel critical path</li>
+                    <li><strong>Predictability:</strong> Deterministic behavior, easy to debug</li>
+                    <li><strong>Reliability:</strong> Battle-tested algorithms, well-understood</li>
+                    <li><strong>Simplicity:</strong> One-size-fits-all approach that works for most workloads</li>
+                    <li><strong>Domain Knowledge:</strong> Codified experience from decades of OS design</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Future: AI/ML Integration</h2>
+                <p>While the current implementation uses static heuristics, the architecture is designed to allow future integration of neural networks and AI for adaptive resource management. The policy layer can be extended to support ML-based decisions while maintaining the deterministic core.</p>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Core Resource Manager</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Resource Policies</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Heuristic Algorithms</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>API</strong><br>
+                        ✅ Complete
+                    </div>
+                </div>
+                <p><strong>Total:</strong> ~1,000 lines of production code</p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

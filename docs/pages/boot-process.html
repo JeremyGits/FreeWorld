@@ -26,11 +26,17 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -71,29 +77,73 @@
                             <li>BOOTMGR jumps to kernel entry point (0x1000:0x0000)</li>
                         </ul>
                     </li>
-                    <li><strong>BCD (Boot Configuration Data)</strong>
+                    <li><strong>BCD (Boot Configuration Data) - PLANNED</strong>
                         <ul>
-                            <li>freeload.exe reads BCD file</li>
-                            <li>BCD provides boot entry configuration</li>
-                            <li>Contains kernel and loader paths</li>
+                            <li><em>Status: Not yet implemented</em></li>
+                            <li>Planned: freeload.exe will read BCD file</li>
+                            <li>Planned: BCD will provide boot entry configuration</li>
+                            <li>Planned: Will contain kernel and loader paths</li>
                         </ul>
                     </li>
-                    <li><strong>freeload.exe (OS Loader)</strong>
+                    <li><strong>freeload.exe (OS Loader) - PLANNED</strong>
                         <ul>
-                            <li>Loads BCD configuration</li>
-                            <li>Loads kernel (fwoskrnl.exe) into memory</li>
-                            <li>Loads essential device drivers</li>
-                            <li>Transfers control to kernel</li>
+                            <li><em>Status: Not yet implemented</em></li>
+                            <li>Planned: Will load BCD configuration</li>
+                            <li>Planned: Will load kernel (fwoskrnl.exe) into memory</li>
+                            <li>Planned: Will load essential device drivers</li>
+                            <li>Planned: Will transfer control to kernel</li>
+                            <li><strong>Current:</strong> BOOTMGR directly loads kernel from disk</li>
                         </ul>
                     </li>
-                    <li><strong>fwoskrnl.exe (Kernel)</strong>
+                    <li><strong>fwoskrnl.exe (Kernel Entry - kernel_entry.asm)</strong>
                         <ul>
-                            <li>Kernel initialization (kernel_init)</li>
-                            <li>Initialize memory management</li>
-                            <li>Initialize process scheduler</li>
-                            <li>Initialize device drivers</li>
-                            <li>Initialize file system</li>
-                            <li>Start system services</li>
+                            <li>Kernel loaded at 0x1000:0x0000 (linear 0x10000)</li>
+                            <li>Boot sequence: 16-bit real mode → 32-bit protected mode → 64-bit long mode</li>
+                            <li>Verify kernel magic number ("FREEWORL")</li>
+                            <li>Initialize hardware (serial port COM1)</li>
+                            <li>Display kernel messages</li>
+                            <li>Detect memory using INT 15h E820</li>
+                            <li><strong>Protected Mode Transition:</strong>
+                                <ul>
+                                    <li>Disable interrupts (cli)</li>
+                                    <li>Load GDT (lgdt)</li>
+                                    <li>Enable A20 line (port 0x92)</li>
+                                    <li>Set CR0.PE bit (protected mode enable)</li>
+                                    <li>32-bit far jump to protected_mode_start (0x10191)</li>
+                                </ul>
+                            </li>
+                            <li>Set up segment registers (DS, ES, FS, GS, SS = 0x10)</li>
+                            <li>Set up stack (ESP = 0x90000)</li>
+                            <li>Remap PIC (Programmable Interrupt Controller) - IRQ0-7 → INT 0x20-0x27</li>
+                            <li>Set up full IDT (256 entries):
+                                <ul>
+                                    <li>0-31: Exception handlers (all 32 CPU exceptions)</li>
+                                    <li>32 (0x20): Timer interrupt (IRQ0) handler</li>
+                                    <li>33 (0x21): Keyboard interrupt (IRQ1) handler</li>
+                                    <li>34-47: Other hardware interrupts (IRQ2-IRQ15)</li>
+                                    <li>128 (0x80): System call handler</li>
+                                    <li>129-255: Generic interrupt handlers</li>
+                                </ul>
+                            </li>
+                            <li>Configure PIT (Programmable Interval Timer) - ~100 Hz for testing</li>
+                            <li>Unmask IRQ0 (timer) and IRQ1 (keyboard) in PIC</li>
+                            <li>Initialize all 32-bit subsystems (memory, drivers, process, filesystem, graphics)</li>
+                            <li><strong>64-bit Long Mode Transition:</strong>
+                                <ul>
+                                    <li>Check CPUID for long mode support (EDX bit 29)</li>
+                                    <li>Disable paging temporarily (clear CR0.PG)</li>
+                                    <li>Set up 4-level page tables (PML4, PDPT, PD, PT)</li>
+                                    <li>Load 64-bit GDT (with L=1 bit for long mode)</li>
+                                    <li>Enable PAE (set CR4.PAE bit)</li>
+                                    <li>Enable long mode (set EFER.LME via MSR 0xC0000080)</li>
+                                    <li>Enable paging (set CR0.PG) - this activates long mode</li>
+                                    <li>64-bit far jump to long_mode_entry (segment 0x08)</li>
+                                </ul>
+                            </li>
+                            <li>Set up 64-bit segment registers (DS, ES, FS, GS, SS = 0x10)</li>
+                            <li>Set up 64-bit stack (RSP = 0x200000)</li>
+                            <li>Initialize 64-bit subsystems</li>
+                            <li>Enter 64-bit kernel main loop</li>
                         </ul>
                     </li>
                     <li><strong>hal.dll (Hardware Abstraction Layer)</strong>
@@ -140,15 +190,42 @@
             <section class="section">
                 <h2>Memory Layout During Boot</h2>
                 <div class="code-block">
-                    <pre>0x0000 - 0x03FF  : Interrupt Vector Table
+                    <pre>0x0000 - 0x03FF  : Interrupt Vector Table (IVT)
 0x0400 - 0x04FF  : BIOS Data Area
 0x0500 - 0x7BFF  : Available
 0x7C00 - 0x7DFF  : Boot Sector (512 bytes) - BOOTMGR
 0x7E00 - 0x9FFF  : Available
 0xA000 - 0xBFFF  : Video Memory
 0xC000 - 0xFFFF  : BIOS ROM
-0x1000:0x0000    : Kernel Entry Point</pre>
+0x1000:0x0000    : Kernel Entry Point (linear 0x10000)
+0x1000:0x2000    : Memory Map Buffer (E820 results)
+0x8000          : IDT (Interrupt Descriptor Table)
+0x90000          : Stack (protected mode)</pre>
                 </div>
+                <h3>64-bit Long Mode Memory Layout</h3>
+                <p>After transitioning to 64-bit long mode, the memory layout uses 48-bit virtual addressing:</p>
+                <div class="code-block">
+                    <pre>0x0000000000000000 : Null page (unmapped)
+0x0000000000100000 : Kernel base (1MB)
+0x0000000000200000 : 64-bit stack (2MB)
+0x0000000000201000 : PML4 table
+0x0000000000202000 : PDPT table
+0x0000000000203000 : Page Directory
+0x0000000000204000 : Page Table
+0x00007FFFFFFFFFFF : Maximum 48-bit user space address
+0xFFFF800000000000 : Kernel space start
+0xFFFFFFFFFFFFFFFF : Maximum 64-bit address</pre>
+                </div>
+
+                <h3>Protected Mode Memory Layout</h3>
+                <p>After transitioning to protected mode (before long mode), the memory layout uses flat addressing:</p>
+                <ul>
+                    <li><strong>0x00000000 - 0x000FFFFF:</strong> Real mode compatibility (first 1MB)</li>
+                    <li><strong>0x00010000:</strong> Kernel entry point</li>
+                    <li><strong>0x00008000:</strong> IDT (256 entries × 8 bytes = 2048 bytes)</li>
+                    <li><strong>0x00090000:</strong> Stack pointer (grows downward)</li>
+                    <li><strong>0xFFFFFFFF:</strong> Maximum 32-bit address (4GB limit)</li>
+                </ul>
             </section>
 
             <section class="section">
@@ -165,7 +242,7 @@
                         <tr>
                             <td>BOOTMGR</td>
                             <td><code>jmp 0x1000:0x0000</code></td>
-                            <td>Far jump to kernel entry point</td>
+                            <td>Far jump to kernel entry point (16-bit real mode)</td>
                         </tr>
                         <tr>
                             <td>BOOTMGR (print_string)</td>
@@ -177,8 +254,21 @@
                             <td><code>jmp print_string</code></td>
                             <td>Unconditional jump to continue loop</td>
                         </tr>
+                        <tr>
+                            <td>Kernel (enter_protected_mode)</td>
+                            <td><code>db 0x66, 0xEA; dd 0x00010191; dw 0x08</code></td>
+                            <td>32-bit far jump to protected mode entry point (0x10191, segment 0x08)</td>
+                        </tr>
+                        <tr>
+                            <td>Kernel (protected_mode_start)</td>
+                            <td><code>call setup_minimal_idt</code></td>
+                            <td>Call to set up IDT (after segment registers)</td>
+                        </tr>
                     </tbody>
                 </table>
+                <div class="alert alert-info">
+                    <strong>Note:</strong> The 32-bit far jump uses opcodes <code>0x66 0xEA</code> followed by a 32-bit offset and 16-bit segment selector. This is required because the target address (0x10191) exceeds 64KB.
+                </div>
             </section>
 
             <section class="section">
@@ -188,6 +278,46 @@
                     <li><strong>Boot Signature:</strong> 0xAA55 at bytes 510-511</li>
                     <li><strong>Load Address:</strong> 0x7C00</li>
                     <li><strong>Mode:</strong> 16-bit real mode</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Current Implementation Status</h2>
+                <div class="alert alert-info">
+                    <strong>Note:</strong> FreeWorld OS currently uses a simplified two-stage boot process. Advanced boot stages (BCD, freeload.exe) are planned but not yet implemented.
+                </div>
+                
+                <h3>Implemented Stages</h3>
+                <ul>
+                    <li><strong>✅ BOOTMGR (bootmgr.asm):</strong> Fully functional boot sector</li>
+                    <li><strong>✅ Kernel Entry (kernel_entry.asm):</strong> Fully functional kernel initialization</li>
+                </ul>
+
+                <h3>Planned Stages (Not Yet Implemented)</h3>
+                <ul>
+                    <li><strong>⏳ BCD (Boot Configuration Data):</strong> Boot configuration database</li>
+                    <li><strong>⏳ freeload.exe:</strong> Advanced OS loader with BCD support</li>
+                </ul>
+
+                <h3>Boot Process Details</h3>
+                <p><strong>BOOTMGR (bootmgr.asm):</strong></p>
+                <ul>
+                    <li>Loaded by BIOS at 0x7C00 (512 bytes)</li>
+                    <li>Initializes serial port (COM1 at 0x3F8) for debugging</li>
+                    <li>Uses INT 13h to read 64 sectors (32KB) from disk starting at sector 2</li>
+                    <li>Loads kernel to 0x1000:0x0000 (linear address 0x10000)</li>
+                    <li>Verifies kernel magic number "FREEWORL"</li>
+                    <li>Jumps to kernel entry point</li>
+                </ul>
+
+                <p><strong>Kernel Entry (kernel_entry.asm):</strong></p>
+                <ul>
+                    <li>Starts in 16-bit real mode at 0x1000:0x0000</li>
+                    <li>Initializes hardware (serial port COM1, FIFO disabled for reliability)</li>
+                    <li>Detects memory using INT 15h E820</li>
+                    <li>Transitions to 32-bit protected mode</li>
+                    <li>Sets up GDT, IDT, PIC remapping, PIT configuration</li>
+                    <li>Enters main kernel loop</li>
                 </ul>
             </section>
         </main>

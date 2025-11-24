@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Network Daemon (networkd) - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li class="nav-section">Drivers</li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Network Daemon (networkd)</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete (Core Implementation)<br>
+                    <strong>Location:</strong> <code>services/networkd/networkd.c</code><br>
+                    <strong>Type:</strong> System Daemon (C)<br>
+                    <strong>Purpose:</strong> Network interface management, IP configuration, and connectivity
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Network Daemon (networkd) manages network interfaces, IP configuration, routing, and DNS for FreeWorld OS. It provides both static and DHCP-based network configuration.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Interface Detection:</strong> Automatically detects network interfaces</li>
+                    <li><strong>Static IP Configuration:</strong> Manual IP, netmask, and gateway configuration</li>
+                    <li><strong>DHCP Support:</strong> Automatic IP configuration via DHCP (structure ready)</li>
+                    <li><strong>DNS Configuration:</strong> DNS server configuration</li>
+                    <li><strong>Routing Table Management:</strong> Add/delete routes (structure ready)</li>
+                    <li><strong>Interface State Management:</strong> Bring interfaces up/down</li>
+                    <li><strong>Connectivity Monitoring:</strong> Ping tests and statistics</li>
+                    <li><strong>Statistics:</strong> Track bytes sent/received per interface</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Network Interface Management</h2>
+                <p>networkd maintains a list of network interfaces with the following information:</p>
+                <ul>
+                    <li><strong>Interface Name:</strong> e.g., "eth0", "wlan0"</li>
+                    <li><strong>MAC Address:</strong> Hardware address</li>
+                    <li><strong>IP Address:</strong> IPv4 address</li>
+                    <li><strong>Netmask:</strong> Subnet mask</li>
+                    <li><strong>Gateway:</strong> Default gateway</li>
+                    <li><strong>DNS Servers:</strong> Up to 4 DNS servers</li>
+                    <li><strong>State:</strong> Interface up/down</li>
+                    <li><strong>DHCP:</strong> DHCP enabled/disabled</li>
+                    <li><strong>Statistics:</strong> Bytes sent/received</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Configuration Methods</h2>
+                
+                <h3>Static IP Configuration</h3>
+                <pre><code>networkd --static eth0 192.168.1.100 255.255.255.0 192.168.1.1</code></pre>
+                <p>Configures interface <code>eth0</code> with:</p>
+                <ul>
+                    <li>IP: 192.168.1.100</li>
+                    <li>Netmask: 255.255.255.0</li>
+                    <li>Gateway: 192.168.1.1</li>
+                </ul>
+
+                <h3>DHCP Configuration</h3>
+                <pre><code>networkd --dhcp eth0</code></pre>
+                <p>Enables DHCP on interface <code>eth0</code> for automatic IP configuration.</p>
+            </section>
+
+            <section class="section">
+                <h2>Ethernet Driver</h2>
+                <p>The network stack requires an Ethernet driver for low-level frame handling:</p>
+                <ul>
+                    <li><strong>Location:</strong> <code>kernel/drivers/ethernet.asm</code></li>
+                    <li><strong>Features:</strong>
+                        <ul>
+                            <li>Ethernet frame transmission</li>
+                            <li>Ethernet frame reception</li>
+                            <li>MAC address management</li>
+                            <li>Frame statistics</li>
+                        </ul>
+                    </li>
+                </ul>
+                <p><strong>Status:</strong> ✅ Core structure complete, needs hardware-specific implementation</p>
+            </section>
+
+            <section class="section">
+                <h2>Network Stack</h2>
+                <p>The kernel provides a basic network stack foundation:</p>
+                <ul>
+                    <li><strong>Location:</strong> <code>kernel/network/network_stack.asm</strong></li>
+                    <li><strong>Purpose:</strong> Low-level network protocol handling</li>
+                    <li><strong>Integration:</strong> Works with Ethernet driver</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li><strong>Full DHCP Client:</strong> Complete DHCP discovery/request/ack cycle</li>
+                    <li><strong>IPv6 Support:</strong> IPv6 address configuration</li>
+                    <li><strong>Wireless Support:</strong> WiFi interface management</li>
+                    <li><strong>VPN Support:</strong> Virtual private network configuration</li>
+                    <li><strong>Network Bonding:</strong> Link aggregation</li>
+                    <li><strong>QoS:</strong> Quality of Service management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <pre><code>services/networkd/
+├── networkd.c          # Main daemon implementation
+└── Makefile            # Build system
+
+kernel/drivers/
+└── ethernet.asm        # Ethernet driver (low-level)
+
+kernel/network/
+└── network_stack.asm   # Network stack foundation</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>networkd integrates with:</p>
+                <ul>
+                    <li><strong>Ethernet Driver:</strong> Low-level frame handling</li>
+                    <li><strong>Network Stack:</strong> Protocol processing</li>
+                    <li><strong>Kernel:</strong> System calls for network operations</li>
+                    <li><strong>Applications:</strong> Provides network configuration API</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Interface Detection</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Static IP Config</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item in-progress">
+                        <strong>DHCP Client</strong><br>
+                        ⚠️ Structure ready, needs full implementation
+                    </div>
+                    <div class="status-item in-progress">
+                        <strong>Ethernet Driver</strong><br>
+                        ⚠️ Core complete, needs hardware-specific code
+                    </div>
+                    <div class="status-item in-progress">
+                        <strong>Routing</strong><br>
+                        ⚠️ Structure ready, needs implementation
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

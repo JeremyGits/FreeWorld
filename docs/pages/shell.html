@@ -26,11 +26,17 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -142,6 +148,95 @@
 
             <section class="section">
                 <h2>Built-in Commands</h2>
+                <p>The shell includes a comprehensive set of commands compatible with Windows CMD and Unix shells. Commands are case-insensitive and support both Windows-style (<code>/option</code>) and Unix-style (<code>-option</code>) flags.</p>
+                
+                <h3>File and Directory Commands</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Command</th>
+                            <th>Description</th>
+                            <th>Usage</th>
+                            <th>Options</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DIR</code>, <code>LS</code></td>
+                            <td>List directory contents</td>
+                            <td>dir [dir] [options]</td>
+                            <td>/W (wide), /P (paged), /A (all), /B (bare), /H (human-readable)</td>
+                        </tr>
+                        <tr>
+                            <td><code>CD</code>, <code>CHDIR</code></td>
+                            <td>Change directory</td>
+                            <td>cd [dir]</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>PWD</code></td>
+                            <td>Print working directory</td>
+                            <td>pwd</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>MKDIR</code>, <code>MD</code></td>
+                            <td>Create directory</td>
+                            <td>mkdir &lt;dir&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>RMDIR</code>, <code>RD</code></td>
+                            <td>Remove directory</td>
+                            <td>rmdir &lt;dir&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>TOUCH</code></td>
+                            <td>Create empty file</td>
+                            <td>touch &lt;file&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>RM</code>, <code>DEL</code>, <code>ERASE</code></td>
+                            <td>Remove file</td>
+                            <td>rm &lt;file&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>CAT</code>, <code>TYPE</code></td>
+                            <td>Display file contents</td>
+                            <td>cat &lt;file&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>COPY</code></td>
+                            <td>Copy file</td>
+                            <td>copy &lt;src&gt; &lt;dst&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>MOVE</code>, <code>REN</code>, <code>RENAME</code></td>
+                            <td>Move/rename file</td>
+                            <td>move &lt;src&gt; &lt;dst&gt;</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>TREE</code></td>
+                            <td>Display directory tree</td>
+                            <td>tree [dir]</td>
+                            <td>-</td>
+                        </tr>
+                        <tr>
+                            <td><code>FIND</code>, <code>FINDSTR</code></td>
+                            <td>Search for text in files</td>
+                            <td>find &lt;pattern&gt; [file]</td>
+                            <td>-</td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <h3>System Commands</h3>
                 <table class="table">
                     <thead>
                         <tr>
@@ -152,72 +247,102 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>help</code></td>
+                            <td><code>HELP</code></td>
                             <td>Show help message</td>
-                            <td>help</td>
+                            <td>help [command]</td>
                         </tr>
                         <tr>
-                            <td><code>exit</code></td>
+                            <td><code>EXIT</code>, <code>QUIT</code></td>
                             <td>Exit the shell</td>
                             <td>exit</td>
                         </tr>
                         <tr>
-                            <td><code>quit</code></td>
-                            <td>Exit the shell</td>
-                            <td>quit</td>
-                        </tr>
-                        <tr>
-                            <td><code>pwd</code></td>
-                            <td>Print working directory</td>
-                            <td>pwd</td>
-                        </tr>
-                        <tr>
-                            <td><code>cd</code></td>
-                            <td>Change directory</td>
-                            <td>cd &lt;dir&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>ls</code></td>
-                            <td>List directory contents</td>
-                            <td>ls [dir]</td>
-                        </tr>
-                        <tr>
-                            <td><code>mkdir</code></td>
-                            <td>Create directory</td>
-                            <td>mkdir &lt;dir&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>rmdir</code></td>
-                            <td>Remove directory</td>
-                            <td>rmdir &lt;dir&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>touch</code></td>
-                            <td>Create empty file</td>
-                            <td>touch &lt;file&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>rm</code></td>
-                            <td>Remove file</td>
-                            <td>rm &lt;file&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>cat</code></td>
-                            <td>Display file contents</td>
-                            <td>cat &lt;file&gt;</td>
-                        </tr>
-                        <tr>
-                            <td><code>echo</code></td>
+                            <td><code>ECHO</code></td>
                             <td>Echo text</td>
-                            <td>echo &lt;text&gt;</td>
+                            <td>echo [text]</td>
                         </tr>
                         <tr>
-                            <td><code>clear</code></td>
+                            <td><code>CLEAR</code>, <code>CLS</code></td>
                             <td>Clear screen</td>
                             <td>clear</td>
                         </tr>
+                        <tr>
+                            <td><code>DATE</code></td>
+                            <td>Display/set date</td>
+                            <td>date [date]</td>
+                        </tr>
+                        <tr>
+                            <td><code>TIME</code></td>
+                            <td>Display/set time</td>
+                            <td>time [time]</td>
+                        </tr>
+                        <tr>
+                            <td><code>VER</code></td>
+                            <td>Display version</td>
+                            <td>ver</td>
+                        </tr>
+                        <tr>
+                            <td><code>VOL</code></td>
+                            <td>Display volume label</td>
+                            <td>vol</td>
+                        </tr>
+                        <tr>
+                            <td><code>SYSTEMINFO</code></td>
+                            <td>Display system information</td>
+                            <td>systeminfo</td>
+                        </tr>
+                        <tr>
+                            <td><code>FWMIC</code></td>
+                            <td>FreeWorld Management Instrumentation and Control</td>
+                            <td>fwmic [options] [query]</td>
+                        </tr>
                     </tbody>
                 </table>
+                
+                <div class="alert alert-success">
+                    <strong>DIR/LS Command Features:</strong>
+                    <ul>
+                        <li>✅ Optimized directory listing with qsort (O(n log n))</li>
+                        <li>✅ Multiple display formats (/W wide, /P paged, /B bare)</li>
+                        <li>✅ Human-readable file sizes (/H option)</li>
+                        <li>✅ Color-coded output (directories in green, files in white)</li>
+                        <li>✅ File attributes display (D=Directory, R=Read-only, etc.)</li>
+                        <li>✅ Sorted output (directories first, then alphabetical)</li>
+                    </ul>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2>Command History</h2>
+                <p>The shell includes a command history system with arrow key navigation:</p>
+                <ul>
+                    <li><strong>Up Arrow:</strong> Navigate to previous command</li>
+                    <li><strong>Down Arrow:</strong> Navigate to next command</li>
+                    <li><strong>History Buffer:</strong> Stores up to 100 commands</li>
+                    <li><strong>Raw Mode Input:</strong> Character-by-character input on Unix-like systems</li>
+                    <li><strong>Fallback Mode:</strong> Simple fgets-based input on Windows/WSL</li>
+                </ul>
+                <p><strong>Location:</strong> <code>shell/history.c</code>, <code>shell/history.h</code></p>
+                <p><strong>Status:</strong> ✅ Complete - Works on Unix-like systems, fallback on Windows</p>
+            </section>
+            
+            <section class="section">
+                <h2>FWMIC (FreeWorld Management Instrumentation and Control)</h2>
+                <p>FWMIC is a WMI-like system for accessing management data from the operating system, hardware, and applications. It provides:</p>
+                <ul>
+                    <li><strong>Hardware Inventory:</strong> Computer system, processor, memory, disk information</li>
+                    <li><strong>Software Inventory:</strong> OS version, BIOS information</li>
+                    <li><strong>Query Engine:</strong> WQL-like query language</li>
+                    <li><strong>Provider System:</strong> Extensible provider architecture</li>
+                </ul>
+                <p><strong>Location:</strong> <code>shell/fwmic.c</code>, <code>shell/fwmic.h</code></p>
+                <p><strong>Status:</strong> ✅ Complete - Basic providers implemented</p>
+                <h3>Usage Examples</h3>
+                <div class="code-block">
+                    <pre>fwmic /query "SELECT * FROM OS"
+fwmic /query "SELECT Name FROM ComputerSystem"
+fwmic /query "SELECT * FROM Processor"</pre>
+                </div>
             </section>
 
             <section class="section">

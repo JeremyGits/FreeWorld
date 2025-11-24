@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Standard Controls - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Standard Controls</h1>
+            <p class="subtitle">Built-in UI controls for applications</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="controls.html">Standard Controls</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>Standard Controls provide pre-built UI components for applications, implemented at the kernel level in <code>kernel/gui/components.asm</code>.</p>
+            </section>
+
+            <section>
+                <h2>Available Controls</h2>
+                
+                <h3>Button</h3>
+                <ul>
+                    <li>Normal, hover, and pressed states</li>
+                    <li>Text label support</li>
+                    <li>Click event handling</li>
+                    <li>API: <code>gui_draw_button()</code></li>
+                </ul>
+
+                <h3>Label</h3>
+                <ul>
+                    <li>Static text display</li>
+                    <li>Configurable color and font</li>
+                    <li>API: <code>gui_draw_label()</code></li>
+                </ul>
+
+                <h3>Input Field</h3>
+                <ul>
+                    <li>Text input with cursor</li>
+                    <li>Focus handling</li>
+                    <li>Keyboard input processing</li>
+                    <li>API: <code>gui_draw_input()</code></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Control States</h2>
+                <ul>
+                    <li><strong>Normal</strong> - Default state</li>
+                    <li><strong>Hover</strong> - Mouse over control</li>
+                    <li><strong>Pressed</strong> - Mouse button down</li>
+                    <li><strong>Disabled</strong> - Control disabled</li>
+                    <li><strong>Focused</strong> - Control has keyboard focus</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Future Controls</h2>
+                <ul>
+                    <li>Checkbox</li>
+                    <li>Radio button</li>
+                    <li>List box</li>
+                    <li>Combo box</li>
+                    <li>Scroll bar</li>
+                    <li>Progress bar</li>
+                    <li>Slider</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

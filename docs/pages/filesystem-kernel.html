@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>File System - FreeWorld OS</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/fs/<br>
+                    <strong>Type:</strong> Assembly File System Driver<br>
+                    <strong>Purpose:</strong> File system operations for loading programs and data<br>
+                    <strong>Status:</strong> ✅ Basic Implementation Complete
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld File System driver provides basic file operations for the kernel. It supports file open/close, read/write, seek, and directory operations.</p>
+                <div class="alert alert-success">
+                    <strong>Status:</strong> Basic file system driver is complete. Total: ~300 lines of code. Currently uses in-memory filesystem; disk-based filesystem to be implemented.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>File System Driver (filesystem.asm)</h2>
+                <p><strong>Location:</strong> <code>kernel/fs/filesystem.asm</code> (~300 lines)</p>
+                <p>Basic file system driver with file operations:</p>
+                
+                <h3>Features</h3>
+                <ul>
+                    <li>File open/close</li>
+                    <li>File read/write</li>
+                    <li>File seek (SEEK_SET, SEEK_CUR, SEEK_END)</li>
+                    <li>Directory operations (mkdir, remove)</li>
+                    <li>Open file table (64 files max)</li>
+                    <li>File existence checking</li>
+                </ul>
+
+                <h3>File Open Modes</h3>
+                <ul>
+                    <li><code>FS_MODE_READ</code>: 0x01 - Open for reading</li>
+                    <li><code>FS_MODE_WRITE</code>: 0x02 - Open for writing</li>
+                    <li><code>FS_MODE_APPEND</code>: 0x04 - Open for appending</li>
+                    <li><code>FS_MODE_CREATE</code>: 0x08 - Create file if it doesn't exist</li>
+                </ul>
+
+                <h3>Key Functions</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Function</th>
+                            <th>Description</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>init_filesystem</code></td>
+                            <td>Initialize file system</td>
+                            <td>EAX = root filesystem base (0 = default)</td>
+                            <td>None</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_open</code></td>
+                            <td>Open a file</td>
+                            <td>ESI = file path, EBX = mode flags</td>
+                            <td>EAX = file descriptor, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_close</code></td>
+                            <td>Close a file</td>
+                            <td>EAX = file descriptor</td>
+                            <td>EAX = 0 on success, -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_read</code></td>
+                            <td>Read from file</td>
+                            <td>EAX = file descriptor, EBX = buffer, ECX = count</td>
+                            <td>EAX = bytes read, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_write</code></td>
+                            <td>Write to file</td>
+                            <td>EAX = file descriptor, EBX = buffer, ECX = count</td>
+                            <td>EAX = bytes written, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_seek</code></td>
+                            <td>Seek in file</td>
+                            <td>EAX = file descriptor, EBX = offset, ECX = whence</td>
+                            <td>EAX = new position, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_get_size</code></td>
+                            <td>Get file size</td>
+                            <td>EAX = file descriptor</td>
+                            <td>EAX = file size, or -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_file_exists</code></td>
+                            <td>Check if file exists</td>
+                            <td>ESI = file path</td>
+                            <td>EAX = 1 if exists, 0 if not</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_mkdir</code></td>
+                            <td>Create directory</td>
+                            <td>ESI = directory path</td>
+                            <td>EAX = 0 on success, -1 on error</td>
+                        </tr>
+                        <tr>
+                            <td><code>fs_remove</code></td>
+                            <td>Remove file or directory</td>
+                            <td>ESI = path</td>
+                            <td>EAX = 0 on success, -1 on error</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>File Entry Structure</h3>
+                <p>Each open file has a 32-byte structure containing:</p>
+                <ul>
+                    <li>File descriptor (4 bytes)</li>
+                    <li>Inode number (4 bytes)</li>
+                    <li>Current position (4 bytes)</li>
+                    <li>File size (4 bytes)</li>
+                    <li>Open mode (4 bytes)</li>
+                    <li>File path pointer (4 bytes)</li>
+                    <li>Flags (4 bytes)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>File system is integrated into the kernel via <code>kernel/integration.asm</code>:</p>
+                <div class="code-block">
+                    <pre>; In kernel_subsystems_init:
+mov eax, 0  ; Use default base address
+call init_filesystem  ; Initialize file system</pre>
+                </div>
+                <p><strong>Status:</strong> ✅ Integrated - File system initialized during kernel boot</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Open and Read File</h3>
+                <div class="code-block">
+                    <pre>; Open file for reading
+mov esi, file_path
+mov ebx, FS_MODE_READ
+call fs_open
+cmp eax, -1
+je open_error
+; EAX contains file descriptor
+
+; Read from file
+mov ebx, buffer
+mov ecx, 1024  ; Read 1024 bytes
+call fs_read
+; EAX contains bytes read
+
+; Close file
+call fs_close</pre>
+                </div>
+
+                <h3>Open and Write File</h3>
+                <div class="code-block">
+                    <pre>; Open file for writing (create if needed)
+mov esi, file_path
+mov ebx, FS_MODE_WRITE | FS_MODE_CREATE
+call fs_open
+cmp eax, -1
+je open_error
+
+; Write to file
+mov ebx, data_buffer
+mov ecx, data_size
+call fs_write
+; EAX contains bytes written
+
+; Close file
+call fs_close</pre>
+                </div>
+
+                <h3>Seek in File</h3>
+                <div class="code-block">
+                    <pre>; Seek to beginning
+mov ebx, 0
+mov ecx, 0  ; SEEK_SET
+call fs_seek
+
+; Seek to end
+mov ebx, 0
+mov ecx, 2  ; SEEK_END
+call fs_seek
+
+; Seek relative to current position
+mov ebx, 100
+mov ecx, 1  ; SEEK_CUR
+call fs_seek</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <p>The current implementation uses an in-memory filesystem. Future enhancements will include:</p>
+                <ul>
+                    <li>Disk-based file system (FAT32, ext2, or custom format)</li>
+                    <li>Directory listing and traversal</li>
+                    <li>File permissions</li>
+                    <li>Symbolic links</li>
+                    <li>File system mounting</li>
+                    <li>Journaling for reliability</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

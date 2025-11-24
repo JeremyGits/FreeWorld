@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fwcompositor Service - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="architecture.html">Architecture</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>fwcompositor Service</h1>
+                <p class="subtitle">Central window manager and compositor service</p>
+            </div>
+
+            <section>
+                <h2>Overview</h2>
+                <p><strong>fwcompositor</strong> is the central window manager service for FreeWorld OS. It runs as a daemon/service and manages all windows, handles compositing, and routes input events. Applications connect to it via IPC (Inter-Process Communication).</p>
+                
+                <div class="alert alert-info">
+                    <strong>Status:</strong> This service is currently <strong>planned</strong> and needs to be implemented. The architecture and API are designed, but the actual service code needs to be written.
+                </div>
+            </section>
+
+            <section>
+                <h2>Purpose</h2>
+                <p>The fwcompositor service provides:</p>
+                <ul>
+                    <li><strong>Window Management:</strong> Creation, destruction, positioning, sizing</li>
+                    <li><strong>Compositing:</strong> Blending all windows into a single framebuffer</li>
+                    <li><strong>Input Routing:</strong> Routing keyboard and mouse events to correct windows</li>
+                    <li><strong>IPC Server:</strong> Communication interface for applications</li>
+                    <li><strong>Kernel Integration:</strong> Direct access to kernel graphics syscalls</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Architecture</h2>
+                
+                <h3>Service Structure</h3>
+                <pre><code>fwcompositor
+├── IPC Server (Unix socket / TCP)
+├── Window Manager
+│   ├── Window registry
+│   ├── Z-order management
+│   └── Focus management
+├── Compositor
+│   ├── Buffer management
+│   ├── Blending engine
+│   └── Dirty region tracking
+├── Input Router
+│   ├── Event queue
+│   ├── Hit testing
+│   └── Event distribution
+└── Kernel Interface
+    ├── Graphics syscalls
+    └── Framebuffer access</code></pre>
+            </section>
+
+            <section>
+                <h2>IPC Methods</h2>
+                
+                <h3>Window Management</h3>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>CreateWindow</code></td>
+                            <td>title, width, height, flags</td>
+                            <td>hwnd</td>
+                            <td>Create a new window</td>
+                        </tr>
+                        <tr>
+                            <td><code>DestroyWindow</code></td>
+                            <td>hwnd</td>
+                            <td>status</td>
+                            <td>Destroy a window</td>
+                        </tr>
+                        <tr>
+                            <td><code>MoveWindow</code></td>
+                            <td>hwnd, x, y</td>
+                            <td>status</td>
+                            <td>Move window to new position</td>
+                        </tr>
+                        <tr>
+                            <td><code>ResizeWindow</code></td>
+                            <td>hwnd, width, height</td>
+                            <td>status</td>
+                            <td>Resize window</td>
+                        </tr>
+                        <tr>
+                            <td><code>ShowWindow</code></td>
+                            <td>hwnd</td>
+                            <td>status</td>
+                            <td>Show window</td>
+                        </tr>
+                        <tr>
+                            <td><code>HideWindow</code></td>
+                            <td>hwnd</td>
+                            <td>status</td>
+                            <td>Hide window</td>
+                        </tr>
+                        <tr>
+                            <td><code>SetFocus</code></td>
+                            <td>hwnd</td>
+                            <td>status</td>
+                            <td>Set keyboard focus</td>
+                        </tr>
+                        <tr>
+                            <td><code>GetWindowInfo</code></td>
+                            <td>hwnd</td>
+                            <td>window info</td>
+                            <td>Get window information</td>
+                        </tr>
+                        <tr>
+                            <td><code>ListWindows</code></td>
+                            <td>-</td>
+                            <td>array of windows</td>
+                            <td>List all windows</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Buffer Management</h3>
+                <table class="api-table">
+                    <thead>
+                        <tr>
+                            <th>Method</th>
+                            <th>Parameters</th>
+                            <th>Returns</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>UpdateWindow</code></td>
+                            <td>hwnd, buffer, x, y, width, height</td>
+                            <td>status</td>
+                            <td>Update window buffer content</td>
+                        </tr>
+                        <tr>
+                            <td><code>GetWindowBuffer</code></td>
+                            <td>hwnd</td>
+                            <td>buffer</td>
+                            <td>Get window's drawing buffer</td>
+                        </tr>
+                        <tr>
+                            <td><code>Composite</code></td>
+                            <td>-</td>
+                            <td>status</td>
+                            <td>Trigger compositing pass</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Implementation Details</h2>
+                
+                <h3>Language</h3>
+                <p>The service will be implemented in <strong>C/ASM</strong> for performance and kernel integration.</p>
+
+                <h3>IPC Server</h3>
+                <ul>
+                    <li><strong>Unix Domain Socket:</strong> <code>/tmp/fwcompositor.sock</code> (Linux/WSL)</li>
+                    <li><strong>TCP Port:</strong> <code>127.0.0.1:8080</code> (fallback)</li>
+                    <li><strong>Named Pipe:</strong> <code>\\.\pipe\fwcompositor</code> (Windows)</li>
+                </ul>
+
+                <h3>Protocol</h3>
+                <ul>
+                    <li><strong>Format:</strong> JSON-RPC 2.0 (initial implementation)</li>
+                    <li><strong>Future:</strong> Binary protocol for better performance</li>
+                    <li><strong>Transport:</strong> Unix socket (preferred) or TCP</li>
+                </ul>
+
+                <h3>Kernel Integration</h3>
+                <p>The service communicates with the kernel via:</p>
+                <ul>
+                    <li><code>SYS_GRAPHICS_INIT</code> - Initialize graphics</li>
+                    <li><code>SYS_GRAPHICS_GET_FB</code> - Get framebuffer address</li>
+                    <li><code>SYS_GRAPHICS_BLIT</code> - Blit composite to screen</li>
+                    <li><code>SYS_MMAP</code> - Map framebuffer to user space</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Window Management</h2>
+                
+                <h3>Window Registry</h3>
+                <p>All windows are stored in a registry with:</p>
+                <ul>
+                    <li>HWND (window handle)</li>
+                    <li>Position (x, y)</li>
+                    <li>Size (width, height)</li>
+                    <li>Z-order (stacking order)</li>
+                    <li>Focus state</li>
+                    <li>Visibility</li>
+                    <li>Buffer reference</li>
+                </ul>
+
+                <h3>Z-Order Management</h3>
+                <p>Windows are maintained in a z-order list (bottom to top). When compositing:</p>
+                <ol>
+                    <li>Start with desktop/background</li>
+                    <li>Composite windows from bottom to top</li>
+                    <li>Apply transparency and shadows</li>
+                    <li>Send final composite to kernel</li>
+                </ol>
+
+                <h3>Focus Management</h3>
+                <p>Only one window has keyboard focus at a time. Focus changes when:</p>
+                <ul>
+                    <li>User clicks on a window</li>
+                    <li>Application requests focus</li>
+                    <li>Window is destroyed</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Compositing</h2>
+                
+                <h3>Compositing Process</h3>
+                <ol>
+                    <li>Create composited buffer (screen size)</li>
+                    <li>Clear with background/desktop</li>
+                    <li>For each window (bottom to top):
+                        <ul>
+                            <li>Check if window is visible</li>
+                            <li>Check if window overlaps with dirty region</li>
+                            <li>Blend window buffer into composite</li>
+                            <li>Apply transparency if needed</li>
+                            <li>Draw shadow if enabled</li>
+                        </ul>
+                    </li>
+                    <li>Send final composite to kernel</li>
+                    <li>Kernel blits to VESA framebuffer</li>
+                </ol>
+
+                <h3>Dirty Region Tracking</h3>
+                <p>Only redraw regions that have changed:</p>
+                <ul>
+                    <li>Track dirty regions per window</li>
+                    <li>Merge overlapping dirty regions</li>
+                    <li>Composite only dirty areas</li>
+                    <li>Clear dirty flags after compositing</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Input Routing</h2>
+                
+                <h3>Event Flow</h3>
+                <ol>
+                    <li>Kernel receives keyboard/mouse input</li>
+                    <li>Kernel sends event to window manager via syscall</li>
+                    <li>Window manager performs hit testing</li>
+                    <li>Window manager routes event to correct window</li>
+                    <li>Window manager sends event to application via IPC</li>
+                </ol>
+
+                <h3>Hit Testing</h3>
+                <p>Determine which window should receive input:</p>
+                <ul>
+                    <li>Check z-order (top to bottom)</li>
+                    <li>Check if point is within window bounds</li>
+                    <li>Check if window accepts input</li>
+                    <li>Check for modal windows</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Implementation Plan</h2>
+                
+                <h3>Phase 1: Basic Service</h3>
+                <ul>
+                    <li>IPC server setup (Unix socket/TCP)</li>
+                    <li>JSON-RPC protocol handler</li>
+                    <li>Basic window registry</li>
+                    <li>Window creation/destruction</li>
+                </ul>
+
+                <h3>Phase 2: Compositing</h3>
+                <ul>
+                    <li>Buffer management</li>
+                    <li>Basic compositing (no transparency)</li>
+                    <li>Kernel graphics syscall integration</li>
+                    <li>Framebuffer blitting</li>
+                </ul>
+
+                <h3>Phase 3: Advanced Features</h3>
+                <ul>
+                    <li>Transparency and shadows</li>
+                    <li>Dirty region tracking</li>
+                    <li>Input event routing</li>
+                    <li>Focus management</li>
+                </ul>
+
+                <h3>Phase 4: Optimization</h3>
+                <ul>
+                    <li>Binary protocol</li>
+                    <li>Hardware acceleration</li>
+                    <li>Multi-threading</li>
+                    <li>Performance tuning</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="windowing-architecture.html">Windowing Architecture</a> - Overall architecture</li>
+                    <li><a href="wm-client.html">Window Manager Client</a> - Node.js client library</li>
+                    <li><a href="gui-kernel.html">Kernel GUI System</a> - Low-level graphics</li>
+                    <li><a href="compositor.html">Compositor</a> - Compositing system</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+</body>
+</html>
+

@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Window Relationships - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Window Relationships</h1>
+            <p class="subtitle">Window hierarchy, parent-child relationships, and z-ordering</p>
+        </header>
+
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="window-relationships.html">Window Relationships</a></li>
+            </ul>
+        </nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>Windows in FreeWorld OS can have parent-child relationships, creating a hierarchical window structure similar to Windows and other modern operating systems.</p>
+            </section>
+
+            <section>
+                <h2>Window Hierarchy</h2>
+                <h3>Parent-Child Relationships</h3>
+                <ul>
+                    <li><strong>Top-level Windows</strong> - Windows with no parent (desktop windows)</li>
+                    <li><strong>Child Windows</strong> - Windows with a parent (dialogs, controls)</li>
+                    <li><strong>Owned Windows</strong> - Modal dialogs owned by parent</li>
+                </ul>
+
+                <h3>Z-Ordering</h3>
+                <p>Windows are ordered by z-index, with child windows always appearing above their parents. The window manager maintains z-order for proper rendering.</p>
+            </section>
+
+            <section>
+                <h2>Window States</h2>
+                <ul>
+                    <li><strong>Normal</strong> - Standard window state</li>
+                    <li><strong>Minimized</strong> - Window minimized to taskbar</li>
+                    <li><strong>Maximized</strong> - Window fills screen</li>
+                    <li><strong>Hidden</strong> - Window not visible</li>
+                    <li><strong>Modal</strong> - Window blocks parent interaction</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Window Manager Functions</h2>
+                <ul>
+                    <li><code>createWindow(parent, x, y, width, height)</code> - Create window</li>
+                    <li><code>setParent(window, parent)</code> - Set window parent</li>
+                    <li><code>bringToFront(window)</code> - Bring window to front</li>
+                    <li><code>setZOrder(window, z)</code> - Set window z-order</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

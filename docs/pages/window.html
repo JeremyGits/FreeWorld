@@ -26,11 +26,17 @@
                 <li class="nav-section">User Interface</li>
                 <li><a href="shell.html">Shell</a></li>
                 <li><a href="wanderer.html">Wanderer</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
                 <li class="nav-section">Node.js System</li>
                 <li><a href="window.html">Window API</a></li>
                 <li><a href="desktop.html">Desktop</a></li>
-                <li><a href="api.html">System API</a></li>
-                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
                 <li class="nav-section">Reference</li>
                 <li><a href="naming-conventions.html">Naming Conventions</a></li>
                 <li><a href="boot-process.html">Boot Process</a></li>
@@ -53,6 +59,10 @@
             <section class="section">
                 <h2>Overview</h2>
                 <p>The Window API provides HWND-like window management capabilities for FreeWorld OS. It offers a complete naming convention for window classes, functions, and variables, similar to how Windows and Linux handle window management.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Architecture Update:</strong> The Window API will be updated to use the <strong>Window Manager Client</strong> (<code>wm-client.js</code>) to communicate with the <strong>fwcompositor</strong> service via IPC. This provides native windows with kernel integration. See <a href="windowing-architecture.html">Windowing Architecture</a> and <a href="wm-client.html">Window Manager Client</a> for details.
+                </div>
             </section>
 
             <section class="section">
@@ -189,6 +199,8 @@
 
             <section class="section">
                 <h2>Usage Example</h2>
+                
+                <h3>Current Implementation (Structural)</h3>
                 <div class="code-block">
                     <pre>const { Window, WindowManager } = require('./window');
 
@@ -198,6 +210,31 @@ window.show();
 window.move(100, 100);
 window.resize(1024, 768);</pre>
                 </div>
+
+                <h3>Future Implementation (with IPC)</h3>
+                <p>Once the fwcompositor service is implemented, the Window API will use the Window Manager Client:</p>
+                <div class="code-block">
+                    <pre>const WindowManagerClient = require('./wm-client');
+
+const wm = new WindowManagerClient();
+await wm.connect(); // Connect to fwcompositor service
+
+const hwnd = await wm.createWindow('My App', 800, 600);
+await wm.showWindow(hwnd);
+await wm.moveWindow(hwnd, 100, 100);
+await wm.resizeWindow(hwnd, 1024, 768);</pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Windowing System</h2>
+                <p>The Window API is part of the native windowing architecture:</p>
+                <ul>
+                    <li><strong>Current:</strong> Structural implementation with in-memory window registry</li>
+                    <li><strong>Future:</strong> Will use Window Manager Client to communicate with fwcompositor service</li>
+                    <li><strong>Benefits:</strong> Native windows, kernel integration, centralized management</li>
+                </ul>
+                <p>See <a href="windowing-architecture.html">Windowing Architecture</a> for the complete system design.</p>
             </section>
         </main>
     </div>
