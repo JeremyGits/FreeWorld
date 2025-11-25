@@ -20,20 +20,21 @@ Complete technical documentation for the FreeWorld Operating System.
 
 ### Core System
 - ✅ [fwoskrnl.exe](pages/kernel.html) - Kernel Executive
-- ✅ [hal.dll](pages/hal.html) - Hardware Abstraction Layer
+- ✅ [hal.dll](pages/hal.html) - Hardware Abstraction Layer (Fully Implemented)
 - ✅ [Memory Management](pages/memory.html) - Memory subsystem
 - ✅ [Process Management](pages/process.html) - Process and thread management
 - ✅ [I/O Infrastructure](pages/io-infrastructure.html) - I/O subsystem
 - ✅ [Device Drivers](pages/drivers.html) - Device driver framework
 - ✅ [File System (Kernel)](pages/filesystem-kernel.html) - Kernel filesystem
 - ✅ [System Calls](pages/syscalls.html) - System call reference
+- ✅ [IPC System](pages/ipc-system.html) - Inter-process communication
 
 ### Services
 - ✅ [smss.exe](pages/smss.html) - Session Manager Subsystem (Fully Implemented)
 - ✅ [csrss.exe](pages/csrss.html) - Client Server Runtime Subsystem (Fully Implemented)
 - ✅ [freeworldlogon.exe](pages/freeworldlogon.html) - Login Manager
 - ✅ [logd](pages/logd.html) - Logging Daemon (Fully Implemented with IPC)
-- ✅ [networkd](pages/networkd.html) - Network Daemon (Core Implementation)
+- ✅ [networkd](pages/networkd.html) - Network Daemon (Fully Implemented: DHCP, Routing, Ethernet)
 - ✅ [securityd](pages/securityd.html) - Security Daemon (Node.js modules, daemon planned)
 - ✅ [display-manager](pages/display-manager.html) - Graphical login and session management
 
@@ -78,11 +79,13 @@ Complete technical documentation for the FreeWorld Operating System.
 - ⏳ [Shell Ecosystem](pages/shell-ecosystem.html) - Desktop, Taskbar, ShellExecute
 
 ### IPC & Communication
-- ✅ **Kernel IPC System** (`kernel/ipc/ipc.asm`) - Core IPC for all services
+- ✅ [IPC System](pages/ipc-system.html) - Core IPC for all services
+  - **Kernel IPC System** (`kernel/ipc/ipc.asm`) - Core IPC infrastructure
   - Unix domain sockets, named pipes, message queues
   - Channel management, message passing
   - Used by logd, csrss, networkd, and all services
 - ✅ **logd IPC Integration** - Unix domain socket (`/var/run/logd.sock`)
+- ✅ **networkd IPC Integration** - Unix domain socket (`/var/run/networkd.sock`)
 - ✅ **csrss IPC Integration** - Unix domain socket (`/var/run/csrss.sock`)
 - ✅ **EventBus Integration** - logd subscribes to EventBus for audit logging
 
@@ -108,12 +111,13 @@ Complete technical documentation for the FreeWorld Operating System.
 ### ✅ Fully Implemented & Documented
 - **Boot Components**: BOOTMGR, BCD, freeload.exe
 - **Core System**: Kernel, HAL, Memory, Process, I/O, Drivers
-- **Services**: smss.exe, csrss.exe, logd, networkd (core)
+- **Services**: smss.exe, csrss.exe, logd, networkd (core + IPC)
 - **Native Rendering Engine**: All 5 phases complete (~2,500 lines)
-- **Kernel Resource Manager**: Complete (~1,000 lines)
-- **IPC System**: Core IPC with Unix domain sockets
+- **Kernel Resource Manager**: Complete (~1,000 lines) + System calls
+- **IPC System**: Core IPC with Unix domain sockets (all services integrated)
 - **Event System**: EventBus and EventManager integrated
 - **logd Integration**: IPC + EventBus audit logging
+- **networkd Integration**: IPC for runtime configuration
 
 ### ⚠️ Partially Implemented
 - **networkd**: Core complete, DHCP client and routing need full implementation

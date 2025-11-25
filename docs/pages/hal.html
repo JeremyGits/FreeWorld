@@ -51,6 +51,7 @@
             <div class="page-header">
                 <h1>hal.dll - Hardware Abstraction Layer</h1>
                 <div class="meta">
+                    <strong>Status:</strong> ✅ Fully Implemented<br>
                     <strong>Location:</strong> hal/hal.c, hal/hal.h<br>
                     <strong>Type:</strong> Dynamic Link Library (DLL)<br>
                     <strong>Purpose:</strong> Hardware abstraction between hardware and kernel
@@ -60,6 +61,18 @@
             <section class="section">
                 <h2>Overview</h2>
                 <p>hal.dll (Hardware Abstraction Layer) provides an abstraction layer between hardware interfaces and the kernel. It allows the kernel to work with different hardware configurations without modification.</p>
+                <p><strong>Status:</strong> Fully implemented with complete CPU detection, memory detection, PCI device enumeration, and device management.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>CPU Detection:</strong> Detects CPU vendor (Intel, AMD, VIA) and features (SSE, AVX, 64-bit, PAE, etc.)</li>
+                    <li><strong>Memory Detection:</strong> Detects system memory via E820 and E801 methods</li>
+                    <li><strong>PCI Device Enumeration:</strong> Scans all PCI buses and detects devices (Ethernet, Storage, Graphics, Sound, USB)</li>
+                    <li><strong>Device Management:</strong> Provides device lookup by type or vendor/device ID</li>
+                    <li><strong>I/O Operations:</strong> Read/write operations for I/O space and memory-mapped devices</li>
+                </ul>
             </section>
 
             <section class="section">
@@ -72,7 +85,22 @@
     uint32_t cpu_features;
     uint64_t memory_size;
     uint32_t device_count;
+    hal_device_t devices[32];  // Up to 32 devices
 } hal_info_t;</pre>
+                </div>
+
+                <h3>hal_device_t</h3>
+                <div class="code-block">
+                    <pre>typedef struct {
+    uint32_t device_id;
+    uint32_t device_type;
+    uint32_t vendor_id;
+    uint32_t class_code;
+    uint32_t io_base;
+    uint64_t mem_base;
+    uint32_t irq;
+    char name[64];
+} hal_device_t;</pre>
                 </div>
 
                 <table class="table">

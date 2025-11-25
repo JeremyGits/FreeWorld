@@ -34,6 +34,10 @@
             <section class="section">
                 <h2>Overview</h2>
                 <p>This document provides a comprehensive analysis of the FreeWorld OS boot system, identifying what's implemented, what's missing, and what's needed for a complete standalone boot from disk or QEMU.</p>
+                
+                <div class="alert alert-success">
+                    <strong>Recent Updates:</strong> The bootloader has been fully fixed and now correctly implements a two-stage boot process with LBA/CHS support and proper sector mapping. Stage 1 successfully loads stage 2, and stage 2 loads graphics and the kernel.
+                </div>
             </section>
 
             <section class="section">
@@ -41,13 +45,33 @@
                 
                 <h3>✅ Implemented and Working</h3>
                 <ul>
-                    <li><strong>BOOTMGR (boot/BOOTMGR/bootmgr.asm)</strong>
+                    <li><strong>Stage 1 Bootloader (boot/bootloader_stage1.asm)</strong>
                         <ul>
-                            <li>512-byte boot sector</li>
-                            <li>Loads kernel from disk (INT 13h)</li>
-                            <li>Serial port debugging</li>
-                            <li>Kernel magic verification</li>
-                            <li>Supports FWEXE and flat binary formats</li>
+                            <li>512-byte MBR boot sector</li>
+                            <li>LBA extended read with CHS fallback</li>
+                            <li>Loads stage 2 from CHS sector 3 (physical sector 2)</li>
+                            <li>Serial port debugging (COM1)</li>
+                            <li>VGA text mode initialization</li>
+                            <li>Stage 2 signature verification ('OB')</li>
+                            <li>Correct CHS sector mapping (physical sector 2 = CHS sector 3)</li>
+                        </ul>
+                    </li>
+                    <li><strong>Stage 2 Bootloader (boot/bootloader_ui.asm)</strong>
+                        <ul>
+                            <li>Graphical bootloader with menu</li>
+                            <li>Graphics mode initialization (VESA/VGA)</li>
+                            <li>Graphics loader (loads logo, background, icons from disk)</li>
+                            <li>Boot menu display</li>
+                            <li>Keyboard input handling</li>
+                            <li>Kernel loading from CHS sector 33</li>
+                            <li>Kernel signature verification ('FREEWORL')</li>
+                        </ul>
+                    </li>
+                    <li><strong>Graphics Loader (boot/graphics/graphics_loader.asm)</strong>
+                        <ul>
+                            <li>Loads graphics resources from disk</li>
+                            <li>Correct CHS sector mapping for all graphics</li>
+                            <li>Graphics buffer management</li>
                         </ul>
                     </li>
                     <li><strong>Kernel Entry (kernel/kernel_entry.asm)</strong>

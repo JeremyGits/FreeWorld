@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Services Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Services Manager</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete<br>
+                    <strong>Location:</strong> <code>system/services-manager.js</code><br>
+                    <strong>Type:</strong> Node.js Service Management System<br>
+                    <strong>Purpose:</strong> Comprehensive service management for all system services
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Services Manager provides comprehensive service management capabilities for FreeWorld OS. It can start, stop, restart, and monitor all system services, manage startup types, handle dependencies, and provide auto-restart functionality.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Service Registration:</strong> Register services with executable paths, arguments, and working directories</li>
+                    <li><strong>Service Control:</strong> Start, stop, restart services with graceful shutdown support</li>
+                    <li><strong>Startup Types:</strong> Automatic, manual, or disabled startup configuration</li>
+                    <li><strong>Auto-Restart:</strong> Automatic restart of services that exit unexpectedly</li>
+                    <li><strong>Critical Services:</strong> Mark services as critical (must stay running)</li>
+                    <li><strong>Dependencies:</strong> Handle service dependencies (start dependencies first)</li>
+                    <li><strong>Service Monitoring:</strong> Periodic monitoring of service health</li>
+                    <li><strong>Service Registry:</strong> Persistent storage of service configuration</li>
+                    <li><strong>Event Integration:</strong> EventBus integration for service events</li>
+                    <li><strong>Logging:</strong> Comprehensive logging via logd</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Service States</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>State</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>stopped</code></td>
+                            <td>Service is not running</td>
+                        </tr>
+                        <tr>
+                            <td><code>starting</code></td>
+                            <td>Service is in the process of starting</td>
+                        </tr>
+                        <tr>
+                            <td><code>running</code></td>
+                            <td>Service is running normally</td>
+                        </tr>
+                        <tr>
+                            <td><code>stopping</code></td>
+                            <td>Service is in the process of stopping</td>
+                        </tr>
+                        <tr>
+                            <td><code>paused</code></td>
+                            <td>Service is paused (future feature)</td>
+                        </tr>
+                        <tr>
+                            <td><code>error</code></td>
+                            <td>Service encountered an error</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Startup Types</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>automatic</code></td>
+                            <td>Service starts automatically at system boot</td>
+                        </tr>
+                        <tr>
+                            <td><code>manual</code></td>
+                            <td>Service must be started manually</td>
+                        </tr>
+                        <tr>
+                            <td><code>disabled</code></td>
+                            <td>Service is disabled and cannot be started</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Default Services</h2>
+                <p>The Services Manager automatically registers these default system services:</p>
+                <ul>
+                    <li><strong>csrss</strong> - Client/Server Runtime Subsystem (automatic, critical, auto-restart)</li>
+                    <li><strong>logd</strong> - Logging Daemon (automatic, critical, auto-restart)</li>
+                    <li><strong>networkd</strong> - Network Daemon (automatic, auto-restart)</li>
+                    <li><strong>securityd</strong> - Security Daemon (automatic, auto-restart)</li>
+                    <li><strong>freeworldlogon</strong> - Login Manager (automatic, critical, auto-restart)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>API Reference</h2>
+                
+                <h3>registerService(serviceInfo)</h3>
+                <p>Register a new service with the Services Manager.</p>
+                <pre><code>const serviceInfo = new ServiceInfo(
+    'myservice',
+    'My Service Description',
+    'path/to/executable',
+    ['arg1', 'arg2'],
+    '/working/directory'
+);
+serviceInfo.startupType = SERVICE_STARTUP_AUTOMATIC;
+serviceInfo.restartOnExit = true;
+serviceInfo.critical = false;
+servicesManager.registerService(serviceInfo);</code></pre>
+
+                <h3>startService(name)</h3>
+                <p>Start a service. Returns a promise with success status and message.</p>
+                <pre><code>const result = await servicesManager.startService('logd');
+if (result.success) {
+    console.log(`Service started: ${result.message}`);
+}</code></pre>
+
+                <h3>stopService(name, force)</h3>
+                <p>Stop a service. If force is true, uses SIGKILL instead of SIGTERM.</p>
+                <pre><code>const result = await servicesManager.stopService('logd', false);</code></pre>
+
+                <h3>restartService(name)</h3>
+                <p>Restart a service (stops then starts).</p>
+                <pre><code>const result = await servicesManager.restartService('networkd');</code></pre>
+
+                <h3>getServiceStatus(name)</h3>
+                <p>Get current status of a service.</p>
+                <pre><code>const status = servicesManager.getServiceStatus('logd');
+console.log(`State: ${status.state}, PID: ${status.pid}`);</code></pre>
+
+                <h3>listServices()</h3>
+                <p>Get list of all registered services with their status.</p>
+                <pre><code>const services = servicesManager.listServices();
+services.forEach(service => {
+    console.log(`${service.name}: ${service.state}`);
+});</code></pre>
+
+                <h3>setStartupType(name, startupType)</h3>
+                <p>Set the startup type for a service.</p>
+                <pre><code>servicesManager.setStartupType('myservice', SERVICE_STARTUP_AUTOMATIC);</code></pre>
+
+                <h3>startAutomaticServices()</h3>
+                <p>Start all services configured for automatic startup.</p>
+                <pre><code>const results = await servicesManager.startAutomaticServices();</code></pre>
+
+                <h3>startMonitoring(interval)</h3>
+                <p>Start monitoring services for health (checks if processes are still running).</p>
+                <pre><code>servicesManager.startMonitoring(5000); // Check every 5 seconds</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Services Manager integrates with:</p>
+                <ul>
+                    <li><strong>FreeWorldSystem:</strong> Initialized in <code>system/integration.js</code></li>
+                    <li><strong>EventBus:</strong> Emits service events (started, stopped, error)</li>
+                    <li><strong>logd:</strong> Logs all service operations</li>
+                    <li><strong>smss:</strong> Works alongside smss for service management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Service Registry</h2>
+                <p>Service configuration is persisted to <code>system/config/services.json</code>. This includes:</p>
+                <ul>
+                    <li>Service name and description</li>
+                    <li>Executable path and arguments</li>
+                    <li>Working directory</li>
+                    <li>Startup type</li>
+                    <li>Auto-restart configuration</li>
+                    <li>Critical flag</li>
+                    <li>Dependencies</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <pre><code>const FreeWorldSystem = require('./system/integration');
+const system = new FreeWorldSystem();
+await system.init();
+
+const servicesManager = system.getServicesManager();
+
+// Get service status
+const status = servicesManager.getServiceStatus('logd');
+console.log(`logd is ${status.state}`);
+
+// Start a service
+await servicesManager.startService('networkd');
+
+// List all services
+const services = servicesManager.listServices();
+services.forEach(s => {
+    console.log(`${s.name}: ${s.state} (PID: ${s.pid || 'N/A'})`);
+});</code></pre>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

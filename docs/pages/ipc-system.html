@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IPC System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="csrss.html">csrss</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>IPC System</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete<br>
+                    <strong>Location:</strong> <code>kernel/ipc/ipc.asm</code>, <code>kernel/ipc/ipc.h</code><br>
+                    <strong>Type:</strong> Kernel-Level IPC Infrastructure<br>
+                    <strong>Purpose:</strong> Core inter-process communication for all services and daemons
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The IPC (Inter-Process Communication) System provides core-level communication infrastructure for FreeWorld OS. It enables all services, daemons, and applications to communicate efficiently using channels, message queues, Unix domain sockets, and named pipes.</p>
+            </section>
+
+            <section class="section">
+                <h2>Architecture</h2>
+                <p>The IPC system operates at the kernel level, providing:</p>
+                <ul>
+                    <li><strong>Channel Management:</strong> Named channels for service communication</li>
+                    <li><strong>Message Queues:</strong> Reliable message passing between processes</li>
+                    <li><strong>Unix Domain Sockets:</strong> Fast local communication</li>
+                    <li><strong>Named Pipes:</strong> Stream-based communication</li>
+                    <li><strong>Message Types:</strong> Structured messages with type, size, sender, receiver, priority</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Channel Types</h2>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Value</th>
+                            <th>Description</th>
+                            <th>Use Case</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>IPC_TYPE_SOCKET</code></td>
+                            <td>0</td>
+                            <td>Unix domain socket</td>
+                            <td>Service daemons (logd, networkd, csrss)</td>
+                        </tr>
+                        <tr>
+                            <td><code>IPC_TYPE_PIPE</code></td>
+                            <td>1</td>
+                            <td>Named pipe</td>
+                            <td>Stream-based communication</td>
+                        </tr>
+                        <tr>
+                            <td><code>IPC_TYPE_QUEUE</code></td>
+                            <td>2</td>
+                            <td>Message queue</td>
+                            <td>Reliable message passing</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>API Reference</h2>
+                
+                <h3>Channel Management</h3>
+                <pre><code>// Create IPC channel
+int ipc_create_channel(const char* name, uint32_t type, uint32_t buffer_size);
+
+// Open existing IPC channel
+int ipc_open_channel(const char* name, uint32_t mode);
+
+// Close IPC channel
+int ipc_close_channel(uint32_t channel_id);</code></pre>
+
+                <h3>Message Passing</h3>
+                <pre><code>// Send message via IPC
+int ipc_send(uint32_t channel_id, const void* buffer, uint32_t size, uint32_t type);
+
+// Receive message via IPC
+int ipc_receive(uint32_t channel_id, void* buffer, uint32_t size);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Message Structure</h2>
+                <pre><code>typedef struct {
+    uint32_t type;      // Message type
+    uint32_t size;      // Payload size (max 512 bytes)
+    uint32_t sender;    // Sender PID
+    uint32_t receiver;  // Receiver PID (0 = broadcast)
+    uint32_t priority;  // Message priority
+    char payload[512];  // Message data
+} IPC_MESSAGE;</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Service Integration</h2>
+                
+                <h3>logd (Logging Daemon)</h3>
+                <ul>
+                    <li><strong>Socket:</strong> <code>/var/run/logd.sock</code></li>
+                    <li><strong>Purpose:</strong> Receive log messages from all system components</li>
+                    <li><strong>Client Library:</strong> <code>services/logd/logd_ipc.c</code></li>
+                    <li><strong>Node.js Client:</strong> <code>system/logd-client.js</code></li>
+                </ul>
+
+                <h3>networkd (Network Daemon)</h3>
+                <ul>
+                    <li><strong>Socket:</strong> <code>/var/run/networkd.sock</code></li>
+                    <li><strong>Purpose:</strong> Network configuration and management</li>
+                    <li><strong>Client Library:</strong> <code>services/networkd/networkd_ipc.c</code></li>
+                    <li><strong>Messages:</strong> Configure static IP, enable DHCP, set DNS, manage routes</li>
+                </ul>
+
+                <h3>csrss (Client/Server Runtime)</h3>
+                <ul>
+                    <li><strong>Socket:</strong> <code>/var/run/csrss.sock</code></li>
+                    <li><strong>Purpose:</strong> Console and window management</li>
+                    <li><strong>Messages:</strong> Create console, create window, console I/O</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>C Client Example</h3>
+                <pre><code>#include "logd_ipc.h"
+
+// Send log message
+logd_info("myapp", "Application started");
+
+// Configure network
+networkd_configure_static("eth0", "192.168.1.100", 
+                          "255.255.255.0", "192.168.1.1");</code></pre>
+
+                <h3>Node.js Client Example</h3>
+                <pre><code>const { getLogdClient } = require('./system/logd-client');
+
+const logd = getLogdClient();
+logd.init(eventManager, eventBus);
+
+// Send log
+logd.info('myapp', 'Application started');
+
+// EventBus integration (automatic)
+eventBus.emit('security.user.login', { username: 'user' });
+// Automatically logged to logd via EventBus subscription</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Performance</h2>
+                <ul>
+                    <li><strong>Unix Domain Sockets:</strong> Very fast local communication (no network overhead)</li>
+                    <li><strong>Message Queues:</strong> Reliable, ordered message delivery</li>
+                    <li><strong>Non-blocking:</strong> Uses poll() for efficient I/O</li>
+                    <li><strong>Kernel-level:</strong> Direct kernel support for maximum performance</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                <pre><code>kernel/ipc/
+├── ipc.asm          # Core IPC implementation (ASM)
+└── ipc.h            # C API header
+
+services/logd/
+├── logd.c           # Daemon with IPC
+└── logd_ipc.c       # Client library
+
+services/networkd/
+├── networkd.c       # Daemon with IPC
+├── networkd_ipc.c   # Client library
+└── networkd_ipc.h   # Client header
+
+services/csrss/
+└── csrss.c          # Daemon with IPC
+
+system/
+└── logd-client.js   # Node.js client</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration with Event System</h2>
+                <p>The IPC system integrates with the Event System:</p>
+                <ul>
+                    <li><strong>logd ↔ EventBus:</strong> logd subscribes to EventBus for automatic audit logging</li>
+                    <li><strong>EventManager:</strong> Security/system/error events automatically sent to logd</li>
+                    <li><strong>Decoupled Architecture:</strong> Components communicate via events, not direct IPC calls</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <div class="status-grid">
+                    <div class="status-item complete">
+                        <strong>Core IPC System</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>logd IPC</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>networkd IPC</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>csrss IPC</strong><br>
+                        ✅ Complete
+                    </div>
+                    <div class="status-item complete">
+                        <strong>Event System Integration</strong><br>
+                        ✅ Complete
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

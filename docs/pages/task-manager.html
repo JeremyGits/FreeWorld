@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Task Manager</h1>
+                <div class="meta">
+                    <strong>Status:</strong> ✅ Complete<br>
+                    <strong>Location:</strong> <code>system/task-manager.js</code>, <code>system/task-manager-ui.js</code><br>
+                    <strong>Type:</strong> Node.js Process Monitoring System<br>
+                    <strong>Purpose:</strong> Process and system monitoring with dual CPU metrics
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Task Manager provides comprehensive process and system monitoring for FreeWorld OS. It features <strong>dual CPU metrics</strong> inspired by aircraft instrumentation, showing both traditional CPU usage percentage and CPU pressure (how hard the CPU is working relative to its current clock speed).</p>
+                <div class="alert alert-info">
+                    <strong>Innovation:</strong> The Task Manager uses a dual-gauge approach similar to aircraft instrumentation (RPM + Manifold Pressure), showing both CPU usage % and CPU pressure. This helps users understand if delays are due to low power settings or actual computational load.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Dual CPU Metrics</h2>
+                <p>The Task Manager displays two complementary CPU metrics:</p>
+                
+                <h3>1. CPU Usage % (Traditional)</h3>
+                <p>Standard CPU usage percentage showing how much of the CPU's time is being used.</p>
+                <ul>
+                    <li>0-100% range</li>
+                    <li>Shows percentage of CPU time in use</li>
+                    <li>Familiar metric from traditional task managers</li>
+                </ul>
+                
+                <h3>2. CPU Pressure (Innovative)</h3>
+                <p>CPU pressure shows how hard the CPU is working relative to its current capacity. This is calculated as:</p>
+                <pre><code>Pressure = (Usage % × Max Clock Speed) / Current Clock Speed</code></pre>
+                <p>This metric is particularly useful for:</p>
+                <ul>
+                    <li><strong>Laptops:</strong> Distinguishing between low power mode and actual computational load</li>
+                    <li><strong>Throttling Detection:</strong> Identifying when CPU is throttled (pressure > 100%)</li>
+                    <li><strong>Power Management:</strong> Understanding if high clock speed is needed or wasteful</li>
+                </ul>
+                
+                <h3>Example Scenarios</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Scenario</th>
+                            <th>Usage %</th>
+                            <th>Clock Speed</th>
+                            <th>Pressure</th>
+                            <th>Interpretation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Normal operation</td>
+                            <td>50%</td>
+                            <td>3000 MHz (100%)</td>
+                            <td>50%</td>
+                            <td>CPU working normally at full capacity</td>
+                        </tr>
+                        <tr>
+                            <td>Power saving mode</td>
+                            <td>50%</td>
+                            <td>900 MHz (30%)</td>
+                            <td>166%</td>
+                            <td>CPU is working harder than its current capacity (throttled)</td>
+                        </tr>
+                        <tr>
+                            <td>Thermal throttling</td>
+                            <td>100%</td>
+                            <td>1500 MHz (50%)</td>
+                            <td>200%</td>
+                            <td>CPU overloaded and throttled due to heat</td>
+                        </tr>
+                        <tr>
+                            <td>Inefficient</td>
+                            <td>20%</td>
+                            <td>3000 MHz (100%)</td>
+                            <td>20%</td>
+                            <td>Low usage but high clock - consider power saving</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Dual CPU Gauges:</strong> Usage % and Pressure metrics</li>
+                    <li><strong>Clock Speed Monitoring:</strong> Current, min, and max clock speeds</li>
+                    <li><strong>Memory Metrics:</strong> Total, used, free, cached, buffers</li>
+                    <li><strong>Process List:</strong> All running processes with CPU and memory usage</li>
+                    <li><strong>Network Metrics:</strong> Bytes sent/received, packets (future)</li>
+                    <li><strong>Load Average:</strong> 1-minute, 5-minute, 15-minute load averages</li>
+                    <li><strong>Real-time Updates:</strong> Updates every second</li>
+                    <li><strong>Status Interpretation:</strong> Automatic interpretation of CPU status</li>
+                    <li><strong>Recommendations:</strong> Suggestions based on current system state</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>CPU Status Interpretation</h2>
+                <p>The Task Manager automatically interprets CPU status and provides recommendations:</p>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Status</th>
+                            <th>Condition</th>
+                            <th>Recommendation</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>normal</code></td>
+                            <td>CPU operating normally</td>
+                            <td>No action needed</td>
+                        </tr>
+                        <tr>
+                            <td><code>overloaded</code></td>
+                            <td>Pressure > 150%</td>
+                            <td>Consider closing applications or upgrading hardware</td>
+                        </tr>
+                        <tr>
+                            <td><code>high_pressure</code></td>
+                            <td>Pressure > 100% and usage > 50%</td>
+                            <td>CPU is working hard - monitor temperature</td>
+                        </tr>
+                        <tr>
+                            <td><code>throttled</code></td>
+                            <td>Usage > 80% but clock < 50%</td>
+                            <td>CPU is throttled - check power settings and thermal management</td>
+                        </tr>
+                        <tr>
+                            <td><code>inefficient</code></td>
+                            <td>Usage < 20% but clock > 80%</td>
+                            <td>Consider enabling power saving mode to reduce clock speed</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>API Reference</h2>
+                
+                <h3>getCPUMetrics()</h3>
+                <p>Get current CPU metrics including usage, pressure, clock speeds, and interpretation.</p>
+                <pre><code>const metrics = taskManager.getCPUMetrics();
+console.log(`Usage: ${metrics.usagePercent}%`);
+console.log(`Pressure: ${metrics.pressure}%`);
+console.log(`Clock: ${metrics.clockSpeed} MHz`);
+console.log(`Status: ${metrics.interpretation.status}`);
+console.log(`Message: ${metrics.interpretation.message}`);</code></pre>
+
+                <h3>getMemoryMetrics()</h3>
+                <p>Get current memory metrics.</p>
+                <pre><code>const memory = taskManager.getMemoryMetrics();
+console.log(`Used: ${memory.used / 1024 / 1024} MB`);
+console.log(`Free: ${memory.free / 1024 / 1024} MB`);
+console.log(`Usage: ${memory.usagePercent}%`);</code></pre>
+
+                <h3>getProcessList()</h3>
+                <p>Get list of all running processes.</p>
+                <pre><code>const processes = taskManager.getProcessList();
+processes.forEach(proc => {
+    console.log(`${proc.name} (PID: ${proc.pid}): ${proc.cpuUsage}% CPU, ${proc.memoryUsage} bytes`);
+});</code></pre>
+
+                <h3>getAllMetrics()</h3>
+                <p>Get all metrics (CPU, memory, network, processes) in one call.</p>
+                <pre><code>const allMetrics = taskManager.getAllMetrics();
+console.log('CPU:', allMetrics.cpu);
+console.log('Memory:', allMetrics.memory);
+console.log('Processes:', allMetrics.processes.length);</code></pre>
+
+                <h3>start()</h3>
+                <p>Start monitoring (updates every second).</p>
+                <pre><code>taskManager.start();</code></pre>
+
+                <h3>stop()</h3>
+                <p>Stop monitoring.</p>
+                <pre><code>taskManager.stop();</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Task Manager integrates with:</p>
+                <ul>
+                    <li><strong>FreeWorldSystem:</strong> Initialized in <code>system/integration.js</code></li>
+                    <li><strong>logd:</strong> Logs monitoring events</li>
+                    <li><strong>Resource Manager:</strong> Can integrate with kernel resource manager for accurate metrics</li>
+                    <li><strong>HAL:</strong> Uses HAL for CPU and memory detection</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>UI Components</h2>
+                <p>The Task Manager UI (<code>system/task-manager-ui.js</code>) provides:</p>
+                <ul>
+                    <li><strong>Performance Tab:</strong> Dual CPU gauges, memory gauge, detailed metrics</li>
+                    <li><strong>Processes Tab:</strong> Process list with CPU and memory usage</li>
+                    <li><strong>Services Tab:</strong> Integration with Services Manager (future)</li>
+                    <li><strong>Real-time Updates:</strong> Automatic refresh every second</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <pre><code>const FreeWorldSystem = require('./system/integration');
+const system = new FreeWorldSystem();
+await system.init();
+
+const taskManager = system.getTaskManager();
+
+// Start monitoring
+taskManager.start();
+
+// Get CPU metrics
+const cpu = taskManager.getCPUMetrics();
+console.log(`CPU Usage: ${cpu.usagePercent}%`);
+console.log(`CPU Pressure: ${cpu.pressure}%`);
+console.log(`Clock Speed: ${cpu.clockSpeed} MHz / ${cpu.maxClockSpeed} MHz`);
+console.log(`Status: ${cpu.interpretation.status}`);
+console.log(`Message: ${cpu.interpretation.message}`);
+console.log(`Recommendation: ${cpu.interpretation.recommendation}`);
+
+// Get all metrics
+const metrics = taskManager.getAllMetrics();
+console.log('All metrics:', metrics);</code></pre>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

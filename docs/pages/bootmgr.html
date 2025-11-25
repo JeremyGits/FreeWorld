@@ -50,18 +50,23 @@
             <div class="page-header">
                 <h1>BOOTMGR - FreeWorld Boot Manager</h1>
                 <div class="meta">
-                    <strong>Location:</strong> boot/BOOTMGR/bootmgr.asm<br>
-                    <strong>Type:</strong> Boot Sector (Assembly)<br>
-                    <strong>Architecture:</strong> x86_64 (16-bit boot code)
+                    <strong>Location:</strong> boot/bootloader_stage1.asm (Stage 1)<br>
+                    <strong>Type:</strong> Boot Sector (Assembly, 512 bytes)<br>
+                    <strong>Architecture:</strong> x86_64 (16-bit real mode)<br>
+                    <strong>Status:</strong> ✅ Fully Implemented with LBA/CHS Support
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>BOOTMGR (Boot Manager) is the initial boot loader for FreeWorld OS. It is the first code executed when the system boots, responsible for initializing the system and loading the kernel into memory.</p>
+                <p>BOOTMGR (Boot Manager) is the initial boot loader for FreeWorld OS. It consists of two stages:</p>
+                <ul>
+                    <li><strong>Stage 1 (bootloader_stage1.asm):</strong> The MBR bootloader (512 bytes) that loads stage 2</li>
+                    <li><strong>Stage 2 (bootloader_ui.asm):</strong> The graphical bootloader that displays the boot menu and loads the kernel</li>
+                </ul>
                 
                 <div class="alert alert-info">
-                    <strong>Note:</strong> BOOTMGR runs in 16-bit real mode and must fit within 512 bytes (boot sector size).
+                    <strong>Note:</strong> Stage 1 runs in 16-bit real mode and must fit within exactly 512 bytes (boot sector size). Stage 2 is larger (~2KB) and is loaded from disk by stage 1.
                 </div>
             </section>
 
@@ -131,28 +136,57 @@ done:
     ret              ; Return</pre>
                 </div>
 
-                <h4>load_kernel</h4>
-                <p>Loads the kernel from disk using BIOS interrupt 0x13:</p>
+                <h4>Disk Read (Stage 1)</h4>
+                <p>Stage 1 loads stage 2 from disk using LBA extended read with CHS fallback:</p>
                 <div class="code-block">
-                    <pre>load_kernel:
-    mov ah, 0x02     ; Read sectors function
-    mov al, 16       ; Number of sectors to read (8KB)
-    mov ch, 0        ; Cylinder 0
-    mov cl, 2        ; Sector 2 (boot sector is sector 1)
-    mov dh, 0        ; Head 0
-    mov dl, 0        ; Drive 0 (floppy A:)
-    mov bx, 0x1000   ; Segment
-    mov es, bx
-    mov bx, 0x0000   ; Offset
-    int 0x13         ; BIOS disk interrupt
-    jc load_error    ; Jump if error (carry flag set)
-    
-    ; Verify kernel magic number
-    ; Compare first 8 bytes with "FREEWORL"
-    ; If mismatch, jump to magic_error</pre>
+                    <pre>; Check for LBA extended read support
+mov ah, 0x41        ; Check Extensions Present
+mov bx, 0x55AA
+mov dl, [boot_device]
+int 0x13
+jc .use_chs         ; Fall back to CHS if not supported
+
+; Use LBA extended read (Disk Address Packet)
+mov si, dap         ; DAP structure
+mov ah, 0x42        ; Extended Read Sectors
+mov dl, [boot_device]
+int 0x13
+jnc .verify_load    ; Success
+
+.use_chs:
+; CHS addressing (required for floppy disks)
+mov ah, 0x02        ; Read sectors
+mov al, 4           ; Read 4 sectors (stage 2)
+mov ch, 0           ; Cylinder 0
+mov cl, 3           ; CHS sector 3 (physical sector 2)
+mov dh, 0           ; Head 0
+mov dl, [boot_device]
+xor bx, bx
+mov es, bx
+mov bx, 0x7E00      ; Load to 0x0000:0x7E00
+int 0x13
+
+.verify_load:
+; Verify stage 2 signature ('OB' = 0x424F)
+cmp byte [es:0x7E00], 'O'
+jne .bad_sig
+cmp byte [es:0x7E00 + 1], 'B'
+jne .bad_sig
+jmp 0x0000:0x7E00   ; Jump to stage 2</pre>
                 </div>
-                <p><strong>Purpose:</strong> Loads the kernel binary from disk sector 2 into memory at 0x1000:0x0000 (linear address 0x10000).</p>
-                <p><strong>Error Handling:</strong> Checks for disk read errors and verifies kernel magic number before jumping to kernel.</p>
+                <p><strong>Purpose:</strong> Loads stage 2 bootloader from disk into memory at 0x0000:0x7E00.</p>
+                <p><strong>Critical:</strong> Uses CHS sector 3 (not 2) because CHS sectors are 1-based while physical sectors are 0-based.</p>
+                <p><strong>Error Handling:</strong> Checks for disk read errors and verifies stage 2 signature ('OB') before jumping.</p>
+                
+                <div class="alert alert-warning">
+                    <strong>Important:</strong> The bootloader was fixed to correctly map physical sectors to CHS sectors:
+                    <ul>
+                        <li>Physical sector 0 = CHS sector 1 (MBR)</li>
+                        <li>Physical sector 2 = CHS sector 3 (Stage 2 start)</li>
+                        <li>Physical sector 6 = CHS sector 7 (Graphics start)</li>
+                        <li>Physical sector 33 = CHS sector 33 (Kernel start)</li>
+                    </ul>
+                </div>
             </section>
 
             <section class="section">
@@ -215,13 +249,30 @@ jmp print_string ; Unconditional jump to continue loop</pre>
 
             <section class="section">
                 <h2>Boot Process Flow</h2>
+                <h3>Stage 1 (bootloader_stage1.asm)</h3>
                 <ol>
                     <li>BIOS loads boot sector (512 bytes) from disk to memory at 0x7C00</li>
                     <li>BIOS jumps to 0x7C00 (start label)</li>
-                    <li>BOOTMGR initializes segments and stack</li>
-                    <li>BOOTMGR displays boot message</li>
-                    <li>BOOTMGR loads kernel into memory (via load_kernel)</li>
-                    <li>BOOTMGR jumps to kernel entry point (0x1000:0x0000)</li>
+                    <li>Stage 1 initializes segments, stack, and serial port</li>
+                    <li>Stage 1 initializes VGA text mode (80x25)</li>
+                    <li>Stage 1 displays "Loading FreeWorld OS..." message</li>
+                    <li>Stage 1 checks for LBA extended read support</li>
+                    <li>Stage 1 loads stage 2 from CHS sector 3 (physical sector 2) to 0x0000:0x7E00</li>
+                    <li>Stage 1 verifies stage 2 signature ('OB')</li>
+                    <li>Stage 1 passes boot device number to stage 2</li>
+                    <li>Stage 1 jumps to stage 2 at 0x0000:0x7E00</li>
+                </ol>
+                
+                <h3>Stage 2 (bootloader_ui.asm)</h3>
+                <ol>
+                    <li>Stage 2 initializes segments and stack</li>
+                    <li>Stage 2 initializes graphics mode (VESA or VGA)</li>
+                    <li>Stage 2 loads graphics from disk (logo, background, icons)</li>
+                    <li>Stage 2 displays graphical boot menu</li>
+                    <li>Stage 2 waits for user selection</li>
+                    <li>Stage 2 loads kernel from CHS sector 33 (physical sector 33) to 0x1000:0x0000</li>
+                    <li>Stage 2 verifies kernel signature ('FREEWORL')</li>
+                    <li>Stage 2 jumps to kernel entry point (0x1000:0x0000)</li>
                 </ol>
             </section>
 
@@ -231,11 +282,32 @@ jmp print_string ; Unconditional jump to continue loop</pre>
                     <pre>0x0000 - 0x03FF  : Interrupt Vector Table
 0x0400 - 0x04FF  : BIOS Data Area
 0x0500 - 0x7BFF  : Available
-0x7C00 - 0x7DFF  : Boot Sector (512 bytes)
-0x7E00 - 0x9FFF  : Available
-0xA000 - 0xBFFF  : Video Memory
+0x7C00 - 0x7DFF  : Stage 1 Bootloader (512 bytes)
+0x7E00 - 0x9FFF  : Stage 2 Bootloader (~2KB)
+0x8000 - 0x8FFF  : Graphics Index Table
+0x9000 - 0x9FFF  : Logo Graphics Buffer
+0xA000 - 0xAFFF  : Background Graphics Buffer
+0xB000 - 0xB7FF  : Selection Highlight Buffer
+0xB800 - 0xBFFF  : Progress Bar Buffer
+0xC000 - 0xC1FF  : Error Icon Buffer
+0xC200 - 0xC3FF  : Success Icon Buffer
+0xA000 - 0xBFFF  : Video Memory (VGA)
 0xC000 - 0xFFFF  : BIOS ROM
 0x1000:0x0000    : Kernel Entry Point</pre>
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2>Disk Layout</h2>
+                <p>The boot disk is organized as follows:</p>
+                <div class="code-block">
+                    <pre>Physical Sector 0  : Stage 1 Bootloader (MBR, 512 bytes)
+Physical Sector 1  : Unused
+Physical Sector 2  : Stage 2 Bootloader start (CHS sector 3)
+Physical Sectors 2-5: Stage 2 Bootloader (4 sectors, ~2KB)
+Physical Sector 6  : Graphics start (Logo, CHS sector 7)
+Physical Sectors 6-32: Graphics resources
+Physical Sector 33 : Kernel start (CHS sector 33)</pre>
                 </div>
             </section>
 
@@ -254,8 +326,38 @@ jmp print_string ; Unconditional jump to continue loop</pre>
                         <tr>
                             <td>0x10</td>
                             <td>Video Services</td>
+                            <td>0x00</td>
+                            <td>Set video mode (AL=0x03 for 80x25 text mode)</td>
+                        </tr>
+                        <tr>
+                            <td>0x10</td>
+                            <td>Video Services</td>
                             <td>0x0E</td>
                             <td>Teletype output - prints character in AL register</td>
+                        </tr>
+                        <tr>
+                            <td>0x13</td>
+                            <td>Disk Services</td>
+                            <td>0x00</td>
+                            <td>Reset disk system</td>
+                        </tr>
+                        <tr>
+                            <td>0x13</td>
+                            <td>Disk Services</td>
+                            <td>0x41</td>
+                            <td>Check if extended disk access functions are available</td>
+                        </tr>
+                        <tr>
+                            <td>0x13</td>
+                            <td>Disk Services</td>
+                            <td>0x42</td>
+                            <td>Extended Read Sectors (LBA) - uses Disk Address Packet (DAP)</td>
+                        </tr>
+                        <tr>
+                            <td>0x13</td>
+                            <td>Disk Services</td>
+                            <td>0x02</td>
+                            <td>Read Sectors (CHS) - traditional cylinder-head-sector addressing</td>
                         </tr>
                     </tbody>
                 </table>
@@ -263,12 +365,20 @@ jmp print_string ; Unconditional jump to continue loop</pre>
 
             <section class="section">
                 <h2>Build Instructions</h2>
-                <p>To build BOOTMGR:</p>
+                <p>To build the bootloader:</p>
                 <div class="code-block">
-                    <pre>cd boot/BOOTMGR
-nasm -f bin bootmgr.asm -o BOOTMGR.bin</pre>
+                    <pre># Build Stage 1
+cd boot
+nasm -f bin bootloader_stage1.asm -o build/bootloader_stage1.bin
+
+# Build Stage 2
+make bootloader_ui.bin
+
+# Create boot image
+./scripts/fix-boot-layout.sh</pre>
                 </div>
-                <p>The output file <code class="code-inline">BOOTMGR.bin</code> is exactly 512 bytes and can be written to the first sector of a bootable disk.</p>
+                <p>The output file <code class="code-inline">bootloader_stage1.bin</code> is exactly 512 bytes and must be written to the first sector (sector 0) of a bootable disk.</p>
+                <p>The <code class="code-inline">fix-boot-layout.sh</code> script ensures correct placement of all boot components on the disk image.</p>
             </section>
 
             <section class="section">
@@ -283,15 +393,32 @@ nasm -f bin bootmgr.asm -o BOOTMGR.bin</pre>
 
             <section class="section">
                 <h2>Debug Output</h2>
-                <p>BOOTMGR outputs messages to both video (BIOS INT 0x10) and serial port (COM1):</p>
+                <p>Stage 1 outputs messages to both video (BIOS INT 0x10) and serial port (COM1):</p>
                 <ul>
-                    <li><strong>"FreeWorld Boot Manager v0.1"</strong> - Initial boot message</li>
-                    <li><strong>"Loading kernel..."</strong> - Before loading kernel</li>
-                    <li><strong>"Kernel loaded."</strong> - After successful kernel load</li>
-                    <li><strong>"Error loading kernel!"</strong> - If disk read fails</li>
-                    <li><strong>"Invalid kernel magic!"</strong> - If kernel signature doesn't match</li>
+                    <li><strong>"S1"</strong> - Stage 1 started (serial only)</li>
+                    <li><strong>"Loading FreeWorld OS..."</strong> - Before loading stage 2</li>
+                    <li><strong>"OK"</strong> - Disk read successful (serial only)</li>
+                    <li><strong>"JMP"</strong> - Jumping to stage 2 (serial only)</li>
+                    <li><strong>"Disk read failed!"</strong> - If disk read fails</li>
+                    <li><strong>"Bad signature! Got: XX"</strong> - If stage 2 signature doesn't match</li>
                 </ul>
-                <p>Serial port output is particularly useful for debugging in QEMU with <code>-serial stdio</code>.</p>
+                <p>Serial port output is particularly useful for debugging in QEMU with <code>-serial stdio</code> or <code>-serial file:serial.log</code>.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Debugging Tip:</strong> The bootloader includes extensive serial output for debugging. Use <code>strings serial.log</code> or <code>hexdump -C serial.log</code> to view the output after a QEMU run.
+                </div>
+            </section>
+            
+            <section class="section">
+                <h2>Recent Fixes</h2>
+                <p>The following critical fixes were implemented:</p>
+                <ul>
+                    <li><strong>CHS Sector Mapping:</strong> Fixed incorrect sector calculation - physical sector 2 now correctly maps to CHS sector 3</li>
+                    <li><strong>LBA Extended Read:</strong> Implemented LBA extended read (INT 0x13, AH=0x42) with automatic fallback to CHS</li>
+                    <li><strong>Graphics Loader:</strong> Fixed graphics loader to use correct CHS sectors matching disk layout</li>
+                    <li><strong>Disk Reset:</strong> Added disk reset before reading to ensure reliable disk access</li>
+                    <li><strong>Register Preservation:</strong> Fixed register preservation during INT 0x13 calls</li>
+                </ul>
             </section>
         </main>
     </div>

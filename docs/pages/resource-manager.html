@@ -202,6 +202,84 @@ uint32_t resource_calculate_system_load(void);</code></pre>
             </section>
 
             <section class="section">
+                <h2>Access Methods</h2>
+                <p>The Resource Manager is kernel-level and accessed via:</p>
+                <ul>
+                    <li><strong>Direct Kernel Calls:</strong> Kernel code calls functions directly</li>
+                    <li><strong>System Calls:</strong> User space processes access via syscalls (INT 0x80)</li>
+                    <li><strong>No IPC Required:</strong> Kernel-level infrastructure doesn't need IPC</li>
+                </ul>
+
+                <h3>System Call Numbers</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Syscall Number</th>
+                            <th>Function</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>20</td>
+                            <td><code>SYS_GET_CPU_QUOTA</code></td>
+                            <td>Get CPU quota for process</td>
+                        </tr>
+                        <tr>
+                            <td>21</td>
+                            <td><code>SYS_CALCULATE_TIMESLICE</code></td>
+                            <td>Calculate time slice</td>
+                        </tr>
+                        <tr>
+                            <td>22</td>
+                            <td><code>SYS_CHECK_MEMORY</code></td>
+                            <td>Check memory allocation</td>
+                        </tr>
+                        <tr>
+                            <td>23</td>
+                            <td><code>SYS_UPDATE_MEMORY</code></td>
+                            <td>Update memory usage</td>
+                        </tr>
+                        <tr>
+                            <td>24</td>
+                            <td><code>SYS_CHECK_IO_BANDWIDTH</code></td>
+                            <td>Check I/O bandwidth</td>
+                        </tr>
+                        <tr>
+                            <td>25</td>
+                            <td><code>SYS_CHECK_FD</code></td>
+                            <td>Check FD allocation</td>
+                        </tr>
+                        <tr>
+                            <td>26</td>
+                            <td><code>SYS_ALLOCATE_FD</code></td>
+                            <td>Allocate file descriptor</td>
+                        </tr>
+                        <tr>
+                            <td>27</td>
+                            <td><code>SYS_SET_PRIORITY</code></td>
+                            <td>Set process priority</td>
+                        </tr>
+                        <tr>
+                            <td>28</td>
+                            <td><code>SYS_SET_NICE</code></td>
+                            <td>Set nice value</td>
+                        </tr>
+                        <tr>
+                            <td>29</td>
+                            <td><code>SYS_GET_SYSTEM_LOAD</code></td>
+                            <td>Get system load</td>
+                        </tr>
+                        <tr>
+                            <td>30</td>
+                            <td><code>SYS_GET_RESOURCE_STATS</code></td>
+                            <td>Get resource statistics</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
                 <h2>Integration</h2>
                 <p>The Resource Manager integrates with:</p>
                 <ul>
@@ -210,6 +288,7 @@ uint32_t resource_calculate_system_load(void);</code></pre>
                     <li><strong>I/O Subsystem:</strong> Provides bandwidth limits</li>
                     <li><strong>File System:</strong> Provides FD limits</li>
                     <li><strong>Process Manager:</strong> Provides priority management</li>
+                    <li><strong>System Call Interface:</strong> Exposes functions to user space</li>
                 </ul>
             </section>
 
@@ -221,7 +300,10 @@ uint32_t resource_calculate_system_load(void);</code></pre>
 ├── resource_policy.c          # Heuristic policies
 ├── resource_policy.h          # Policy API header
 ├── Makefile                   # Build system
-└── README.md                  # Documentation</code></pre>
+└── README.md                  # Documentation
+
+kernel/syscalls/
+└── resource_syscalls.asm       # System call wrappers</code></pre>
             </section>
 
             <section class="section">
