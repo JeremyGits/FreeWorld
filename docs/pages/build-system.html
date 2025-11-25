@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Build System - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../navigation.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Build System & Toolchain</h1>
+            <p class="subtitle">Location: <code>build-toolchain.sh</code>, <code>scripts/</code> | Type: Build Infrastructure | Status: ✅ Fully Implemented</p>
+        </header>
+
+        <nav class="sidebar" id="sidebar"></nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The FreeWorld OS build system provides cross-compilation toolchain setup, kernel headers, and build scripts for compiling programs for FreeWorld OS.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+            </section>
+
+            <section>
+                <h2>Components</h2>
+                
+                <h3>1. Cross-Compilation Toolchain</h3>
+                <p><strong>Location:</strong> <code>build-toolchain.sh</code></p>
+                <p>Sets up GCC wrapper scripts for FreeWorld target:</p>
+                <ul>
+                    <li>Creates <code>x86_64-freeworld-gcc</code> wrapper</li>
+                    <li>Configures FreeWorld-specific compiler flags</li>
+                    <li>Sets up include and library paths</li>
+                    <li>Creates tool wrappers (ar, as, ld, etc.)</li>
+                </ul>
+
+                <h4>Usage</h4>
+                <pre><code>./build-toolchain.sh</code></pre>
+                <p>Creates toolchain in <code>build/toolchain/bin/</code></p>
+
+                <h3>2. Kernel Headers</h3>
+                <p><strong>Location:</strong> <code>scripts/create-kernel-headers.sh</code></p>
+                <p>Creates system headers in <code>build/sysroot/usr/include/</code>:</p>
+                <ul>
+                    <li><code>sys/syscall.h</code> - System call numbers</li>
+                    <li><code>freeworld/kernel.h</code> - Kernel types and structures</li>
+                    <li><code>unistd.h</code> - POSIX system call wrappers</li>
+                    <li><code>errno.h</code> - Error codes</li>
+                    <li><code>stddef.h</code> - Standard definitions</li>
+                    <li><code>stdint.h</code> - Integer types</li>
+                    <li><code>stdarg.h</code> - Variable arguments</li>
+                    <li><code>string.h</code> - String function declarations</li>
+                </ul>
+
+                <h4>Usage</h4>
+                <pre><code>./scripts/create-kernel-headers.sh</code></pre>
+
+                <h3>3. Minimal C Library Build</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/Makefile</code></p>
+                <p>Builds the minimal C library:</p>
+                <pre><code>cd libc-minimal
+make
+make install</code></pre>
+
+                <h3>4. glibc Build Scripts (Future)</h3>
+                <p><strong>Location:</strong> <code>scripts/configure-glibc.sh</code>, <code>scripts/build-glibc.sh</code></p>
+                <p>Scripts for building glibc (requires FreeWorld sysdeps implementation):</p>
+                <ul>
+                    <li>Configure glibc for FreeWorld target</li>
+                    <li>Build glibc (will take hours)</li>
+                    <li>Install to filesystem</li>
+                </ul>
+                <p><strong>Note:</strong> Full glibc build requires extensive FreeWorld-specific implementation.</p>
+
+                <h3>5. Node.js Build Scripts (Future)</h3>
+                <p><strong>Location:</strong> <code>scripts/configure-nodejs.sh</code>, <code>scripts/build-nodejs.sh</code></p>
+                <p>Scripts for building Node.js (requires OS abstraction layer):</p>
+                <ul>
+                    <li>Configure Node.js for FreeWorld target</li>
+                    <li>Build Node.js and V8 (will take many hours)</li>
+                    <li>Install to filesystem</li>
+                </ul>
+                <p><strong>Note:</strong> Full Node.js build requires extensive FreeWorld-specific implementation.</p>
+            </section>
+
+            <section>
+                <h2>Build Process</h2>
+                
+                <h3>Step 1: Set Up Toolchain</h3>
+                <pre><code>./build-toolchain.sh</code></pre>
+                <p>This creates the cross-compiler wrappers.</p>
+
+                <h3>Step 2: Create Kernel Headers</h3>
+                <pre><code>./scripts/create-kernel-headers.sh</code></pre>
+                <p>This creates all system headers.</p>
+
+                <h3>Step 3: Build Minimal C Library</h3>
+                <pre><code>cd libc-minimal
+make
+make install</code></pre>
+                <p>This builds and installs the C library.</p>
+
+                <h3>Step 4: Compile Programs</h3>
+                <pre><code># Add toolchain to PATH
+export PATH="$(pwd)/build/toolchain/bin:$PATH"
+
+# Compile a program
+x86_64-freeworld-gcc -o hello hello.c -Lbuild/sysroot/lib -lc</code></pre>
+            </section>
+
+            <section>
+                <h2>Compiler Flags</h2>
+                
+                <p>The cross-compiler uses these flags automatically:</p>
+                <ul>
+                    <li><code>-ffreestanding</code> - Freestanding environment (no standard library)</li>
+                    <li><code>-fno-stack-protector</code> - No stack protection</li>
+                    <li><code>-fno-pic</code> - No position-independent code</li>
+                    <li><code>-mno-red-zone</code> - No red zone (required for kernel)</li>
+                    <li><code>-nostdlib</code> - Don't link standard library</li>
+                    <li><code>-nostdinc</code> - Don't use standard include paths</li>
+                    <li><code>-Ibuild/sysroot/usr/include</code> - Kernel headers path</li>
+                    <li><code>-Lbuild/sysroot/lib</code> - Library path</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Directory Structure</h2>
+                <pre><code>build/
+├── toolchain/          # Cross-compiler toolchain
+│   └── bin/            # Compiler wrappers
+├── sysroot/            # System root
+│   ├── usr/
+│   │   └── include/    # Kernel headers
+│   └── lib/            # Libraries (libc.a)
+└── glibc-build/        # glibc build directory (future)
+└── nodejs-build/       # Node.js build directory (future)
+
+libc-minimal/           # Minimal C library source
+├── src/                # Source files
+├── include/            # Header files
+├── lib/                # Built library
+└── Makefile            # Build configuration
+
+scripts/                # Build scripts
+├── create-kernel-headers.sh
+├── configure-glibc.sh
+├── build-glibc.sh
+├── configure-nodejs.sh
+└── build-nodejs.sh</code></pre>
+            </section>
+
+            <section>
+                <h2>Future: Full glibc Build</h2>
+                <p>To build full glibc (when ready):</p>
+                <ol>
+                    <li>Implement FreeWorld sysdeps (<code>dev/glibc/sysdeps/freeworld/</code>)</li>
+                    <li>Run <code>./scripts/configure-glibc.sh</code></li>
+                    <li>Run <code>./scripts/build-glibc.sh</code> (will take hours)</li>
+                </ol>
+                <p>See <a href="../BUILD-GLIBC-NODEJS.md">BUILD-GLIBC-NODEJS.md</a> for details.</p>
+            </section>
+
+            <section>
+                <h2>Future: Node.js Build</h2>
+                <p>To build Node.js (when ready):</p>
+                <ol>
+                    <li>Implement FreeWorld OS abstraction layer</li>
+                    <li>Port V8 platform support</li>
+                    <li>Run <code>./scripts/configure-nodejs.sh</code></li>
+                    <li>Run <code>./scripts/build-nodejs.sh</code> (will take many hours)</li>
+                </ol>
+                <p>See <a href="../BUILD-GLIBC-NODEJS.md">BUILD-GLIBC-NODEJS.md</a> for details.</p>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="minimal-libc.html">Minimal C Library</a> - C runtime library</li>
+                    <li><a href="syscalls.html">System Calls</a> - System call interface</li>
+                    <li><a href="elf-loader.html">ELF Loader</a> - Loading executables</li>
+                    <li><a href="../BUILD-GLIBC-NODEJS.md">Building glibc and Node.js</a> - Full build guide</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

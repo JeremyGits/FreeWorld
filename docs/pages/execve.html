@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>execve() System Call - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../navigation.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>execve() System Call</h1>
+            <p class="subtitle">Location: <code>kernel/process/execve.asm</code> | Type: System Call | Status: ✅ Fully Implemented</p>
+        </header>
+
+        <nav class="sidebar" id="sidebar"></nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The <code>execve()</code> system call executes a new program, replacing the current process image. It loads ELF executables from the filesystem, sets up the execution environment, and transfers control to the program entry point.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+            </section>
+
+            <section>
+                <h2>Function Signature</h2>
+                <pre><code>int execve(const char *pathname, char *const argv[], char *const envp[]);</code></pre>
+                
+                <h3>Parameters</h3>
+                <ul>
+                    <li><code>pathname</code> - Path to executable file (e.g., "/usr/lib/nodejs/bin/node")</li>
+                    <li><code>argv</code> - Array of command-line argument strings (NULL-terminated)</li>
+                    <li><code>envp</code> - Array of environment variable strings (NULL-terminated)</li>
+                </ul>
+
+                <h3>Return Value</h3>
+                <ul>
+                    <li>On success: Does not return (process is replaced)</li>
+                    <li>On error: Returns -1 and sets <code>errno</code></li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Implementation</h2>
+                
+                <h3>Main Handler</h3>
+                <p><strong>Function:</strong> <code>syscall_execve()</code></p>
+                <p>System call handler registered as syscall #11 (Linux-compatible).</p>
+
+                <h3>Execution Flow</h3>
+                <ol>
+                    <li><strong>Load ELF File:</strong> Uses <code>elf_load_file()</code> to read executable from filesystem</li>
+                    <li><strong>Get Entry Point:</strong> Extracts program entry point from ELF header</li>
+                    <li><strong>Count Arguments:</strong> Counts argc from argv array</li>
+                    <li><strong>Set Up Stack:</strong> Allocates stack and sets up argc, argv, envp</li>
+                    <li><strong>Execute Program:</strong> Calls <code>elf_execute()</code> to run the program</li>
+                    <li><strong>Cleanup:</strong> Frees resources if execution fails</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Process Spawning</h2>
+                
+                <h3>Function: <code>execve_spawn_process()</code></h3>
+                <p>Creates a new process and executes a program in it:</p>
+                <ol>
+                    <li>Creates new process via <code>create_process()</code></li>
+                    <li>Loads ELF file into new process</li>
+                    <li>Sets up process address space</li>
+                    <li>Sets up process stack</li>
+                    <li>Executes program in new process context</li>
+                    <li>Returns new process ID</li>
+                </ol>
+
+                <h3>Address Space Setup</h3>
+                <p><strong>Function:</strong> <code>execve_setup_address_space()</code></p>
+                <p>Sets up the process virtual address space (currently a placeholder for future implementation):</p>
+                <ul>
+                    <li>Create new page directory for process</li>
+                    <li>Map ELF segments to their virtual addresses</li>
+                    <li>Set up stack mapping</li>
+                    <li>Set up heap mapping</li>
+                    <li>Update process CR3 register</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Stack Building Utilities</h2>
+                
+                <h3>Build Argument Vector</h3>
+                <p><strong>Function:</strong> <code>execve_build_argv_stack()</code></p>
+                <p>Builds the argument vector on the program stack:</p>
+                <ol>
+                    <li>Counts arguments in argv array</li>
+                    <li>Allocates space for argv pointers on stack</li>
+                    <li>Copies argument strings to stack</li>
+                    <li>Sets up argv pointer array</li>
+                    <li>Adds NULL terminator</li>
+                </ol>
+
+                <h3>Build Environment Vector</h3>
+                <p><strong>Function:</strong> <code>execve_build_envp_stack()</code></p>
+                <p>Builds the environment variable vector on the program stack:</p>
+                <ol>
+                    <li>Counts environment variables in envp array</li>
+                    <li>Allocates space for envp pointers on stack</li>
+                    <li>Copies environment strings to stack</li>
+                    <li>Sets up envp pointer array</li>
+                    <li>Adds NULL terminator</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Integration</h2>
+                
+                <h3>With ELF Loader</h3>
+                <p><code>execve()</code> uses the ELF loader to:</p>
+                <ul>
+                    <li>Load ELF files from filesystem</li>
+                    <li>Parse ELF headers</li>
+                    <li>Load program segments</li>
+                    <li>Get entry point address</li>
+                    <li>Execute the program</li>
+                </ul>
+
+                <h3>With Filesystem</h3>
+                <p><code>execve()</code> uses the filesystem to:</p>
+                <ul>
+                    <li>Open executable files by path</li>
+                    <li>Read ELF file data</li>
+                    <li>Handle file errors</li>
+                </ul>
+
+                <h3>With Process Management</h3>
+                <p><code>execve()</code> integrates with:</p>
+                <ul>
+                    <li>Process creation (<code>create_process()</code>)</li>
+                    <li>Process state management</li>
+                    <li>Process address space setup</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Usage Example</h2>
+                <pre><code>// Execute a program
+char *argv[] = {"/usr/lib/nodejs/bin/node", "app.js", NULL};
+char *envp[] = {"PATH=/usr/bin", "HOME=/root", NULL};
+
+int result = execve("/usr/lib/nodejs/bin/node", argv, envp);
+if (result == -1) {
+    // Error: program failed to execute
+    perror("execve");
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Error Handling</h2>
+                <p><code>execve()</code> can fail with:</p>
+                <ul>
+                    <li><code>ENOENT</code> - File not found</li>
+                    <li><code>EACCES</code> - Permission denied</li>
+                    <li><code>ENOMEM</code> - Out of memory</li>
+                    <li><code>ENOEXEC</code> - Not an executable file</li>
+                    <li><code>EFAULT</code> - Invalid pointer</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Build System</h2>
+                <p>The execve implementation is built as part of the process management system:</p>
+                <pre><code>cd kernel/process
+make</code></pre>
+                <p>This compiles <code>execve.asm</code> along with other process management files.</p>
+            </section>
+
+            <section>
+                <h2>System Call Registration</h2>
+                <p><code>execve()</code> is registered in the system call table as syscall #11 (Linux-compatible):</p>
+                <pre><code>// In kernel/syscalls/syscall_table.asm
+mov eax, 11  ; SYS_EXECVE
+mov ebx, syscall_execve
+call register_syscall</code></pre>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="process.html">Process Management</a> - Process creation and management</li>
+                    <li><a href="elf-loader.html">ELF Loader</a> - Loading ELF executables</li>
+                    <li><a href="filesystem-kernel.html">File System</a> - Reading files from disk</li>
+                    <li><a href="syscalls.html">System Calls</a> - System call reference</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

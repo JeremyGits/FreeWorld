@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal C Library - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../navigation.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Minimal C Library</h1>
+            <p class="subtitle">Location: <code>libc-minimal/</code> | Type: C Runtime Library | Status: ✅ Fully Implemented</p>
+        </header>
+
+        <nav class="sidebar" id="sidebar"></nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The Minimal C Library provides essential C runtime functions for FreeWorld OS. It implements only the functions needed to run basic programs, making it much simpler and faster to build than full glibc.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+                
+                <div class="alert alert-info">
+                    <strong>Why Minimal?</strong> Building full glibc for a new OS is a multi-year project. This minimal library (~500 lines) provides enough functionality to run basic programs and can be extended incrementally.
+                </div>
+            </section>
+
+            <section>
+                <h2>Components</h2>
+                
+                <h3>1. System Call Wrappers</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/src/syscalls.c</code></p>
+                <p>Wrappers for kernel system calls:</p>
+                <ul>
+                    <li><code>_exit()</code> - Terminate process</li>
+                    <li><code>write()</code> - Write to file descriptor</li>
+                    <li><code>read()</code> - Read from file descriptor</li>
+                    <li><code>open()</code> - Open file</li>
+                    <li><code>close()</code> - Close file descriptor</li>
+                    <li><code>execve()</code> - Execute program</li>
+                </ul>
+
+                <h3>2. Memory Allocation</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/src/malloc.c</code></p>
+                <p>Simple heap allocator:</p>
+                <ul>
+                    <li><code>malloc()</code> - Allocate memory</li>
+                    <li><code>free()</code> - Free memory (stub - no-op for now)</li>
+                    <li><code>calloc()</code> - Allocate and zero memory</li>
+                    <li><code>realloc()</code> - Reallocate memory</li>
+                </ul>
+                <p><strong>Note:</strong> Uses a simple 1MB heap. For production, this should be replaced with a proper allocator.</p>
+
+                <h3>3. String Functions</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/src/string.c</code></p>
+                <p>Standard string manipulation:</p>
+                <ul>
+                    <li><code>strlen()</code> - String length</li>
+                    <li><code>strcpy()</code> - Copy string</li>
+                    <li><code>strncpy()</code> - Copy string with length limit</li>
+                    <li><code>strcmp()</code> - Compare strings</li>
+                    <li><code>strncmp()</code> - Compare strings with length limit</li>
+                    <li><code>memset()</code> - Set memory</li>
+                    <li><code>memcpy()</code> - Copy memory</li>
+                    <li><code>memmove()</code> - Move memory (handles overlap)</li>
+                    <li><code>memcmp()</code> - Compare memory</li>
+                </ul>
+
+                <h3>4. Standard I/O</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/src/stdio.c</code></p>
+                <p>Basic I/O functions:</p>
+                <ul>
+                    <li><code>printf()</code> - Formatted output (supports %d, %u, %x, %s, %c)</li>
+                    <li><code>puts()</code> - Print string with newline</li>
+                    <li><code>putchar()</code> - Print single character</li>
+                </ul>
+                <p><strong>Note:</strong> <code>printf()</code> is a basic implementation. Full printf support can be added later.</p>
+
+                <h3>5. Program Entry Point</h3>
+                <p><strong>Location:</strong> <code>libc-minimal/src/start.c</code></p>
+                <p>Provides <code>_start()</code> function that:</p>
+                <ul>
+                    <li>Gets argc, argv, envp from stack</li>
+                    <li>Calls <code>main()</code></li>
+                    <li>Calls <code>_exit()</code> with return value</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Building</h2>
+                
+                <h3>Prerequisites</h3>
+                <ul>
+                    <li>Cross-compiler toolchain (created by <code>build-toolchain.sh</code>)</li>
+                    <li>Kernel headers (created by <code>scripts/create-kernel-headers.sh</code>)</li>
+                </ul>
+
+                <h3>Build Steps</h3>
+                <pre><code>cd libc-minimal
+make
+make install</code></pre>
+
+                <p>This will:</p>
+                <ol>
+                    <li>Compile all source files</li>
+                    <li>Create static library <code>lib/libc.a</code></li>
+                    <li>Install to <code>build/sysroot/lib/</code> and <code>build/sysroot/usr/lib/</code></li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Using the Library</h2>
+                
+                <h3>Compiling Programs</h3>
+                <pre><code>x86_64-freeworld-gcc -o hello hello.c -L../build/sysroot/lib -lc</code></pre>
+
+                <h3>Example Program</h3>
+                <pre><code>#include &lt;stdio.h&gt;
+
+int main(int argc, char *argv[]) {
+    printf("Hello, FreeWorld OS!\n");
+    printf("argc = %d\n", argc);
+    if (argc > 0 && argv[0]) {
+        printf("argv[0] = %s\n", argv[0]);
+    }
+    return 0;
+}</code></pre>
+            </section>
+
+            <section>
+                <h2>Comparison with glibc</h2>
+                
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Feature</th>
+                            <th>Minimal C Library</th>
+                            <th>glibc</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Lines of Code</td>
+                            <td>~500 lines</td>
+                            <td>Millions of lines</td>
+                        </tr>
+                        <tr>
+                            <td>Build Time</td>
+                            <td>Seconds</td>
+                            <td>Hours to days</td>
+                        </tr>
+                        <tr>
+                            <td>Functions</td>
+                            <td>Essential only</td>
+                            <td>Complete POSIX</td>
+                        </tr>
+                        <tr>
+                            <td>Complexity</td>
+                            <td>Simple, understandable</td>
+                            <td>Extremely complex</td>
+                        </tr>
+                        <tr>
+                            <td>Extensibility</td>
+                            <td>Easy to extend</td>
+                            <td>Difficult to modify</td>
+                        </tr>
+                        <tr>
+                            <td>Use Case</td>
+                            <td>Getting started, basic programs</td>
+                            <td>Full compatibility, production</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section>
+                <h2>Extending the Library</h2>
+                
+                <p>To add new functions:</p>
+                <ol>
+                    <li>Add implementation to <code>src/</code></li>
+                    <li>Add header declaration to <code>include/</code></li>
+                    <li>Rebuild: <code>make clean && make && make install</code></li>
+                </ol>
+
+                <h3>Future Additions</h3>
+                <ul>
+                    <li>More printf format specifiers</li>
+                    <li>File I/O functions (fopen, fread, fwrite, fclose)</li>
+                    <li>String functions (strcat, strstr, sprintf)</li>
+                    <li>Math functions (basic operations)</li>
+                    <li>Time functions (gettimeofday, etc.)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Integration</h2>
+                
+                <h3>With Kernel</h3>
+                <p>The library uses kernel system calls for all operations.</p>
+
+                <h3>With Build System</h3>
+                <p>Programs link against <code>libc.a</code> from <code>build/sysroot/lib/</code>.</p>
+
+                <h3>With ELF Loader</h3>
+                <p>Programs compiled with this library can be loaded and executed by the ELF loader.</p>
+            </section>
+
+            <section>
+                <h2>Limitations</h2>
+                <ul>
+                    <li>No dynamic linking support</li>
+                    <li>Simple heap allocator (no free() implementation yet)</li>
+                    <li>Basic printf (limited format specifiers)</li>
+                    <li>No floating point support</li>
+                    <li>No locale support</li>
+                    <li>No threading support</li>
+                </ul>
+                <p>These can be added incrementally as needed.</p>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="syscalls.html">System Calls</a> - Kernel system call interface</li>
+                    <li><a href="elf-loader.html">ELF Loader</a> - Loading programs</li>
+                    <li><a href="execve.html">execve()</a> - Executing programs</li>
+                    <li><a href="build-system.html">Build System</a> - Compiling programs</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

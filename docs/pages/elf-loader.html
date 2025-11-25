@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ELF Loader - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+    <script src="../navigation.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>ELF Loader</h1>
+            <p class="subtitle">Location: <code>kernel/loader/</code> | Type: Kernel Subsystem | Status: ✅ Fully Implemented</p>
+        </header>
+
+        <nav class="sidebar" id="sidebar"></nav>
+
+        <main>
+            <section>
+                <h2>Overview</h2>
+                <p>The ELF (Executable and Linkable Format) loader is responsible for loading and executing ELF executables. It supports both 32-bit and 64-bit ELF files and handles program segment loading, stack setup, and entry point execution.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+            </section>
+
+            <section>
+                <h2>Components</h2>
+                
+                <h3>1. ELF Parser</h3>
+                <p><strong>Location:</strong> <code>kernel/loader/elf.asm</code></p>
+                <p>Parses ELF file headers and program segments:</p>
+                <ul>
+                    <li><strong>Header Parsing:</strong> Validates ELF magic, class, machine type, and file type</li>
+                    <li><strong>32-bit Support:</strong> Handles 32-bit ELF executables (ET_EXEC, ET_DYN)</li>
+                    <li><strong>64-bit Support:</strong> Handles 64-bit ELF executables (ET_EXEC, ET_DYN)</li>
+                    <li><strong>Segment Loading:</strong> Loads PT_LOAD segments into memory</li>
+                    <li><strong>BSS Handling:</strong> Zero-initializes BSS sections (when memsz > filesz)</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>elf_load_file()</code> - Load ELF file from filesystem</li>
+                    <li><code>elf_parse_header()</code> - Parse ELF header and validate</li>
+                    <li><code>elf_parse_header_32()</code> - Parse 32-bit ELF header</li>
+                    <li><code>elf_parse_header_64()</code> - Parse 64-bit ELF header</li>
+                    <li><code>elf_load_segments_32()</code> - Load 32-bit program segments</li>
+                    <li><code>elf_load_segments_64()</code> - Load 64-bit program segments</li>
+                    <li><code>elf_get_entry_point()</code> - Get program entry point address</li>
+                    <li><code>elf_is_64bit_check()</code> - Check if ELF is 64-bit</li>
+                    <li><code>elf_cleanup()</code> - Clean up ELF loader state</li>
+                </ul>
+
+                <h3>2. Program Executor</h3>
+                <p><strong>Location:</strong> <code>kernel/loader/elf_exec.asm</code></p>
+                <p>Sets up execution environment and runs programs:</p>
+                <ul>
+                    <li><strong>Stack Setup:</strong> Allocates and configures program stack</li>
+                    <li><strong>Argument Passing:</strong> Sets up argc, argv, envp on stack</li>
+                    <li><strong>Entry Point Execution:</strong> Transfers control to program entry point</li>
+                    <li><strong>Cleanup:</strong> Handles program return and cleanup</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>elf_execute()</code> - Execute loaded ELF program</li>
+                    <li><code>elf_execute_32bit()</code> - Execute 32-bit program</li>
+                    <li><code>elf_setup_stack()</code> - Set up program stack</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>ELF Format Support</h2>
+                
+                <h3>Supported ELF Types</h3>
+                <ul>
+                    <li><strong>ET_EXEC:</strong> Executable files</li>
+                    <li><strong>ET_DYN:</strong> Shared objects (dynamic libraries)</li>
+                </ul>
+
+                <h3>Supported Architectures</h3>
+                <ul>
+                    <li><strong>32-bit:</strong> x86 (ELF_MACHINE_386)</li>
+                    <li><strong>64-bit:</strong> x86_64 (ELF_MACHINE_X86_64)</li>
+                </ul>
+
+                <h3>Supported Segment Types</h3>
+                <ul>
+                    <li><strong>PT_LOAD:</strong> Loadable segments (code and data)</li>
+                    <li>Other segment types are skipped</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Loading Process</h2>
+                
+                <h3>Step 1: Load ELF File</h3>
+                <pre><code>// Load ELF file from filesystem
+int result = elf_load_file("/usr/lib/nodejs/bin/node");
+if (result != 0) {
+    // Error loading file
+}</code></pre>
+
+                <h3>Step 2: Parse ELF Header</h3>
+                <ol>
+                    <li>Read first 16 bytes (ELF identification)</li>
+                    <li>Verify ELF magic number (0x7F 'E' 'L' 'F')</li>
+                    <li>Check ELF class (32-bit or 64-bit)</li>
+                    <li>Verify machine type (x86 or x86_64)</li>
+                    <li>Check file type (executable or shared object)</li>
+                    <li>Extract entry point address</li>
+                    <li>Get program header table location</li>
+                </ol>
+
+                <h3>Step 3: Load Program Segments</h3>
+                <ol>
+                    <li>Read program header table</li>
+                    <li>For each PT_LOAD segment:
+                        <ul>
+                            <li>Allocate memory for segment</li>
+                            <li>Copy segment data from file</li>
+                            <li>Zero-initialize BSS section if needed</li>
+                            <li>Map segment to virtual address (TODO)</li>
+                        </ul>
+                    </li>
+                </ol>
+
+                <h3>Step 4: Set Up Stack</h3>
+                <ol>
+                    <li>Allocate 1MB stack</li>
+                    <li>Push environment variables (envp)</li>
+                    <li>Push NULL terminator for envp</li>
+                    <li>Push command-line arguments (argv)</li>
+                    <li>Push NULL terminator for argv</li>
+                    <li>Push argument count (argc)</li>
+                </ol>
+
+                <h3>Step 5: Execute Program</h3>
+                <ol>
+                    <li>Set up registers (EAX=argc, EBX=argv, ECX=envp)</li>
+                    <li>Call program entry point</li>
+                    <li>Handle program return</li>
+                    <li>Clean up allocated memory</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>Stack Layout</h2>
+                <p>The program stack is set up as follows (growing downward):</p>
+                <pre><code>High Address
+    ┌─────────────────┐
+    │   envp[0]       │  ← Environment variable pointers
+    │   envp[1]       │
+    │   ...           │
+    │   envp[n]       │
+    │   NULL          │  ← NULL terminator for envp
+    ├─────────────────┤
+    │   argv[0]       │  ← Command-line argument pointers
+    │   argv[1]       │
+    │   ...           │
+    │   argv[n]       │
+    │   NULL          │  ← NULL terminator for argv
+    ├─────────────────┤
+    │   argc          │  ← Argument count
+    ├─────────────────┤
+    │   return addr   │  ← Return address (0 for main)
+    └─────────────────┘
+Low Address</code></pre>
+            </section>
+
+            <section>
+                <h2>Memory Management</h2>
+                
+                <h3>ELF File Buffer</h3>
+                <p>The entire ELF file is loaded into memory for parsing. This is allocated via <code>kmalloc()</code>.</p>
+
+                <h3>Program Segments</h3>
+                <p>Each PT_LOAD segment is allocated separately. Memory is allocated via <code>kmalloc()</code>.</p>
+
+                <h3>Stack</h3>
+                <p>A 1MB stack is allocated for program execution via <code>kmalloc()</code>.</p>
+
+                <h3>Cleanup</h3>
+                <p>All allocated memory is freed via <code>kfree()</code> after program execution or on error.</p>
+            </section>
+
+            <section>
+                <h2>Error Handling</h2>
+                <ul>
+                    <li><code>ELF_ERROR_NONE</code> - Success</li>
+                    <li><code>ELF_ERROR_INVALID_MAGIC</code> - Not an ELF file</li>
+                    <li><code>ELF_ERROR_UNSUPPORTED_CLASS</code> - Unsupported ELF class</li>
+                    <li><code>ELF_ERROR_UNSUPPORTED_MACHINE</code> - Unsupported architecture</li>
+                    <li><code>ELF_ERROR_INVALID_TYPE</code> - Unsupported file type</li>
+                    <li><code>ELF_ERROR_READ_FAILED</code> - Failed to read file from filesystem</li>
+                    <li><code>ELF_ERROR_MEMORY_ALLOC_FAILED</code> - Out of memory</li>
+                    <li><code>ELF_ERROR_INVALID_SEGMENT</code> - Invalid segment data</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Integration Points</h2>
+                
+                <h3>With Filesystem</h3>
+                <p>The ELF loader uses the filesystem driver to read ELF files from disk.</p>
+
+                <h3>With execve()</h3>
+                <p>The <code>execve()</code> system call uses the ELF loader to load and execute programs.</p>
+
+                <h3>With Process Management</h3>
+                <p>Process creation uses the ELF loader to load program images.</p>
+            </section>
+
+            <section>
+                <h2>Build System</h2>
+                <p>The ELF loader is built as part of the kernel:</p>
+                <pre><code>cd kernel/loader
+make</code></pre>
+                <p>This compiles:</p>
+                <ul>
+                    <li><code>elf.asm</code> - ELF parser and loader</li>
+                    <li><code>elf_exec.asm</code> - Program executor</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li>Relocation handling</li>
+                    <li>Dynamic linking support</li>
+                    <li>Shared library loading</li>
+                    <li>Symbol resolution</li>
+                    <li>Virtual address space mapping</li>
+                    <li>Process isolation</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="filesystem-kernel.html">File System</a> - Reading ELF files from disk</li>
+                    <li><a href="process.html">Process Management</a> - execve() implementation</li>
+                    <li><a href="syscalls.html">System Calls</a> - execve syscall</li>
+                    <li><a href="memory.html">Memory Management</a> - Memory allocation for segments</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

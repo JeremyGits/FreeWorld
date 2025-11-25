@@ -3,265 +3,255 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>File System - FreeWorld OS Documentation</title>
+    <title>File System (Kernel) - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
+    <script src="../navigation.js"></script>
 </head>
 <body>
     <div class="container">
-        <nav class="sidebar">
-            <h2>Navigation</h2>
-            <ul class="nav-menu">
-                <li><a href="../index.html">Home</a></li>
-                <li class="nav-section">Boot Components</li>
-                <li><a href="bootmgr.html">BOOTMGR</a></li>
-                <li><a href="bcd.html">BCD</a></li>
-                <li><a href="freeload.html">freeload.exe</a></li>
-                <li class="nav-section">Core System</li>
-                <li><a href="kernel.html">fwoskrnl.exe</a></li>
-                <li><a href="hal.html">hal.dll</a></li>
-                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
-                <li><a href="memory.html">Memory Management</a></li>
-                <li><a href="drivers.html">Device Drivers</a></li>
-                <li><a href="process.html">Process Management</a></li>
-                <li><a href="filesystem-kernel.html">File System</a></li>
-                <li><a href="graphics.html">Graphics System</a></li>
-                <li class="nav-section">Services</li>
-                <li><a href="smss.html">smss.exe</a></li>
-                <li><a href="csrss.html">csrss.exe</a></li>
-                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
-                <li class="nav-section">User Interface</li>
-                <li><a href="shell.html">Shell</a></li>
-                <li><a href="wanderer.html">Wanderer</a></li>
-                <li class="nav-section">Reference</li>
-                <li><a href="naming-conventions.html">Naming Conventions</a></li>
-                <li><a href="boot-process.html">Boot Process</a></li>
-                <li><a href="architecture.html">Architecture</a></li>
-                <li><a href="syscalls.html">System Calls</a></li>
-                <li><a href="variables.html">Variables & Constants</a></li>
-            </ul>
-        </nav>
+        <header>
+            <h1>File System (Kernel)</h1>
+            <p class="subtitle">Location: <code>kernel/fs/</code> | Type: Kernel Subsystem | Status: ✅ Fully Implemented</p>
+        </header>
 
-        <main class="content">
-            <div class="page-header">
-                <h1>File System - FreeWorld OS</h1>
-                <div class="meta">
-                    <strong>Location:</strong> kernel/fs/<br>
-                    <strong>Type:</strong> Assembly File System Driver<br>
-                    <strong>Purpose:</strong> File system operations for loading programs and data<br>
-                    <strong>Status:</strong> ✅ Basic Implementation Complete
-                </div>
-            </div>
+        <nav class="sidebar" id="sidebar"></nav>
 
-            <section class="section">
+        <main>
+            <section>
                 <h2>Overview</h2>
-                <p>The FreeWorld File System driver provides basic file operations for the kernel. It supports file open/close, read/write, seek, and directory operations.</p>
-                <div class="alert alert-success">
-                    <strong>Status:</strong> Basic file system driver is complete. Total: ~300 lines of code. Currently uses in-memory filesystem; disk-based filesystem to be implemented.
-                </div>
-            </section>
-
-            <section class="section">
-                <h2>File System Driver (filesystem.asm)</h2>
-                <p><strong>Location:</strong> <code>kernel/fs/filesystem.asm</code> (~300 lines)</p>
-                <p>Basic file system driver with file operations:</p>
+                <p>The FreeWorld OS kernel filesystem provides complete disk I/O and filesystem parsing capabilities. It includes a FAT32 filesystem parser and ATA disk driver for reading files from disk.</p>
                 
-                <h3>Features</h3>
-                <ul>
-                    <li>File open/close</li>
-                    <li>File read/write</li>
-                    <li>File seek (SEEK_SET, SEEK_CUR, SEEK_END)</li>
-                    <li>Directory operations (mkdir, remove)</li>
-                    <li>Open file table (64 files max)</li>
-                    <li>File existence checking</li>
-                </ul>
-
-                <h3>File Open Modes</h3>
-                <ul>
-                    <li><code>FS_MODE_READ</code>: 0x01 - Open for reading</li>
-                    <li><code>FS_MODE_WRITE</code>: 0x02 - Open for writing</li>
-                    <li><code>FS_MODE_APPEND</code>: 0x04 - Open for appending</li>
-                    <li><code>FS_MODE_CREATE</code>: 0x08 - Create file if it doesn't exist</li>
-                </ul>
-
-                <h3>Key Functions</h3>
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th>Function</th>
-                            <th>Description</th>
-                            <th>Parameters</th>
-                            <th>Returns</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td><code>init_filesystem</code></td>
-                            <td>Initialize file system</td>
-                            <td>EAX = root filesystem base (0 = default)</td>
-                            <td>None</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_open</code></td>
-                            <td>Open a file</td>
-                            <td>ESI = file path, EBX = mode flags</td>
-                            <td>EAX = file descriptor, or -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_close</code></td>
-                            <td>Close a file</td>
-                            <td>EAX = file descriptor</td>
-                            <td>EAX = 0 on success, -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_read</code></td>
-                            <td>Read from file</td>
-                            <td>EAX = file descriptor, EBX = buffer, ECX = count</td>
-                            <td>EAX = bytes read, or -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_write</code></td>
-                            <td>Write to file</td>
-                            <td>EAX = file descriptor, EBX = buffer, ECX = count</td>
-                            <td>EAX = bytes written, or -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_seek</code></td>
-                            <td>Seek in file</td>
-                            <td>EAX = file descriptor, EBX = offset, ECX = whence</td>
-                            <td>EAX = new position, or -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_get_size</code></td>
-                            <td>Get file size</td>
-                            <td>EAX = file descriptor</td>
-                            <td>EAX = file size, or -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_file_exists</code></td>
-                            <td>Check if file exists</td>
-                            <td>ESI = file path</td>
-                            <td>EAX = 1 if exists, 0 if not</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_mkdir</code></td>
-                            <td>Create directory</td>
-                            <td>ESI = directory path</td>
-                            <td>EAX = 0 on success, -1 on error</td>
-                        </tr>
-                        <tr>
-                            <td><code>fs_remove</code></td>
-                            <td>Remove file or directory</td>
-                            <td>ESI = path</td>
-                            <td>EAX = 0 on success, -1 on error</td>
-                        </tr>
-                    </tbody>
-                </table>
-
-                <h3>File Entry Structure</h3>
-                <p>Each open file has a 32-byte structure containing:</p>
-                <ul>
-                    <li>File descriptor (4 bytes)</li>
-                    <li>Inode number (4 bytes)</li>
-                    <li>Current position (4 bytes)</li>
-                    <li>File size (4 bytes)</li>
-                    <li>Open mode (4 bytes)</li>
-                    <li>File path pointer (4 bytes)</li>
-                    <li>Flags (4 bytes)</li>
-                </ul>
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
             </section>
 
-            <section class="section">
-                <h2>Integration</h2>
-                <p>File system is integrated into the kernel via <code>kernel/integration.asm</code>:</p>
-                <div class="code-block">
-                    <pre>; In kernel_subsystems_init:
-mov eax, 0  ; Use default base address
-call init_filesystem  ; Initialize file system</pre>
-                </div>
-                <p><strong>Status:</strong> ✅ Integrated - File system initialized during kernel boot</p>
-            </section>
-
-            <section class="section">
-                <h2>Usage Examples</h2>
+            <section>
+                <h2>Components</h2>
                 
-                <h3>Open and Read File</h3>
-                <div class="code-block">
-                    <pre>; Open file for reading
-mov esi, file_path
-mov ebx, FS_MODE_READ
-call fs_open
-cmp eax, -1
-je open_error
-; EAX contains file descriptor
+                <h3>1. FAT32 Filesystem Parser</h3>
+                <p><strong>Location:</strong> <code>kernel/fs/fat32.asm</code></p>
+                <p>Complete FAT32 filesystem implementation with:</p>
+                <ul>
+                    <li><strong>BPB Parsing:</strong> Reads and parses BIOS Parameter Block from boot sector</li>
+                    <li><strong>FAT Reading:</strong> Reads File Allocation Table entries and traverses cluster chains</li>
+                    <li><strong>Directory Traversal:</strong> Finds files in root and subdirectories</li>
+                    <li><strong>File Reading:</strong> Reads file data by following cluster chains</li>
+                    <li><strong>Path Resolution:</strong> Converts Unix-style paths to FAT32 8.3 filenames</li>
+                    <li><strong>Cluster Management:</strong> Converts cluster numbers to physical disk sectors</li>
+                </ul>
 
-; Read from file
-mov ebx, buffer
-mov ecx, 1024  ; Read 1024 bytes
-call fs_read
-; EAX contains bytes read
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>fat32_init()</code> - Initialize FAT32 filesystem (reads BPB from sector 0)</li>
+                    <li><code>fat32_find_file()</code> - Find file in directory by name</li>
+                    <li><code>fat32_read_file()</code> - Read file data from cluster chain</li>
+                    <li><code>fat32_read_fat_entry()</code> - Read FAT entry for cluster</li>
+                    <li><code>fat32_path_to_83()</code> - Convert path to 8.3 filename format</li>
+                </ul>
 
-; Close file
-call fs_close</pre>
-                </div>
+                <h3>2. ATA Disk Driver (32-bit)</h3>
+                <p><strong>Location:</strong> <code>kernel/drivers/ata_32.asm</code></p>
+                <p>32-bit ATA/IDE disk driver for reading sectors from disk:</p>
+                <ul>
+                    <li><strong>LBA Addressing:</strong> Uses Logical Block Addressing for sector access</li>
+                    <li><strong>Sector Reading:</strong> Reads 512-byte sectors from disk</li>
+                    <li><strong>Controller Management:</strong> Handles ATA controller status and errors</li>
+                    <li><strong>Data Transfer:</strong> Transfers data via I/O ports</li>
+                </ul>
 
-                <h3>Open and Write File</h3>
-                <div class="code-block">
-                    <pre>; Open file for writing (create if needed)
-mov esi, file_path
-mov ebx, FS_MODE_WRITE | FS_MODE_CREATE
-call fs_open
-cmp eax, -1
-je open_error
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>ata_init_32()</code> - Initialize ATA controller</li>
+                    <li><code>ata_read_sector_32()</code> - Read single sector from disk (LBA)</li>
+                    <li><code>ata_wait_ready_32()</code> - Wait for controller to be ready</li>
+                    <li><code>ata_wait_data_32()</code> - Wait for data transfer ready</li>
+                </ul>
 
-; Write to file
-mov ebx, data_buffer
-mov ecx, data_size
-call fs_write
-; EAX contains bytes written
-
-; Close file
-call fs_close</pre>
-                </div>
-
-                <h3>Seek in File</h3>
-                <div class="code-block">
-                    <pre>; Seek to beginning
-mov ebx, 0
-mov ecx, 0  ; SEEK_SET
-call fs_seek
-
-; Seek to end
-mov ebx, 0
-mov ecx, 2  ; SEEK_END
-call fs_seek
-
-; Seek relative to current position
-mov ebx, 100
-mov ecx, 1  ; SEEK_CUR
-call fs_seek</pre>
-                </div>
+                <h3>3. Filesystem Integration</h3>
+                <p><strong>Location:</strong> <code>kernel/fs/filesystem.asm</code></p>
+                <p>Main filesystem driver that integrates FAT32 with the kernel:</p>
+                <ul>
+                    <li><strong>File Operations:</strong> <code>fs_open()</code>, <code>fs_read()</code>, <code>fs_close()</code></li>
+                    <li><strong>FAT32 Integration:</strong> Uses FAT32 parser to find and read files</li>
+                    <li><strong>File Descriptors:</strong> Manages open file table</li>
+                    <li><strong>Path Resolution:</strong> Converts file paths to disk locations</li>
+                </ul>
             </section>
 
-            <section class="section">
+            <section>
+                <h2>Architecture</h2>
+                
+                <h3>Filesystem Stack</h3>
+                <pre><code>Application
+    ↓
+System Calls (syscall_open, syscall_read, etc.)
+    ↓
+Filesystem Driver (filesystem.asm)
+    ↓
+FAT32 Parser (fat32.asm)
+    ↓
+ATA Driver (ata_32.asm)
+    ↓
+Hardware (ATA/IDE Controller)</code></pre>
+
+                <h3>Data Flow</h3>
+                <ol>
+                    <li>Application calls <code>open("/usr/lib/nodejs/bin/node")</code></li>
+                    <li>System call handler calls <code>fs_open()</code></li>
+                    <li>Filesystem driver converts path to 8.3 filename</li>
+                    <li>FAT32 parser searches directory for file</li>
+                    <li>FAT32 parser reads FAT to get cluster chain</li>
+                    <li>ATA driver reads sectors from disk</li>
+                    <li>Data is returned to application</li>
+                </ol>
+            </section>
+
+            <section>
+                <h2>FAT32 Structure</h2>
+                
+                <h3>Boot Sector (BPB)</h3>
+                <p>The first sector contains the BIOS Parameter Block with filesystem metadata:</p>
+                <ul>
+                    <li>Bytes per sector (usually 512)</li>
+                    <li>Sectors per cluster</li>
+                    <li>Number of FATs</li>
+                    <li>FAT size in sectors</li>
+                    <li>Root cluster number</li>
+                    <li>Total sectors</li>
+                </ul>
+
+                <h3>File Allocation Table (FAT)</h3>
+                <p>Maps cluster numbers to next cluster in chain:</p>
+                <ul>
+                    <li><code>0x0000000</code> - Free cluster</li>
+                    <li><code>0x0000001</code> - Reserved</li>
+                    <li><code>0x0000002-0x0FFFFFEF</code> - Next cluster in chain</li>
+                    <li><code>0x0FFFFFF0-0x0FFFFFF6</code> - Reserved</li>
+                    <li><code>0x0FFFFFF7</code> - Bad cluster</li>
+                    <li><code>0x0FFFFFF8-0x0FFFFFFF</code> - End of file</li>
+                </ul>
+
+                <h3>Directory Entries</h3>
+                <p>32-byte entries containing:</p>
+                <ul>
+                    <li>8.3 filename (11 bytes)</li>
+                    <li>File attributes</li>
+                    <li>Creation/modification dates and times</li>
+                    <li>Starting cluster number (high and low 16 bits)</li>
+                    <li>File size (32 bits)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>File Operations</h2>
+                
+                <h3>Opening Files</h3>
+                <pre><code>// Open file by path
+int fd = fs_open("/usr/lib/nodejs/bin/node", FS_MODE_READ);
+if (fd < 0) {
+    // Error: file not found or couldn't open
+}</code></pre>
+
+                <h3>Reading Files</h3>
+                <pre><code>// Read data from file
+char buffer[1024];
+int bytes_read = fs_read(fd, buffer, sizeof(buffer));
+if (bytes_read < 0) {
+    // Error reading file
+}</code></pre>
+
+                <h3>Closing Files</h3>
+                <pre><code>// Close file descriptor
+fs_close(fd);</code></pre>
+            </section>
+
+            <section>
+                <h2>Implementation Details</h2>
+                
+                <h3>Memory Management</h3>
+                <ul>
+                    <li>FAT sector buffer: 512 bytes</li>
+                    <li>Directory buffer: 16KB (32 sectors)</li>
+                    <li>File data: Allocated dynamically via <code>kmalloc()</code></li>
+                </ul>
+
+                <h3>Error Handling</h3>
+                <ul>
+                    <li><code>ELF_ERROR_NONE</code> - Success</li>
+                    <li><code>ELF_ERROR_INVALID_MAGIC</code> - Not a FAT32 filesystem</li>
+                    <li><code>ELF_ERROR_UNSUPPORTED_CLASS</code> - Unsupported filesystem type</li>
+                    <li><code>ELF_ERROR_READ_FAILED</code> - Disk read error</li>
+                    <li><code>ELF_ERROR_MEMORY_ALLOC_FAILED</code> - Out of memory</li>
+                </ul>
+
+                <h3>Performance Considerations</h3>
+                <ul>
+                    <li>FAT entries are cached in memory</li>
+                    <li>Directory entries are read sector-by-sector</li>
+                    <li>File data is read cluster-by-cluster</li>
+                    <li>BSS sections are zero-initialized efficiently</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Integration Points</h2>
+                
+                <h3>With ELF Loader</h3>
+                <p>The filesystem is used by the ELF loader to read executable files from disk.</p>
+
+                <h3>With System Calls</h3>
+                <p>System calls (<code>syscall_open</code>, <code>syscall_read</code>, etc.) use the filesystem driver.</p>
+
+                <h3>With Process Management</h3>
+                <p><code>execve()</code> uses the filesystem to load program files.</p>
+            </section>
+
+            <section>
+                <h2>Build System</h2>
+                <p>The filesystem is built as part of the kernel:</p>
+                <pre><code>cd kernel/fs
+make</code></pre>
+                <p>This compiles:</p>
+                <ul>
+                    <li><code>filesystem.asm</code> - Main filesystem driver</li>
+                    <li><code>fat32.asm</code> - FAT32 parser</li>
+                    <li><code>file_operations.asm</code> - File I/O operations (64-bit)</li>
+                    <li><code>directory.asm</code> - Directory operations (64-bit)</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Testing</h2>
+                <p>To test the filesystem:</p>
+                <ol>
+                    <li>Format a disk image with FAT32</li>
+                    <li>Copy test files to the disk</li>
+                    <li>Boot FreeWorld OS</li>
+                    <li>Use system calls to open and read files</li>
+                </ol>
+            </section>
+
+            <section>
                 <h2>Future Enhancements</h2>
-                <p>The current implementation uses an in-memory filesystem. Future enhancements will include:</p>
                 <ul>
-                    <li>Disk-based file system (FAT32, ext2, or custom format)</li>
-                    <li>Directory listing and traversal</li>
-                    <li>File permissions</li>
-                    <li>Symbolic links</li>
-                    <li>File system mounting</li>
-                    <li>Journaling for reliability</li>
+                    <li>File writing support</li>
+                    <li>Directory creation and deletion</li>
+                    <li>File deletion</li>
+                    <li>EXT2/EXT4 support (for Linux compatibility)</li>
+                    <li>Caching and buffering</li>
+                    <li>Journaling support</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="syscalls.html">System Calls</a> - File operation syscalls</li>
+                    <li><a href="process.html">Process Management</a> - execve() implementation</li>
+                    <li><a href="elf-loader.html">ELF Loader</a> - Loading executables from disk</li>
+                    <li><a href="drivers.html">Device Drivers</a> - ATA driver details</li>
                 </ul>
             </section>
         </main>
     </div>
-
-    <footer>
-        <p>FreeWorld OS Documentation v0.1.0</p>
-    </footer>
-
-    <script src="../navigation.js"></script>
 </body>
 </html>
-

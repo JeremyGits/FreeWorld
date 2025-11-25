@@ -42,6 +42,11 @@
                 <li><a href="boot-process.html">Boot Process</a></li>
                 <li><a href="architecture.html">Architecture</a></li>
                 <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="execve.html">execve()</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
                 <li><a href="variables.html">Variables & Constants</a></li>
             </ul>
         </nav>
@@ -167,6 +172,20 @@ int 0x80                 ; Invoke syscall
                     <li><code>milliseconds</code>: Sleep duration in milliseconds</li>
                 </ul>
                 <p><strong>Returns:</strong> None (blocks until sleep completes)</p>
+
+                <h3>sys_execve</h3>
+                <div class="code-block">
+                    <pre>int sys_execve(const char* pathname, char* const argv[], char* const envp[]);</pre>
+                </div>
+                <p><strong>Parameters:</strong></p>
+                <ul>
+                    <li><code>pathname</code>: Path to executable file</li>
+                    <li><code>argv</code>: Array of command-line argument strings (NULL-terminated)</li>
+                    <li><code>envp</code>: Array of environment variable strings (NULL-terminated)</li>
+                </ul>
+                <p><strong>Returns:</strong> On success, does not return (process is replaced). On error, returns -1.</p>
+                <p><strong>Description:</strong> Loads and executes an ELF executable, replacing the current process image. Uses the ELF loader and filesystem to load the program.</p>
+                <p>See <a href="execve.html">execve() System Call</a> for complete documentation.</p>
             </section>
 
             <section class="section">
@@ -238,6 +257,11 @@ int 0x80                 ; Invoke syscall
                             <td>SYS_SLEEP</td>
                             <td>Sleep for milliseconds</td>
                         </tr>
+                        <tr>
+                            <td>11</td>
+                            <td>SYS_EXECVE</td>
+                            <td>Execute program (loads and runs ELF executable)</td>
+                        </tr>
                     </tbody>
                 </table>
             </section>
@@ -253,10 +277,20 @@ int 0x80                 ; Invoke syscall
             </section>
 
             <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="execve.html">execve() System Call</a> - Complete execve() documentation</li>
+                    <li><a href="elf-loader.html">ELF Loader</a> - Loading ELF executables</li>
+                    <li><a href="filesystem-kernel.html">File System</a> - Reading files from disk</li>
+                    <li><a href="process.html">Process Management</a> - Process creation and management</li>
+                </ul>
+            </section>
+
+            <section class="section">
                 <h2>Future System Calls</h2>
                 <p>Additional system calls planned for future implementation:</p>
                 <ul>
-                    <li>Process management (fork, exec, wait)</li>
+                    <li>Process management (fork, wait)</li>
                     <li>Memory management (mmap, munmap)</li>
                     <li>Inter-process communication</li>
                     <li>Network operations</li>
