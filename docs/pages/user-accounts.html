@@ -379,12 +379,90 @@ console.log('Can read:', accessResult.allowed, accessResult.reason);</code></pre
             </section>
 
             <section class="section">
+                <h2>Filesystem Permissions Integration</h2>
+                <p>The User Account Management system is fully integrated with the filesystem API for permission checking:</p>
+                
+                <h3>Automatic Permission Checking</h3>
+                <p>All filesystem operations automatically check permissions before execution:</p>
+                <ul>
+                    <li><strong>Read operations:</strong> Check read permission on file/directory</li>
+                    <li><strong>Write operations:</strong> Check write permission on file or parent directory</li>
+                    <li><strong>Delete operations:</strong> Check write/delete permission</li>
+                    <li><strong>Create operations:</strong> Check write permission on parent directory</li>
+                </ul>
+                
+                <h3>Setting User Context</h3>
+                <div class="code-block">
+                    <pre><code>const FileSystem = require('./system/filesystem');
+
+const fs = new FileSystem();
+
+// Set current user context for permission checks
+fs.setCurrentUser('john');
+
+// All operations now check permissions for 'john'
+try {
+    const content = fs.readFile('/home/john/document.txt');
+    console.log('File read successfully');
+} catch (error) {
+    console.error('Access denied:', error.message);
+}</code></pre>
+                </div>
+                
+                <h3>Permission Checking</h3>
+                <p>The filesystem uses the PermissionsManager to check access:</p>
+                <ul>
+                    <li>Checks file ownership (owner, group, others)</li>
+                    <li>Checks file permissions (read, write, execute)</li>
+                    <li>Checks ACLs (Access Control Lists) if present</li>
+                    <li>Checks user privileges (e.g., SeTakeOwnershipPrivilege)</li>
+                    <li>Root user (UID 0) has full access to all files</li>
+                </ul>
+                
+                <h3>File Ownership Operations</h3>
+                <div class="code-block">
+                    <pre><code>// Get file owner
+const owner = fs.getOwner('/home/john/document.txt');
+console.log('Owner:', owner.owner, 'UID:', owner.ownerUid);
+
+// Take ownership (requires SeTakeOwnershipPrivilege)
+try {
+    fs.takeOwnership('/home/john/document.txt');
+    console.log('Ownership taken successfully');
+} catch (error) {
+    console.error('Access denied:', error.message);
+}
+
+// Set file permissions (requires SeSecurityPrivilege or ownership)
+try {
+    fs.setPermissions('/home/john/document.txt', {
+        owner: { read: true, write: true, execute: false },
+        group: { read: true, write: false, execute: false },
+        others: { read: false, write: false, execute: false }
+    });
+} catch (error) {
+    console.error('Access denied:', error.message);
+}</code></pre>
+                </div>
+                
+                <h3>Access Denied Errors</h3>
+                <p>When a filesystem operation is denied, an error is thrown with a descriptive message:</p>
+                <ul>
+                    <li><code class="code-inline">Access denied: Owner access</code> - User is owner but lacks permission</li>
+                    <li><code class="code-inline">Access denied: Group access</code> - User is in group but lacks permission</li>
+                    <li><code class="code-inline">Access denied: Others access</code> - User has others permission</li>
+                    <li><code class="code-inline">Access denied: ACL deny</code> - ACL explicitly denies access</li>
+                    <li><code class="code-inline">Access denied: Requires SeSecurityPrivilege</code> - Operation requires privilege</li>
+                </ul>
+            </section>
+
+            <section class="section">
                 <h2>Integration</h2>
                 <p>The User Account Management system integrates with:</p>
                 <ul>
                     <li><strong>FreeWorld Logon:</strong> User authentication and login</li>
                     <li><strong>Security Manager:</strong> Session and token management</li>
-                    <li><strong>File System:</strong> File ownership and permissions</li>
+                    <li><strong>File System:</strong> ✅ Fully integrated - All filesystem operations check permissions automatically</li>
                     <li><strong>Shell:</strong> User context for commands</li>
                     <li><strong>Process Management:</strong> Process ownership and privileges</li>
                 </ul>
