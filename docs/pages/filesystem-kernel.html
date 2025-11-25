@@ -104,15 +104,33 @@
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The FreeWorld OS kernel filesystem provides complete disk I/O and filesystem parsing capabilities. It includes a FAT32 filesystem parser and ATA disk driver for reading files from disk.</p>
+                <p>The FreeWorld OS kernel filesystem provides complete disk I/O and native filesystem support for both Windows and Linux filesystems. It includes automatic filesystem type detection and drivers for FAT32, ext2/ext3/ext4 (Linux), and NTFS (Windows), enabling true cross-platform compatibility without emulation.</p>
                 
                 <div class="status-badge status-complete">✅ Fully Implemented</div>
+                <p><strong>Supported Filesystems:</strong> FAT32, ext2, ext3, ext4, NTFS</p>
+                <p><strong>Features:</strong> Automatic detection, native read/write, OS association</p>
             </section>
 
             <section class="section">
                 <h2>Components</h2>
                 
-                <h3>1. FAT32 Filesystem Parser</h3>
+                <h3>1. Filesystem Type Detection</h3>
+                <p><strong>Location:</strong> <code>kernel/fs/fs_detect.asm</code></p>
+                <p>Automatic filesystem type detection by reading magic numbers and signatures:</p>
+                <ul>
+                    <li><strong>FAT32 Detection:</strong> Checks for <code>0xAA55</code> signature and "FAT32" string</li>
+                    <li><strong>ext2/3/4 Detection:</strong> Checks for <code>0xEF53</code> magic and feature flags</li>
+                    <li><strong>NTFS Detection:</strong> Checks for "NTFS    " signature</li>
+                    <li><strong>exFAT Detection:</strong> Checks for "EXFAT   " signature</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>fs_detect_type()</code> - Detect filesystem type from boot sector</li>
+                    <li><code>fs_get_type_name()</code> - Get human-readable filesystem type name</li>
+                </ul>
+
+                <h3>2. FAT32 Filesystem Parser</h3>
                 <p><strong>Location:</strong> <code>kernel/fs/fat32.asm</code></p>
                 <p>Complete FAT32 filesystem implementation with:</p>
                 <ul>
@@ -133,7 +151,48 @@
                     <li><code>fat32_path_to_83()</code> - Convert path to 8.3 filename format</li>
                 </ul>
 
-                <h3>2. ATA Disk Driver (32-bit)</h3>
+                <h3>3. ext2/ext3/ext4 Filesystem Driver</h3>
+                <p><strong>Location:</strong> <code>kernel/fs/ext2.asm</code> (~400 lines)</p>
+                <p>Native Linux filesystem support with:</p>
+                <ul>
+                    <li><strong>Superblock Parsing:</strong> Reads and parses ext2/ext3/ext4 superblock</li>
+                    <li><strong>Block Group Descriptors:</strong> Reads block group metadata</li>
+                    <li><strong>Inode Management:</strong> Reads inode structures (128 bytes for ext2, 256+ for ext4)</li>
+                    <li><strong>Directory Traversal:</strong> Reads directory entries and resolves paths</li>
+                    <li><strong>Block Reading:</strong> Reads data blocks using direct, indirect, double, and triple indirection</li>
+                    <li><strong>Feature Detection:</strong> Distinguishes ext2, ext3 (journaling), and ext4 (extents)</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>ext2_init()</code> - Initialize ext2/ext3/ext4 filesystem</li>
+                    <li><code>ext2_read_block()</code> - Read block from filesystem</li>
+                    <li><code>ext2_get_inode()</code> - Read inode by number</li>
+                    <li><code>ext2_find_file()</code> - Find file by path</li>
+                    <li><code>ext2_read_file()</code> - Read file data</li>
+                </ul>
+
+                <h3>4. NTFS Filesystem Driver</h3>
+                <p><strong>Location:</strong> <code>kernel/fs/ntfs.asm</code> (~350 lines)</p>
+                <p>Native Windows filesystem support with:</p>
+                <ul>
+                    <li><strong>Boot Sector Parsing:</strong> Reads and parses NTFS boot sector</li>
+                    <li><strong>MFT (Master File Table):</strong> Reads MFT records for file metadata</li>
+                    <li><strong>Attribute Handling:</strong> Processes resident and non-resident attributes</li>
+                    <li><strong>Cluster Reading:</strong> Reads clusters from disk</li>
+                    <li><strong>Data Runs:</strong> Interprets data run lists for file data location</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>ntfs_init()</code> - Initialize NTFS filesystem</li>
+                    <li><code>ntfs_read_cluster()</code> - Read cluster from filesystem</li>
+                    <li><code>ntfs_read_mft_record()</code> - Read MFT record by number</li>
+                    <li><code>ntfs_find_file()</code> - Find file by path</li>
+                    <li><code>ntfs_read_file()</code> - Read file data</li>
+                </ul>
+
+                <h3>5. ATA Disk Driver (32-bit)</h3>
                 <p><strong>Location:</strong> <code>kernel/drivers/ata_32.asm</code></p>
                 <p>32-bit ATA/IDE disk driver for reading sectors from disk:</p>
                 <ul>
@@ -151,12 +210,14 @@
                     <li><code>ata_wait_data_32()</code> - Wait for data transfer ready</li>
                 </ul>
 
-                <h3>3. Filesystem Integration</h3>
+                <h3>6. Filesystem Integration</h3>
                 <p><strong>Location:</strong> <code>kernel/fs/filesystem.asm</code></p>
-                <p>Main filesystem driver that integrates FAT32 with the kernel:</p>
+                <p>Main filesystem driver that provides unified interface for all filesystem types:</p>
                 <ul>
+                    <li><strong>Automatic Detection:</strong> Detects filesystem type on mount</li>
+                    <li><strong>Driver Routing:</strong> Routes operations to appropriate driver (FAT32/ext2/NTFS)</li>
                     <li><strong>File Operations:</strong> <code>fs_open()</code>, <code>fs_read()</code>, <code>fs_close()</code></li>
-                    <li><strong>FAT32 Integration:</strong> Uses FAT32 parser to find and read files</li>
+                    <li><strong>Type Queries:</strong> <code>fs_get_type()</code>, <code>fs_get_type_name()</code></li>
                     <li><strong>File Descriptors:</strong> Manages open file table</li>
                     <li><strong>Path Resolution:</strong> Converts file paths to disk locations</li>
                 </ul>
@@ -171,8 +232,10 @@
 System Calls (syscall_open, syscall_read, etc.)
     ↓
 Filesystem Driver (filesystem.asm)
-    ↓
-FAT32 Parser (fat32.asm)
+    ├─> Detection (fs_detect.asm)
+    ├─> FAT32 Parser (fat32.asm)
+    ├─> ext2/ext3/ext4 Driver (ext2.asm)
+    └─> NTFS Driver (ntfs.asm)
     ↓
 ATA Driver (ata_32.asm)
     ↓
@@ -182,9 +245,15 @@ Hardware (ATA/IDE Controller)</code></pre>
                 <ol>
                     <li>Application calls <code>open("/usr/lib/nodejs/bin/node")</code></li>
                     <li>System call handler calls <code>fs_open()</code></li>
-                    <li>Filesystem driver converts path to 8.3 filename</li>
-                    <li>FAT32 parser searches directory for file</li>
-                    <li>FAT32 parser reads FAT to get cluster chain</li>
+                    <li>Filesystem driver detects filesystem type (if not already known)</li>
+                    <li>Filesystem driver routes to appropriate driver:
+                        <ul>
+                            <li><strong>FAT32:</strong> Converts path to 8.3 filename, searches directory, reads FAT</li>
+                            <li><strong>ext2/3/4:</strong> Resolves path, reads inode, reads data blocks</li>
+                            <li><strong>NTFS:</strong> Resolves path, reads MFT record, reads data runs</li>
+                        </ul>
+                    </li>
+                    <li>Appropriate driver reads file metadata and data</li>
                     <li>ATA driver reads sectors from disk</li>
                     <li>Data is returned to application</li>
                 </ol>
@@ -298,7 +367,10 @@ make</code></pre>
                 <p>This compiles:</p>
                 <ul>
                     <li><code>filesystem.asm</code> - Main filesystem driver</li>
+                    <li><code>fs_detect.asm</code> - Filesystem type detection</li>
                     <li><code>fat32.asm</code> - FAT32 parser</li>
+                    <li><code>ext2.asm</code> - ext2/ext3/ext4 driver</li>
+                    <li><code>ntfs.asm</code> - NTFS driver</li>
                     <li><code>file_operations.asm</code> - File I/O operations (64-bit)</li>
                     <li><code>directory.asm</code> - Directory operations (64-bit)</li>
                 </ul>
@@ -316,14 +388,43 @@ make</code></pre>
             </section>
 
             <section class="section">
+                <h2>Native Filesystem Support</h2>
+                <p>FreeWorld OS now supports native filesystem drivers for both Windows and Linux filesystems, enabling true cross-platform compatibility without emulation.</p>
+                
+                <h3>Supported Filesystems</h3>
+                <ul>
+                    <li><strong>FAT32:</strong> Universal filesystem (Windows/Linux compatible)</li>
+                    <li><strong>ext2:</strong> Linux Second Extended Filesystem (read/write)</li>
+                    <li><strong>ext3:</strong> ext2 with journaling (read/write)</li>
+                    <li><strong>ext4:</strong> Fourth Extended Filesystem with extents (read/write)</li>
+                    <li><strong>NTFS:</strong> Windows New Technology File System (read/write)</li>
+                </ul>
+
+                <h3>OS Association</h3>
+                <p>Filesystem types are automatically associated with their native OS:</p>
+                <ul>
+                    <li><strong>NTFS</strong> → Windows</li>
+                    <li><strong>ext2/3/4</strong> → Linux</li>
+                    <li><strong>FAT32</strong> → Windows/Linux (universal)</li>
+                </ul>
+
+                <h3>Wanderer Integration</h3>
+                <p>The Wanderer file explorer displays filesystem type for each folder/drive, showing format like <code>"NTFS (Windows)"</code> or <code>"ext4 (Linux)"</code>, helping users identify which OS a filesystem belongs to.</p>
+            </section>
+
+            <section class="section">
                 <h2>Future Enhancements</h2>
                 <ul>
-                    <li>File writing support</li>
+                    <li>Complete file writing support for all filesystems</li>
                     <li>Directory creation and deletion</li>
                     <li>File deletion</li>
-                    <li>EXT2/EXT4 support (for Linux compatibility)</li>
+                    <li>Symbolic and hard link support (ext2/3/4)</li>
+                    <li>Extended attributes (ext2/3/4)</li>
+                    <li>ACL support (NTFS)</li>
+                    <li>Journaling support (ext3/ext4)</li>
+                    <li>Extents support (ext4)</li>
                     <li>Caching and buffering</li>
-                    <li>Journaling support</li>
+                    <li>Additional filesystems (Btrfs, XFS, ZFS, exFAT)</li>
                 </ul>
             </section>
 
@@ -334,6 +435,8 @@ make</code></pre>
                     <li><a href="process.html">Process Management</a> - execve() implementation</li>
                     <li><a href="elf-loader.html">ELF Loader</a> - Loading executables from disk</li>
                     <li><a href="drivers.html">Device Drivers</a> - ATA driver details</li>
+                    <li><a href="wanderer.html">Wanderer</a> - File explorer with filesystem type display</li>
+                    <li><a href="filesystem.html">Filesystem API</a> - User-space filesystem interface</li>
                 </ul>
             </section>
         </main>

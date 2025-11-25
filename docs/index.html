@@ -21,8 +21,12 @@
                 <li><a href="pages/bootmgr.html">BOOTMGR</a></li>
                 <li><a href="pages/bcd.html">BCD</a></li>
                 <li><a href="pages/freeload.html">freeload.exe</a></li>
+                <li><a href="pages/uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="pages/boot-parameters.html">Boot Parameters</a></li>
                 <li class="nav-section">Core System</li>
                 <li><a href="pages/kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="pages/early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="pages/acpi-support.html">ACPI Support</a></li>
                 <li><a href="pages/hal.html">hal.dll</a></li>
                 <li><a href="pages/io-infrastructure.html">I/O Infrastructure</a></li>
                 <li><a href="pages/memory.html">Memory Management</a></li>
@@ -34,6 +38,7 @@
                 <li><a href="../INTEGRATION-AUDIT.md">Integration Audit</a></li>
                 <li><a href="../INTEGRATION-GAPS.md">Integration Gaps</a></li>
                 <li><a href="pages/filesystem-kernel.html">File System</a></li>
+                <li><a href="pages/kernel-decompression.html">Kernel Decompression</a></li>
                 <li><a href="pages/elf-loader.html">ELF Loader</a></li>
                 <li><a href="pages/graphics.html">Graphics System</a></li>
                 <li><a href="pages/minimal-libc.html">Minimal C Library</a></li>
@@ -117,8 +122,33 @@
                 <div class="card-grid">
                     <div class="card">
                         <h4>Boot Components</h4>
-                        <p>Documentation for boot manager, BCD, and OS loader</p>
+                        <p>Documentation for boot manager, BCD, OS loader, and UEFI boot</p>
+                        <p class="status-badge">✅ UEFI Boot Complete</p>
                         <a href="pages/bootmgr.html">View Boot Components →</a>
+                    </div>
+                    <div class="card">
+                        <h4>UEFI Boot</h4>
+                        <p>Modern UEFI bootloader with boot parameters, ACPI, and initrd support</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/uefi-boot.html">View UEFI Boot →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Early Hardware Detection</h4>
+                        <p>Comprehensive hardware detection before drivers load</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/early-hardware-detection.html">View Early Hardware Detection →</a>
+                    </div>
+                    <div class="card">
+                        <h4>ACPI Support</h4>
+                        <p>Complete ACPI table parsing and device tree enumeration</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/acpi-support.html">View ACPI Support →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Boot Parameters</h4>
+                        <p>Comprehensive command-line parsing and boot configuration</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/boot-parameters.html">View Boot Parameters →</a>
                     </div>
                     <div class="card">
                         <h4>Kernel & HAL</h4>
@@ -152,9 +182,15 @@
                     </div>
                     <div class="card">
                         <h4>File System</h4>
-                        <p>Kernel file system driver for loading programs</p>
-                        <p class="status-badge">✅ Complete</p>
+                        <p>Native filesystem support for Windows (NTFS) and Linux (ext2/3/4)</p>
+                        <p class="status-badge">✅ Complete - FAT32, ext2/3/4, NTFS</p>
                         <a href="pages/filesystem-kernel.html">View File System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Kernel Decompression</h4>
+                        <p>Complete decompression support for gzip, LZMA2/XZ, and ZSTD</p>
+                        <p class="status-badge">✅ Complete - ~5,000 lines</p>
+                        <a href="pages/kernel-decompression.html">View Decompression →</a>
                     </div>
                     <div class="card">
                         <h4>Graphics System</h4>

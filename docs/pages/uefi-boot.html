@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UEFI Boot - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li><a href="user-accounts.html">User Account Management</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Rendering System</li>
+                <li><a href="rendering-engine.html">Native Rendering Engine</a></li>
+                <li><a href="browser-engine.html">ASM Browser Engine (Legacy)</a></li>
+                <li><a href="browser-nodejs.html">Node.js Integration</a></li>
+                <li><a href="browser-rendering.html">Rendering System</a></li>
+                <li><a href="browser-network.html">Network Stack</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>UEFI Boot</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>boot/uefi/</code><br>
+                    <strong>Type:</strong> Bootloader<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS UEFI bootloader provides complete modern firmware-based booting for x64 systems. It replaces legacy BIOS boot and provides better hardware support, faster boot times, and modern features like Secure Boot readiness.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+                <p><strong>Key Features:</strong> EFI System Partition support, boot parameter passing, memory map handling, ACPI support, initrd support, compression detection</p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. UEFI Bootloader</h3>
+                <p><strong>Location:</strong> <code>boot/uefi/bootx64.c</code></p>
+                <p>Complete EFI application that:</p>
+                <ul>
+                    <li><strong>Early Hardware Detection:</strong> Detects CPU, memory, ACPI, PCI, storage</li>
+                    <li><strong>Kernel Loading:</strong> Loads kernel from EFI System Partition</li>
+                    <li><strong>Compression Detection:</strong> Detects gzip, LZMA2/XZ, ZSTD compression</li>
+                    <li><strong>Initrd Loading:</strong> Loads initial ramdisk if present</li>
+                    <li><strong>Memory Map:</strong> Retrieves and manages EFI memory map</li>
+                    <li><strong>ExitBootServices:</strong> Properly exits boot services</li>
+                    <li><strong>Boot Parameters:</strong> Builds and passes boot parameter structure</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>efi_main()</code> - Main EFI entry point</li>
+                    <li><code>DetectHardwareEarly()</code> - Early hardware detection</li>
+                    <li><code>LoadKernel()</code> - Load kernel from ESP</li>
+                    <li><code>LoadInitrd()</code> - Load initrd from ESP</li>
+                    <li><code>GetMemoryMap()</code> - Get EFI memory map</li>
+                    <li><code>ExitBootServices()</code> - Exit boot services</li>
+                    <li><code>DecompressKernel()</code> - Detect and handle compression</li>
+                </ul>
+
+                <h3>2. Boot Parameters</h3>
+                <p><strong>Location:</strong> <code>boot/uefi/boot_params.h</code></p>
+                <p>Structured boot parameter passing between bootloader and kernel:</p>
+                <ul>
+                    <li><strong>Magic Number:</strong> Validation (<code>BOOT_PARAMS_MAGIC</code>)</li>
+                    <li><strong>Memory Map:</strong> EFI memory map pointer and metadata</li>
+                    <li><strong>ACPI RSDP:</strong> ACPI Root System Description Pointer</li>
+                    <li><strong>Initrd:</strong> Initial ramdisk address and size</li>
+                    <li><strong>Command Line:</strong> Boot command-line arguments (UTF-16)</li>
+                </ul>
+
+                <h3>3. Kernel Entry Point</h3>
+                <p><strong>Location:</strong> <code>kernel/uefi/kernel_entry_uefi.asm</code></p>
+                <p>64-bit long mode entry point that:</p>
+                <ul>
+                    <li><strong>Receives Boot Parameters:</strong> Extracts boot parameter structure</li>
+                    <li><strong>Initializes Serial:</strong> Sets up serial port for debugging</li>
+                    <li><strong>Initializes Kernel:</strong> Calls kernel subsystem initialization</li>
+                    <li><strong>No Mode Transitions:</strong> Already in 64-bit long mode</li>
+                </ul>
+
+                <h3>4. Decompression Detection</h3>
+                <p><strong>Location:</strong> <code>boot/uefi/decompress.c</code></p>
+                <p>Compression format detection:</p>
+                <ul>
+                    <li><strong>gzip:</strong> Detects <code>0x1F 0x8B</code> magic</li>
+                    <li><strong>LZMA2/XZ:</strong> Detects XZ magic bytes</li>
+                    <li><strong>ZSTD:</strong> Detects ZSTD magic bytes</li>
+                    <li><strong>Note:</strong> Full decompression handled by kernel if needed</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Boot Flow</h2>
+                
+                <h3>UEFI Boot Sequence</h3>
+                <pre><code>UEFI Firmware
+    ↓
+Load bootx64.efi from /EFI/BOOT/ or /EFI/FreeWorld/
+    ↓
+bootx64.efi:
+    [1/5] Early Hardware Detection
+        - CPU detection
+        - Memory detection (via EFI memory map)
+        - ACPI table discovery
+        - PCI presence detection
+        - Storage detection
+    ↓
+    [2/5] Load Kernel
+        - Search for kernel in ESP
+        - Allocate memory for kernel
+        - Read kernel file
+    ↓
+    [3/5] Decompress Kernel (if compressed)
+        - Detect compression format
+        - Decompress or pass to kernel
+    ↓
+    [4/5] Load Initrd (optional)
+        - Search for initrd in ESP
+        - Allocate memory for initrd
+        - Read initrd file
+    ↓
+    [5/5] Prepare Boot Services Exit
+        - Get memory map
+        - Build boot parameters
+        - ExitBootServices
+        - Pass boot parameters to kernel
+        - Jump to kernel_entry_uefi
+    ↓
+kernel_entry_uefi (64-bit long mode):
+    - Extract boot parameters
+    - Initialize serial port
+    - Initialize kernel subsystems
+    - Enter kernel main loop</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Boot Parameters Structure</h2>
+                
+                <pre><code>typedef struct {
+    uint64_t magic;              // BOOT_PARAMS_MAGIC ("FWOS")
+    uint64_t version;            // BOOT_PARAMS_VERSION
+    void* memory_map;            // EFI memory map pointer
+    uint64_t memory_map_size;    // Memory map size in bytes
+    uint64_t descriptor_size;    // Size of each descriptor
+    uint32_t descriptor_version; // Descriptor version
+    void* acpi_rsdp;             // ACPI RSDP pointer
+    void* initrd_address;        // Initrd address (or NULL)
+    uint64_t initrd_size;        // Initrd size in bytes
+    void* command_line;          // Boot command line (UTF-16, or NULL)
+} boot_params_t;</code></pre>
+
+                <h3>Boot Parameter Flags</h3>
+                <ul>
+                    <li><code>BOOT_FLAG_VERBOSE</code> - Verbose boot output</li>
+                    <li><code>BOOT_FLAG_DEBUG</code> - Debug mode</li>
+                    <li><code>BOOT_FLAG_SINGLE_USER</code> - Single user mode</li>
+                    <li><code>BOOT_FLAG_NO_INITRD</code> - Skip initrd</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>EFI System Partition (ESP)</h2>
+                
+                <h3>Directory Structure</h3>
+                <pre><code>/EFI/
+├── BOOT/
+│   └── bootx64.efi          # Standard UEFI boot path
+└── FreeWorld/
+    ├── bootx64.efi          # FreeWorld bootloader
+    ├── fwoskrnl.exe         # Kernel
+    └── initrd.img           # Initial ramdisk (optional)</code></pre>
+
+                <h3>File Locations</h3>
+                <p>The bootloader searches for the kernel in this order:</p>
+                <ol>
+                    <li><code>\EFI\FreeWorld\fwoskrnl.exe</code></li>
+                    <li><code>\fwoskrnl.exe</code></li>
+                    <li><code>\kernel\fwoskrnl.exe</code></li>
+                </ol>
+
+                <p>The bootloader searches for initrd in this order:</p>
+                <ol>
+                    <li><code>\EFI\FreeWorld\initrd.img</code></li>
+                    <li><code>\initrd.img</code></li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Building</h2>
+                
+                <h3>Prerequisites</h3>
+                <pre><code># Install UEFI development tools
+sudo apt-get install gnu-efi</code></pre>
+
+                <h3>Build Bootloader</h3>
+                <pre><code>cd boot/uefi
+make</code></pre>
+                <p>This creates <code>bootx64.efi</code> - the UEFI bootloader.</p>
+
+                <h3>Create Disk Image</h3>
+                <pre><code>./scripts/create-disk-uefi.sh</code></pre>
+                <p>This creates <code>build/freeworld_uefi.img</code> with GPT partitions and ESP.</p>
+            </section>
+
+            <section class="section">
+                <h2>Testing</h2>
+                
+                <h3>QEMU with OVMF</h3>
+                <pre><code>./scripts/test-boot-uefi.sh</code></pre>
+
+                <h3>Manual QEMU Command</h3>
+                <pre><code>qemu-system-x86_64 \
+    -drive file=build/freeworld_uefi.img,format=raw \
+    -bios /usr/share/ovmf/OVMF.fd \
+    -m 512M \
+    -serial stdio</code></pre>
+
+                <h3>Real Hardware</h3>
+                <ol>
+                    <li>Copy <code>bootx64.efi</code> to ESP: <code>/EFI/FreeWorld/bootx64.efi</code></li>
+                    <li>Copy kernel to ESP: <code>/EFI/FreeWorld/fwoskrnl.exe</code></li>
+                    <li>Add FreeWorld to UEFI boot menu (or use as default)</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Boot Command Line</h2>
+                
+                <h3>Setting Boot Parameters</h3>
+                <p>Boot command line can be set via EFI variables:</p>
+                <pre><code># From EFI shell or boot manager
+efi-setvar BootParameters \
+    -guid {8BE4DF61-93CA-11D2-AA0D-00E09802402A} \
+    -s "root=/dev/sda2 quiet"</code></pre>
+
+                <h3>Common Boot Options</h3>
+                <ul>
+                    <li><code>root=</code> - Root filesystem device</li>
+                    <li><code>quiet</code> - Quiet boot (minimal output)</li>
+                    <li><code>debug</code> - Debug mode</li>
+                    <li><code>single</code> - Single user mode</li>
+                    <li><code>initrd=</code> - Initrd path (if not in standard location)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Advantages Over BIOS Boot</h2>
+                
+                <ul>
+                    <li><strong>No Mode Transitions:</strong> Direct 64-bit entry, no 16-bit/32-bit code</li>
+                    <li><strong>Better Hardware Support:</strong> UEFI provides more hardware information</li>
+                    <li><strong>Faster Boot:</strong> More efficient initialization</li>
+                    <li><strong>Modern Standards:</strong> Uses modern UEFI protocols</li>
+                    <li><strong>Secure Boot Ready:</strong> Can be extended for Secure Boot support</li>
+                    <li><strong>Better Error Handling:</strong> UEFI provides better error reporting</li>
+                    <li><strong>Large Disk Support:</strong> GPT partition table support</li>
+                    <li><strong>Network Boot:</strong> Can be extended for PXE boot</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                
+                <h3>With Kernel</h3>
+                <p>The kernel receives boot parameters via the <code>boot_params_t</code> structure and uses them for:</p>
+                <ul>
+                    <li>Memory management initialization</li>
+                    <li>ACPI table parsing</li>
+                    <li>Initrd mounting</li>
+                    <li>Boot option parsing</li>
+                </ul>
+
+                <h3>With Hardware Detection</h3>
+                <p>Early hardware detection in the bootloader provides information that the kernel uses for:</p>
+                <ul>
+                    <li>CPU feature detection</li>
+                    <li>Memory map initialization</li>
+                    <li>ACPI table location</li>
+                    <li>Storage device enumeration</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li>Secure Boot support (sign bootloader and kernel)</li>
+                    <li>Full decompression in bootloader (currently kernel handles it)</li>
+                    <li>Graphical boot menu for kernel selection</li>
+                    <li>Recovery mode automatic boot option</li>
+                    <li>Persistent boot logs</li>
+                    <li>Multi-boot support (multiple kernel versions)</li>
+                    <li>PXE network boot support</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="boot-process.html">Boot Process</a> - Complete boot sequence</li>
+                    <li><a href="kernel.html">Kernel</a> - Kernel initialization</li>
+                    <li><a href="kernel-decompression.html">Kernel Decompression</a> - Compression handling</li>
+                    <li><a href="memory.html">Memory Management</a> - Memory map usage</li>
+                    <li><a href="bootmgr.html">BOOTMGR</a> - Legacy BIOS bootloader</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

@@ -70,6 +70,7 @@
                 <ul>
                     <li><strong>File Type Associations</strong>: Automatic icon and application mapping for 100+ file types</li>
                     <li><strong>Icon Display</strong>: Real icon files with emoji fallbacks</li>
+                    <li><strong>Filesystem Type Display</strong>: Shows filesystem type with OS association (e.g., "NTFS (Windows)", "ext4 (Linux)")</li>
                     <li><strong>Open With</strong>: Double-click files to open with default applications</li>
                     <li><strong>File Operations</strong>: Create, delete, move, copy, rename files and folders</li>
                     <li><strong>Navigation</strong>: Back, forward, up, and path navigation</li>
@@ -124,6 +125,21 @@
                     <li>HTTP icon serving for web-based GUI</li>
                 </ul>
                 <p>See <a href="icon-system.html">Icon System</a> for complete details on icon management.</p>
+
+                <h2>Filesystem Type Display</h2>
+                <p>Wanderer displays filesystem type information for each folder and drive, helping users identify which operating system a filesystem belongs to:</p>
+                <ul>
+                    <li><strong>Automatic Detection</strong>: Filesystem type is automatically detected by the kernel</li>
+                    <li><strong>OS Association</strong>: Shows OS type alongside filesystem type (e.g., "NTFS (Windows)", "ext4 (Linux)")</li>
+                    <li><strong>Supported Types</strong>: FAT32, ext2, ext3, ext4, NTFS, exFAT</li>
+                    <li><strong>Display Format</strong>: <code>"[Filesystem Type] ([OS Type])"</code></li>
+                </ul>
+                <p>This feature is powered by the native filesystem support in the kernel. See <a href="filesystem-kernel.html">File System (Kernel)</a> for details on filesystem drivers.</p>
+                <div class="code-block">
+                    <pre>Filesystem Type: NTFS (Windows)
+Filesystem Type: ext4 (Linux)
+Filesystem Type: FAT32 (Windows/Linux)</pre>
+                </div>
 
                 <h2>Directory Listing Format</h2>
                 <p>Wanderer displays directory listings with icons and file information:</p>
@@ -226,6 +242,7 @@
                     <li><a href="file-type-associations.html">File Type Associations</a> - File type registry and associations</li>
                     <li><a href="icon-system.html">Icon System</a> - Icon management and display</li>
                     <li><a href="filesystem.html">Filesystem API</a> - File system operations</li>
+                    <li><a href="filesystem-kernel.html">File System (Kernel)</a> - Native filesystem drivers and type detection</li>
                     <li><a href="desktop.html">Desktop</a> - Desktop integration</li>
                 </ul>
             </section>

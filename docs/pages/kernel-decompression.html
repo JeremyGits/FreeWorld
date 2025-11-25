@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kernel Decompression - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li><a href="user-accounts.html">User Account Management</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Rendering System</li>
+                <li><a href="rendering-engine.html">Native Rendering Engine</a></li>
+                <li><a href="browser-engine.html">ASM Browser Engine (Legacy)</a></li>
+                <li><a href="browser-nodejs.html">Node.js Integration</a></li>
+                <li><a href="browser-rendering.html">Rendering System</a></li>
+                <li><a href="browser-network.html">Network Stack</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Kernel Decompression</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>kernel/compression/</code><br>
+                    <strong>Type:</strong> Kernel Subsystem<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS kernel decompression system provides complete support for decompressing compressed kernel images. It supports three major compression formats: <strong>gzip</strong>, <strong>LZMA2/XZ</strong>, and <strong>Zstandard (ZSTD)</strong>. This allows the kernel to be stored in compressed form, reducing boot media size and improving load times.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+                <p><strong>Total Implementation:</strong> ~5,034 lines of production-quality assembly code</p>
+            </section>
+
+            <section class="section">
+                <h2>Supported Formats</h2>
+                
+                <h3>1. gzip (DEFLATE)</h3>
+                <p><strong>Location:</strong> <code>kernel/compression/inflate.asm</code> (~970 lines)</p>
+                <p>Complete DEFLATE/INFLATE algorithm implementation with:</p>
+                <ul>
+                    <li><strong>Bitstream Handling:</strong> Variable-length bit reading with buffer management</li>
+                    <li><strong>Huffman Coding:</strong> Fixed and dynamic Huffman table building and decoding</li>
+                    <li><strong>LZ77 Decompression:</strong> Literal and match decoding with sliding window</li>
+                    <li><strong>Block Types:</strong> Uncompressed, fixed Huffman, and dynamic Huffman blocks</li>
+                    <li><strong>32KB Sliding Window:</strong> Dictionary management for match references</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>inflate_deflate()</code> - Main DEFLATE decompression function</li>
+                    <li><code>read_bits()</code> - Read variable-length bits from stream</li>
+                    <li><code>build_huffman_codes()</code> - Build Huffman decoding tables</li>
+                    <li><code>decode_huffman_symbol()</code> - Decode symbol using Huffman tree</li>
+                    <li><code>decode_length_and_distance()</code> - Decode LZ77 match length and distance</li>
+                    <li><code>copy_from_window()</code> - Copy match from sliding window</li>
+                </ul>
+
+                <h3>2. LZMA2/XZ</h3>
+                <p><strong>Location:</strong> <code>kernel/compression/lzma2.asm</code> (~981 lines) and <code>kernel/compression/lzma2_helpers.asm</code> (~858 lines)</p>
+                <p>Complete LZMA2/XZ decompression implementation with:</p>
+                <ul>
+                    <li><strong>XZ Format Parsing:</strong> Magic bytes, stream headers, block handling</li>
+                    <li><strong>Range Decoder:</strong> Arithmetic coding with bit normalization</li>
+                    <li><strong>LZMA Decoder:</strong> Literal, length, and distance decoding</li>
+                    <li><strong>Context-Aware Decoding:</strong> lc/lp/pb properties for literal context</li>
+                    <li><strong>Dictionary Management:</strong> Circular buffer for match references</li>
+                    <li><strong>Unpack Size Termination:</strong> Proper stream termination handling</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>decompress_xz()</code> - Main XZ decompression function</li>
+                    <li><code>range_decoder_decode_bit()</code> - Decode single bit using range decoder</li>
+                    <li><code>range_decoder_normalize()</code> - Normalize range decoder state</li>
+                    <li><code>lzma_decode_literal()</code> - Decode literal byte with context</li>
+                    <li><code>lzma_decode_len()</code> - Decode match length</li>
+                    <li><code>lzma_decode_distance()</code> - Decode match distance</li>
+                    <li><code>lzma_copy_match()</code> - Copy match from dictionary</li>
+                </ul>
+
+                <h3>3. Zstandard (ZSTD)</h3>
+                <p><strong>Location:</strong> <code>kernel/compression/zstd.asm</code> (~668 lines) and <code>kernel/compression/zstd_helpers.asm</code> (~1,300 lines)</p>
+                <p>Complete ZSTD decompression implementation with:</p>
+                <ul>
+                    <li><strong>ZSTD Format Parsing:</strong> Magic bytes, frame headers, block processing</li>
+                    <li><strong>FSE (Finite State Entropy):</strong> Table building and symbol decoding</li>
+                    <li><strong>Huffman Coding:</strong> Canonical Huffman tree building and decoding</li>
+                    <li><strong>Literal Decompression:</strong> Raw, RLE, and Huffman modes</li>
+                    <li><strong>Sequence Decompression:</strong> FSE decoding for lengths and offsets</li>
+                    <li><strong>Match Copying:</strong> Window-based match copying with wrapping</li>
+                    <li><strong>Window Management:</strong> Allocation, position tracking, and wrapping</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code>decompress_zstd()</code> - Main ZSTD decompression function</li>
+                    <li><code>zstd_build_fse_table()</code> - Build FSE decoding table</li>
+                    <li><code>zstd_decode_fse_symbol()</code> - Decode symbol using FSE</li>
+                    <li><code>zstd_build_huffman_table()</code> - Build canonical Huffman table</li>
+                    <li><code>zstd_decode_huffman_symbol()</code> - Decode symbol using Huffman</li>
+                    <li><code>zstd_decompress_literals()</code> - Decompress literal block</li>
+                    <li><code>zstd_decompress_sequences()</code> - Decompress sequence block</li>
+                    <li><code>zstd_copy_match()</code> - Copy match with window management</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Architecture</h2>
+                
+                <h3>Decompression Flow</h3>
+                <pre><code>Kernel Image (Compressed)
+    ↓
+kernel_decompress() - Format Detection
+    ↓
+    ├─> gzip → decompress_gzip() → inflate_deflate()
+    ├─> XZ → decompress_xz() → LZMA2 decoder
+    └─> ZSTD → decompress_zstd() → ZSTD decoder
+    ↓
+Kernel Image (Decompressed)
+    ↓
+Kernel Initialization</code></pre>
+
+                <h3>Format Detection</h3>
+                <p>The decompression dispatcher (<code>kernel/compression/decompress.asm</code>) automatically detects the compression format by checking magic numbers:</p>
+                <ul>
+                    <li><strong>gzip:</strong> <code>0x1F 0x8B</code> at offset 0</li>
+                    <li><strong>XZ:</strong> <code>0xFD 0x37 0x7A 0x58 0x5A 0x00</code> at offset 0</li>
+                    <li><strong>ZSTD:</strong> <code>0x28 0xB5 0x2F 0xFD</code> at offset 0</li>
+                </ul>
+
+                <h3>Memory Management</h3>
+                <ul>
+                    <li>Compressed kernel buffer: Provided by bootloader</li>
+                    <li>Decompressed kernel buffer: Allocated via <code>kmalloc()</code></li>
+                    <li>Working buffers: Allocated as needed for algorithms</li>
+                    <li>Sliding windows: Managed within algorithm implementations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Implementation Details</h2>
+                
+                <h3>gzip/DEFLATE</h3>
+                <p>The DEFLATE implementation follows RFC 1951 and includes:</p>
+                <ul>
+                    <li>Bit-level reading with buffer refills</li>
+                    <li>Fixed Huffman tables (pre-defined in RFC 1951)</li>
+                    <li>Dynamic Huffman table building from code lengths</li>
+                    <li>LZ77 match decoding (lengths 3-258, distances 1-32768)</li>
+                    <li>32KB sliding window for match references</li>
+                </ul>
+
+                <h3>LZMA2/XZ</h3>
+                <p>The LZMA2 implementation includes:</p>
+                <ul>
+                    <li>XZ container format parsing (magic, stream flags, CRC)</li>
+                    <li>LZMA2 block types (uncompressed, compressed, LZMA variants)</li>
+                    <li>Range decoder with 32-bit precision</li>
+                    <li>Literal decoding with lc/lp/pb context properties</li>
+                    <li>Length and distance decoding with position-based probabilities</li>
+                    <li>Dictionary management with circular buffer</li>
+                </ul>
+
+                <h3>Zstandard</h3>
+                <p>The ZSTD implementation includes:</p>
+                <ul>
+                    <li>ZSTD frame header parsing (window descriptor, content size)</li>
+                    <li>Block types (raw, RLE, compressed, end blocks)</li>
+                    <li>FSE table building with normalization</li>
+                    <li>Canonical Huffman tree construction</li>
+                    <li>Literal decompression (raw, RLE, Huffman modes)</li>
+                    <li>Sequence decompression (FSE for lengths/offsets)</li>
+                    <li>Window management for match copying</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage</h2>
+                
+                <h3>Kernel Initialization</h3>
+                <p>Decompression is automatically called during kernel initialization:</p>
+                <pre><code>kernel_init()
+    ├─> early_hardware_detect()
+    ├─> kernel_decompress()  ← Automatic decompression
+    ├─> hardware_detect()
+    └─> ...</code></pre>
+
+                <h3>Manual Decompression</h3>
+                <pre><code>; Decompress kernel if compressed
+; Input: RSI = compressed buffer, RCX = compressed size
+; Output: RAX = decompressed buffer, RDX = decompressed size
+extern kernel_decompress
+call kernel_decompress</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Build System</h2>
+                <p>The decompression system is built as part of the kernel:</p>
+                <pre><code>cd kernel/compression
+make</code></pre>
+                <p>This compiles:</p>
+                <ul>
+                    <li><code>decompress.asm</code> - Format detection and dispatcher</li>
+                    <li><code>inflate.asm</code> - gzip/DEFLATE decompression</li>
+                    <li><code>lzma2.asm</code> - XZ format parsing and block handling</li>
+                    <li><code>lzma2_helpers.asm</code> - LZMA2 core algorithms</li>
+                    <li><code>zstd.asm</code> - ZSTD format parsing and block handling</li>
+                    <li><code>zstd_helpers.asm</code> - ZSTD core algorithms</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Performance</h2>
+                <ul>
+                    <li><strong>gzip:</strong> Fast decompression, moderate compression ratio</li>
+                    <li><strong>LZMA2/XZ:</strong> Excellent compression ratio, slower decompression</li>
+                    <li><strong>ZSTD:</strong> Balanced compression ratio and speed</li>
+                </ul>
+                <p>All algorithms are optimized for kernel-space execution with minimal memory overhead.</p>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                
+                <h3>With Bootloader</h3>
+                <p>The bootloader can load a compressed kernel image, which is automatically decompressed during kernel initialization.</p>
+
+                <h3>With Kernel Initialization</h3>
+                <p>Decompression is integrated into the kernel initialization sequence, occurring after early hardware detection but before full kernel startup.</p>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="kernel.html">Kernel</a> - Kernel initialization process</li>
+                    <li><a href="boot-process.html">Boot Process</a> - Boot sequence and kernel loading</li>
+                    <li><a href="memory.html">Memory Management</a> - Memory allocation for decompression</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

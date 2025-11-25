@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boot Parameters - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Boot Parameters</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>kernel/boot/boot_params.asm</code><br>
+                    <strong>Type:</strong> Kernel Component<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS boot parameter system provides comprehensive command-line parsing, boot flag handling, and parameter extraction. This enables full control over kernel boot behavior and configuration.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+                <p><strong>Key Features:</strong> UTF-16 to ASCII conversion, command-line tokenization, boot flag parsing, parameter extraction, memory size parsing</p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. Boot Parameter Initialization</h3>
+                <p><strong>Location:</strong> <code>kernel/boot/boot_params.asm</code></p>
+                <p>Complete boot parameter parsing and management:</p>
+                <ul>
+                    <li><strong>Structure Validation:</strong> Magic number verification</li>
+                    <li><strong>Command-Line Extraction:</strong> From boot parameters structure</li>
+                    <li><strong>UTF-16 Conversion:</strong> Automatic UTF-16 to ASCII conversion</li>
+                    <li><strong>Argument Tokenization:</strong> Space and tab-separated arguments</li>
+                    <li><strong>Flag Parsing:</strong> Boot flag detection and setting</li>
+                    <li><strong>Parameter Extraction:</strong> Key-value parameter parsing</li>
+                    <li><strong>Parameter Storage:</strong> All parameters stored for access</li>
+                </ul>
+
+                <h3>2. Boot Flags</h3>
+                <p>Supported boot flags:</p>
+                <ul>
+                    <li><code>quiet</code> - Quiet boot (minimal output)</li>
+                    <li><code>debug</code> - Debug mode (verbose debugging)</li>
+                    <li><code>verbose</code> - Verbose output</li>
+                    <li><code>single</code> / <code>s</code> - Single user mode</li>
+                    <li><code>nosmp</code> - Disable SMP (single CPU)</li>
+                    <li><code>nomodeset</code> - Disable mode setting</li>
+                    <li><code>acpi=off</code> / <code>noacpi</code> - Disable ACPI</li>
+                    <li><code>nohpet</code> - Disable HPET</li>
+                    <li><code>nopci</code> - Disable PCI</li>
+                </ul>
+
+                <h3>3. Boot Parameters</h3>
+                <p>Supported parameters:</p>
+                <ul>
+                    <li><code>root=&lt;device&gt;</code> - Root filesystem device (e.g., <code>/dev/sda2</code>)</li>
+                    <li><code>initrd=&lt;path&gt;</code> - Initrd path</li>
+                    <li><code>vga=&lt;mode&gt;</code> - VGA mode (e.g., <code>vga=791</code>)</li>
+                    <li><code>console=&lt;device&gt;</code> - Console device (e.g., <code>console=ttyS0</code>)</li>
+                    <li><code>loglevel=&lt;n&gt;</code> - Log level (0-7, default 7)</li>
+                    <li><code>maxcpus=&lt;n&gt;</code> - Maximum CPUs to use (0 = all)</li>
+                    <li><code>mem=&lt;size&gt;</code> - Memory limit with unit (e.g., <code>mem=512M</code>, <code>mem=2G</code>)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Boot Parameter Flow</h2>
+                
+                <pre><code>UEFI Bootloader
+    ↓
+Read BootParameters EFI variable
+    ↓
+Pass to kernel via boot_params_t
+    ↓
+Kernel Entry (kernel_entry_uefi)
+    ↓
+Extract command_line from boot_params
+    ↓
+Boot Parameter Initialization
+    ↓
+1. Validate boot parameters
+    - Check magic number ("FWOS")
+    - Verify structure
+    ↓
+2. Parse Command Line
+    - Convert UTF-16 to ASCII
+    - Tokenize arguments (space/tab)
+    - Store arguments (up to 64)
+    ↓
+3. Parse Arguments
+    - Check for flags
+    - Extract parameters (key=value)
+    - Set boot flags
+    ↓
+4. Store Parameters
+    - Root device
+    - Initrd path
+    - VGA mode
+    - Console
+    - Log level
+    - Max CPUs
+    - Memory limit
+    ↓
+Boot Parameters Ready</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>API Functions</h2>
+                
+                <h3>Initialization</h3>
+                <pre><code>; Initialize boot parameters
+boot_params_init:
+    ; Input: RDI = boot parameters pointer
+    ; Returns: RAX = 0 on success, non-zero on error</code></pre>
+
+                <h3>Flag Access</h3>
+                <pre><code>; Get boot flags
+boot_params_get_flags:
+    ; Returns: EAX = boot flags
+
+; Check boot flag
+boot_params_check_flag:
+    ; Input: EAX = flag to check
+    ; Returns: AL = 1 if set, 0 if not</code></pre>
+
+                <h3>Parameter Access</h3>
+                <pre><code>; Get root device
+boot_params_get_root:
+    ; Returns: RAX = pointer to root device string
+
+; Get initrd path
+boot_params_get_initrd:
+    ; Returns: RAX = pointer to initrd path string
+
+; Get VGA mode
+boot_params_get_vga:
+    ; Returns: RAX = pointer to VGA mode string
+
+; Get console
+boot_params_get_console:
+    ; Returns: RAX = pointer to console string
+
+; Get log level
+boot_params_get_loglevel:
+    ; Returns: AL = log level (0-7)
+
+; Get max CPUs
+boot_params_get_maxcpus:
+    ; Returns: EAX = max CPUs (0 = all)
+
+; Get memory limit
+boot_params_get_mem_limit:
+    ; Returns: RAX = memory limit in bytes (0 = no limit)</code></pre>
+
+                <h3>Argument Access</h3>
+                <pre><code>; Get argument count
+boot_params_get_arg_count:
+    ; Returns: EAX = argument count
+
+; Get argument
+boot_params_get_arg:
+    ; Input: EAX = argument index
+    ; Returns: RAX = pointer to argument string or 0</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Supported Boot Options</h2>
+                
+                <h3>Boot Flags</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Flag</th>
+                            <th>Description</th>
+                            <th>Boot Flag Constant</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>quiet</code></td>
+                            <td>Quiet boot (minimal output)</td>
+                            <td><code>BOOT_FLAG_QUIET</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>debug</code></td>
+                            <td>Debug mode</td>
+                            <td><code>BOOT_FLAG_DEBUG</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>verbose</code></td>
+                            <td>Verbose output</td>
+                            <td><code>BOOT_FLAG_VERBOSE</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>single</code> / <code>s</code></td>
+                            <td>Single user mode</td>
+                            <td><code>BOOT_FLAG_SINGLE_USER</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>nosmp</code></td>
+                            <td>Disable SMP</td>
+                            <td><code>BOOT_FLAG_NOSMP</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>nomodeset</code></td>
+                            <td>Disable mode setting</td>
+                            <td><code>BOOT_FLAG_NOMODESET</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>acpi=off</code> / <code>noacpi</code></td>
+                            <td>Disable ACPI</td>
+                            <td><code>BOOT_FLAG_ACPI_OFF</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>nohpet</code></td>
+                            <td>Disable HPET</td>
+                            <td><code>BOOT_FLAG_NOHPET</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>nopci</code></td>
+                            <td>Disable PCI</td>
+                            <td><code>BOOT_FLAG_NOPCI</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h3>Boot Parameters</h3>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Parameter</th>
+                            <th>Format</th>
+                            <th>Example</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>root=</code></td>
+                            <td><code>&lt;device&gt;</code></td>
+                            <td><code>root=/dev/sda2</code></td>
+                            <td>Root filesystem device</td>
+                        </tr>
+                        <tr>
+                            <td><code>initrd=</code></td>
+                            <td><code>&lt;path&gt;</code></td>
+                            <td><code>initrd=/boot/initrd.img</code></td>
+                            <td>Initrd path</td>
+                        </tr>
+                        <tr>
+                            <td><code>vga=</code></td>
+                            <td><code>&lt;mode&gt;</code></td>
+                            <td><code>vga=791</code></td>
+                            <td>VGA mode</td>
+                        </tr>
+                        <tr>
+                            <td><code>console=</code></td>
+                            <td><code>&lt;device&gt;</code></td>
+                            <td><code>console=ttyS0</code></td>
+                            <td>Console device</td>
+                        </tr>
+                        <tr>
+                            <td><code>loglevel=</code></td>
+                            <td><code>&lt;0-7&gt;</code></td>
+                            <td><code>loglevel=4</code></td>
+                            <td>Log level</td>
+                        </tr>
+                        <tr>
+                            <td><code>maxcpus=</code></td>
+                            <td><code>&lt;n&gt;</code></td>
+                            <td><code>maxcpus=4</code></td>
+                            <td>Maximum CPUs</td>
+                        </tr>
+                        <tr>
+                            <td><code>mem=</code></td>
+                            <td><code>&lt;size&gt;[K|M|G|T]</code></td>
+                            <td><code>mem=512M</code></td>
+                            <td>Memory limit</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Setting Boot Parameters</h3>
+                <p>From EFI shell or boot manager:</p>
+                <pre><code>efi-setvar BootParameters \
+    -guid {8BE4DF61-93CA-11D2-AA0D-00E09802402A} \
+    -s "root=/dev/sda2 quiet loglevel=4 maxcpus=4 mem=2G"</code></pre>
+
+                <h3>Accessing Boot Parameters in Kernel</h3>
+                <pre><code>; Initialize boot parameters
+extern boot_params_init
+extern uefi_boot_params
+mov rdi, [uefi_boot_params]
+call boot_params_init
+
+; Check if quiet mode
+extern boot_params_check_flag
+mov eax, 0x0010  ; BOOT_FLAG_QUIET
+call boot_params_check_flag
+test al, al
+jnz .quiet_mode
+
+; Get root device
+extern boot_params_get_root
+call boot_params_get_root
+; RAX = pointer to root device string
+
+; Get log level
+extern boot_params_get_loglevel
+call boot_params_get_loglevel
+; AL = log level
+
+; Get memory limit
+extern boot_params_get_mem_limit
+call boot_params_get_mem_limit
+; RAX = memory limit in bytes (0 = no limit)</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                
+                <h3>With UEFI Boot</h3>
+                <ul>
+                    <li>Boot parameters passed from UEFI bootloader</li>
+                    <li>Command line from EFI variables</li>
+                    <li>Boot parameter structure validation</li>
+                </ul>
+
+                <h3>With Kernel Initialization</h3>
+                <ul>
+                    <li>Boot parameters initialized early (Phase 2.5)</li>
+                    <li>Flags affect kernel behavior</li>
+                    <li>Parameters used for configuration</li>
+                </ul>
+
+                <h3>With ACPI</h3>
+                <ul>
+                    <li>ACPI can be disabled via <code>acpi=off</code> or <code>noacpi</code></li>
+                    <li>Boot parameter checked before ACPI init</li>
+                </ul>
+
+                <h3>With Driver System</h3>
+                <ul>
+                    <li>Root device used for filesystem mounting</li>
+                    <li>Console parameter used for console setup</li>
+                    <li>VGA mode used for display initialization</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                
+                <pre><code>kernel/boot/
+├── boot_params.asm    # Boot parameter parsing (~800 lines)
+└── Makefile          # Build system</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li><strong>Additional Parameters:</strong> <code>resume=</code>, <code>panic=</code>, <code>apic=</code>, <code>noapic</code></li>
+                    <li><strong>Parameter Validation:</strong> Range checking, device path validation, mode validation</li>
+                    <li><strong>Boot Profiles:</strong> Predefined boot profiles, profile selection, custom profile support</li>
+                    <li><strong>Runtime Modification:</strong> Boot parameter modification at runtime, dynamic flag setting</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="uefi-boot.html">UEFI Boot</a> - Boot parameter passing</li>
+                    <li><a href="kernel.html">Kernel</a> - Kernel initialization phases</li>
+                    <li><a href="acpi-support.html">ACPI Support</a> - ACPI disable support</li>
+                    <li><a href="early-hardware-detection.html">Early Hardware Detection</a> - Hardware detection</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

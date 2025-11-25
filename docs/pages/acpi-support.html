@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ACPI Support - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>ACPI Support</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>kernel/acpi/</code><br>
+                    <strong>Type:</strong> Kernel Component<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS ACPI (Advanced Configuration and Power Interface) support provides complete table parsing, enumeration, and device tree building. This enables comprehensive hardware enumeration and configuration information from ACPI tables.</p>
+                
+                <div class="status-badge status-complete">✅ Fully Implemented</div>
+                <p><strong>Key Features:</strong> RSDP detection, RSDT/XSDT parsing, table enumeration, device tree building, full ACPI table support</p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. ACPI Core Support</h3>
+                <p><strong>Location:</strong> <code>kernel/acpi/acpi.asm</code></p>
+                <p>Complete ACPI table parsing and management:</p>
+                <ul>
+                    <li><strong>RSDP Detection:</strong> Memory search (EBDA, BIOS ROM) or from UEFI</li>
+                    <li><strong>RSDP Validation:</strong> Checksum verification (ACPI 1.0 and 2.0+)</li>
+                    <li><strong>RSDT Parsing:</strong> ACPI 1.0 Root System Description Table (32-bit pointers)</li>
+                    <li><strong>XSDT Parsing:</strong> ACPI 2.0+ Extended System Description Table (64-bit pointers)</li>
+                    <li><strong>Version Detection:</strong> Automatic ACPI 1.0 vs 2.0+ detection</li>
+                    <li><strong>Table Enumeration:</strong> All ACPI tables scanned and stored</li>
+                    <li><strong>Table Validation:</strong> Checksum verification for all tables</li>
+                    <li><strong>Table Finding:</strong> Find tables by signature</li>
+                </ul>
+
+                <h3>2. ACPI Table Support</h3>
+                <p>Full support for standard ACPI tables:</p>
+                <ul>
+                    <li><strong>FADT</strong> (Fixed ACPI Description Table) - System configuration, power management</li>
+                    <li><strong>MADT</strong> (Multiple APIC Description Table) - APIC information, interrupt routing</li>
+                    <li><strong>DSDT</strong> (Differentiated System Description Table) - ACPI namespace, device definitions</li>
+                    <li><strong>SSDT</strong> (Secondary System Description Table) - Additional device definitions</li>
+                    <li><strong>SRAT</strong> (Static Resource Affinity Table) - NUMA topology, memory/CPU affinity</li>
+                    <li><strong>SLIT</strong> (System Locality Information Table) - NUMA node distances</li>
+                    <li><strong>MCFG</strong> (PCI Express Configuration) - PCIe configuration space base addresses</li>
+                    <li><strong>HPET</strong> (High Precision Event Timer) - Timer information</li>
+                    <li><strong>DMAR</strong> (DMA Remapping) - IOMMU information</li>
+                </ul>
+
+                <h3>3. Device Tree</h3>
+                <p><strong>Location:</strong> <code>kernel/acpi/device_tree.asm</code></p>
+                <p>Hardware enumeration from ACPI tables:</p>
+                <ul>
+                    <li><strong>MADT Enumeration:</strong> Local APIC, I/O APIC devices</li>
+                    <li><strong>MCFG Enumeration:</strong> PCI Express devices</li>
+                    <li><strong>SRAT Enumeration:</strong> NUMA nodes</li>
+                    <li><strong>FADT Enumeration:</strong> System devices (HPET, PM1a)</li>
+                    <li><strong>DSDT Enumeration:</strong> ACPI namespace devices (structure ready)</li>
+                    <li><strong>Device Nodes:</strong> Structured device information</li>
+                    <li><strong>Device Finding:</strong> Find devices by name</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>ACPI Initialization Flow</h2>
+                
+                <pre><code>Kernel Initialization
+    ↓
+Early Hardware Detection
+    ↓ (RSDP found)
+ACPI Initialization
+    ↓
+1. Validate RSDP
+    - Checksum verification
+    - Version detection (1.0 vs 2.0+)
+    ↓
+2. Parse RSDT/XSDT
+    - ACPI 1.0: RSDT (32-bit pointers)
+    - ACPI 2.0+: XSDT (64-bit pointers)
+    ↓
+3. Enumerate All Tables
+    - Scan RSDT/XSDT entries
+    - Validate each table (checksum)
+    - Store in table list
+    ↓
+4. Parse Important Tables
+    - FADT (system configuration)
+    - MADT (APIC information)
+    - SRAT (NUMA topology)
+    - MCFG (PCIe configuration)
+    - HPET (timer information)
+    ↓
+5. Build Device Tree
+    - Enumerate devices from tables
+    - Create device nodes
+    - Link device tree
+    ↓
+ACPI Ready</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>API Functions</h2>
+                
+                <h3>ACPI Core Functions</h3>
+                <pre><code>; Initialize ACPI
+acpi_init:
+    ; Input: RAX = RSDP address (or 0 to search)
+    ; Returns: RAX = 0 on success, non-zero on error
+
+; Find ACPI table by signature
+acpi_find_table:
+    ; Input: RSI = signature (4 bytes, null-padded to 8)
+    ; Returns: RAX = table address or 0
+
+; Get specific table addresses
+acpi_get_fadt:    ; Returns: RAX = FADT address
+acpi_get_madt:    ; Returns: RAX = MADT address
+acpi_get_dsdt:    ; Returns: RAX = DSDT address
+acpi_get_srat:    ; Returns: RAX = SRAT address
+acpi_get_mcfg:    ; Returns: RAX = MCFG address
+acpi_get_hpet:    ; Returns: RAX = HPET address
+
+; Get ACPI information
+acpi_get_version:         ; Returns: AL = version (1 or 2)
+acpi_is_initialized:      ; Returns: AL = 1 if initialized
+acpi_get_table_count:     ; Returns: EAX = table count
+acpi_get_table_list:      ; Returns: RAX = pointer to table list</code></pre>
+
+                <h3>Device Tree Functions</h3>
+                <pre><code>; Build device tree from ACPI tables
+acpi_build_device_tree:
+    ; Returns: RAX = 0 on success, non-zero on error
+
+; Get device tree information
+acpi_get_device_tree_root:    ; Returns: RAX = root node pointer
+acpi_get_device_node_count:   ; Returns: EAX = device node count
+acpi_get_device_nodes:        ; Returns: RAX = pointer to device nodes
+
+; Find device by name
+acpi_find_device:
+    ; Input: RSI = device name (null-terminated)
+    ; Returns: RAX = device node pointer or 0</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>ACPI Tables</h2>
+                
+                <h3>FADT (Fixed ACPI Description Table)</h3>
+                <p>Contains fixed hardware addresses and configuration:</p>
+                <ul>
+                    <li>PM1a/PM1b Event and Control Blocks</li>
+                    <li>PM2 Control Block</li>
+                    <li>PM Timer Block</li>
+                    <li>GPE0/GPE1 Blocks</li>
+                    <li>DSDT address</li>
+                    <li>HPET address (ACPI 2.0+)</li>
+                </ul>
+
+                <h3>MADT (Multiple APIC Description Table)</h3>
+                <p>Contains APIC and interrupt information:</p>
+                <ul>
+                    <li>Local APIC entries (processor information)</li>
+                    <li>I/O APIC entries (I/O APIC addresses)</li>
+                    <li>Interrupt Source Override entries</li>
+                    <li>NMI Source entries</li>
+                    <li>Local APIC NMI entries</li>
+                </ul>
+
+                <h3>DSDT (Differentiated System Description Table)</h3>
+                <p>Contains ACPI namespace in AML (ACPI Machine Language):</p>
+                <ul>
+                    <li>Device definitions</li>
+                    <li>Method definitions</li>
+                    <li>Resource definitions</li>
+                    <li>Power management definitions</li>
+                    <li><strong>Note:</strong> Full parsing requires AML interpreter (structure ready)</li>
+                </ul>
+
+                <h3>SRAT (Static Resource Affinity Table)</h3>
+                <p>Contains NUMA topology information:</p>
+                <ul>
+                    <li>Processor Local APIC/SAPIC Affinity entries</li>
+                    <li>Memory Affinity entries</li>
+                    <li>Processor Local x2APIC Affinity entries</li>
+                    <li>GICC Affinity entries (ARM)</li>
+                    <li>GIC ITS Affinity entries (ARM)</li>
+                </ul>
+
+                <h3>MCFG (PCI Express Configuration)</h3>
+                <p>Contains PCI Express configuration space information:</p>
+                <ul>
+                    <li>Base address for each PCIe segment</li>
+                    <li>Bus range for each segment</li>
+                    <li>Segment group number</li>
+                </ul>
+
+                <h3>HPET (High Precision Event Timer)</h3>
+                <p>Contains HPET timer information:</p>
+                <ul>
+                    <li>HPET base address</li>
+                    <li>HPET capabilities</li>
+                    <li>Timer count</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Device Tree Structure</h2>
+                
+                <h3>Device Node Structure</h3>
+                <pre><code>struc DEVICE_NODE
+    .name: resb 64        ; Device name/path
+    .type: resb 1         ; Device type
+    .address: resq 1      ; Device address
+    .irq: resb 1          ; IRQ number
+    .vendor_id: resw 1    ; Vendor ID
+    .device_id: resw 1    ; Device ID
+    .class_code: resd 1   ; Class code
+    .parent: resq 1       ; Parent node pointer
+    .children: resq 1     ; Children list pointer
+    .next: resq 1         ; Next sibling
+endstruc</code></pre>
+
+                <h3>Device Types</h3>
+                <ul>
+                    <li><code>DEVICE_TYPE_UNKNOWN</code> - Unknown device</li>
+                    <li><code>DEVICE_TYPE_PCI</code> - PCI device</li>
+                    <li><code>DEVICE_TYPE_PCIe</code> - PCI Express device</li>
+                    <li><code>DEVICE_TYPE_ISA</code> - ISA device</li>
+                    <li><code>DEVICE_TYPE_ACPI</code> - ACPI device</li>
+                    <li><code>DEVICE_TYPE_IOAPIC</code> - I/O APIC</li>
+                    <li><code>DEVICE_TYPE_LAPIC</code> - Local APIC</li>
+                    <li><code>DEVICE_TYPE_HPET</code> - HPET timer</li>
+                    <li><code>DEVICE_TYPE_TIMER</code> - Timer device</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>Initialize ACPI</h3>
+                <pre><code>; Get RSDP from early hardware detection
+extern get_early_hardware_info
+call get_early_hardware_info
+mov rsi, rax
+mov rax, [rsi + 112]  ; acpi_rsdp offset
+
+; Initialize ACPI
+extern acpi_init
+call acpi_init
+test rax, rax
+jnz .acpi_error
+
+; Build device tree
+extern acpi_build_device_tree
+call acpi_build_device_tree</code></pre>
+
+                <h3>Access ACPI Tables</h3>
+                <pre><code>; Get MADT address
+extern acpi_get_madt
+call acpi_get_madt
+; RAX = MADT address
+
+; Find table by signature
+extern acpi_find_table
+mov rsi, acpi_sig_srat  ; "SRAT"
+call acpi_find_table
+; RAX = SRAT address or 0</code></pre>
+
+                <h3>Access Device Tree</h3>
+                <pre><code>; Get device tree root
+extern acpi_get_device_tree_root
+call acpi_get_device_tree_root
+; RAX = root node pointer
+
+; Find device by name
+extern acpi_find_device
+mov rsi, device_name  ; "/LAPIC"
+call acpi_find_device
+; RAX = device node pointer or 0</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Integration Points</h2>
+                
+                <h3>With Early Hardware Detection</h3>
+                <ul>
+                    <li>RSDP passed from early hardware detection</li>
+                    <li>ACPI version detected</li>
+                    <li>RSDP address available</li>
+                </ul>
+
+                <h3>With Kernel Initialization</h3>
+                <ul>
+                    <li>ACPI initialized after hardware detection</li>
+                    <li>Device tree built during kernel init</li>
+                    <li>Tables available for driver matching</li>
+                </ul>
+
+                <h3>With Driver System</h3>
+                <ul>
+                    <li>Device nodes used for driver matching</li>
+                    <li>Device addresses from ACPI tables</li>
+                    <li>IRQ information from MADT</li>
+                </ul>
+
+                <h3>With Memory Management</h3>
+                <ul>
+                    <li>NUMA topology from SRAT</li>
+                    <li>Memory affinity information</li>
+                    <li>Node distance information (SLIT)</li>
+                </ul>
+
+                <h3>With Boot Parameters</h3>
+                <ul>
+                    <li>ACPI can be disabled via <code>acpi=off</code> or <code>noacpi</code></li>
+                    <li>Boot parameter checked before ACPI init</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Structure</h2>
+                
+                <pre><code>kernel/acpi/
+├── acpi.asm          # Core ACPI support (~600 lines)
+├── device_tree.asm   # Device tree enumeration (~500 lines)
+└── Makefile         # Build system</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <ul>
+                    <li><strong>AML Interpreter:</strong> Full DSDT/SSDT parsing, ACPI namespace traversal, method execution</li>
+                    <li><strong>Power Management:</strong> ACPI power states, sleep/wake support, CPU power management</li>
+                    <li><strong>Thermal Management:</strong> Thermal zones, cooling devices, temperature monitoring</li>
+                    <li><strong>Device Configuration:</strong> Device-specific configuration, resource allocation, interrupt routing</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="uefi-boot.html">UEFI Boot</a> - RSDP passing from UEFI</li>
+                    <li><a href="early-hardware-detection.html">Early Hardware Detection</a> - RSDP detection</li>
+                    <li><a href="boot-parameters.html">Boot Parameters</a> - ACPI disable support</li>
+                    <li><a href="kernel.html">Kernel</a> - Kernel initialization phases</li>
+                    <li><a href="drivers.html">Device Drivers</a> - Driver matching using ACPI</li>
+                    <li><a href="memory.html">Memory Management</a> - NUMA topology usage</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+
