@@ -136,13 +136,27 @@ Complete technical documentation for the FreeWorld Operating System.
 - **Process Execution**: execve() system call for program spawning
 - **C Runtime**: Minimal C library for basic program execution
 - **Build System**: Cross-compilation toolchain and kernel headers
-- **Services**: smss.exe, csrss.exe, logd, networkd (core + IPC)
+- **Services**: smss.exe, csrss.exe, logd, networkd, securityd (all with IPC)
+- **Networking Stack**: Complete TCP/IP implementation
+  - **IP Layer**: Packet routing, checksums, fragmentation support
+  - **TCP Layer**: Full state machine (11 states), connection management, flow control
+  - **UDP Layer**: Socket management, datagram handling, port management
+  - **ICMP Layer**: Ping support, error messages
+  - **Port Manager**: Centralized port binding and conflict detection
+- **Ethernet Drivers**: Complete hardware support
+  - **RTL8139**: TX/RX buffer management, interrupt handling
+  - **E1000**: TX/RX descriptor rings, ring initialization
+  - **VirtIO**: Queue setup and management
+  - **Ethernet Core**: Frame construction, routing (IPv4/IPv6/ARP), validation
+- **DHCP Client**: Complete implementation (discover, offer, request, ACK, renewal)
+- **Routing Table**: Complete with longest prefix match, default routes
 - **Native Rendering Engine**: All 5 phases complete (~2,500 lines)
 - **Kernel Resource Manager**: Complete (~1,000 lines) + System calls
 - **IPC System**: Core IPC with Unix domain sockets (all services integrated)
 - **Event System**: EventBus and EventManager integrated
 - **logd Integration**: IPC + EventBus audit logging
 - **networkd Integration**: IPC for runtime configuration
+- **securityd Integration**: IPC for user/group management
 
 ### ⚠️ Partially Implemented
 - **GUI Subsystems**: Some components fully implemented, others structural only
@@ -154,6 +168,22 @@ Complete technical documentation for the FreeWorld Operating System.
 - These provide structure but not yet production-ready functionality
 
 ## Recent Additions
+
+### Networking Stack (Complete Implementation)
+- **TCP/IP Stack**: Full networking stack implementation
+  - **IP Layer** (`kernel/network/ip.asm`): IP packet transmission/reception, checksum calculation, routing integration
+  - **TCP Layer** (`kernel/network/tcp.asm`): Complete TCP state machine (11 states), connection management (SYN/ACK/FIN/RST), sequence number management, flow control, TCP checksum
+  - **UDP Layer** (`kernel/network/udp.asm`): UDP socket management, datagram transmission/reception, port-based socket lookup
+  - **ICMP Layer** (`kernel/network/icmp.asm`): ICMP echo request/reply (ping), ICMP checksum calculation
+  - **Port Manager** (`kernel/network/port_manager.asm`): Centralized port binding/unbinding, port conflict detection, auto-assignment of dynamic ports
+- **Ethernet Hardware Drivers**: Complete hardware-specific implementations
+  - **RTL8139** (`kernel/drivers/ethernet_hw.asm`): TX/RX buffer management, interrupt handling, packet transmission/reception
+  - **E1000** (`kernel/drivers/ethernet_hw.asm`): TX/RX descriptor rings, ring initialization, packet transmission/reception
+  - **VirtIO** (`kernel/drivers/ethernet_hw.asm`): Queue setup and management, TX/RX queue handling
+- **Ethernet Frame Handling** (`kernel/drivers/ethernet.asm`): Full Ethernet frame construction (destination MAC, source MAC, EtherType, payload), frame routing (IPv4/IPv6/ARP), frame validation (MAC address checking, broadcast detection)
+- **DHCP Client** (`services/networkd/dhcp_client.c`): Complete DHCP implementation with discover, offer, request, ACK, renewal, lease management
+- **Routing Table** (`services/networkd/routing.c`): Complete routing implementation with add, delete, lookup, longest prefix match, default routes
+- **securityd Daemon** (`services/securityd/securityd.c`): Complete daemon implementation with user/group management, IPC integration, access control framework
 
 ### Filesystem & Program Execution
 - **FAT32 Filesystem**: Complete FAT32 parser with directory traversal and file reading
@@ -199,7 +229,8 @@ Complete technical documentation for the FreeWorld Operating System.
 
 - **Boot Components**: 100% documented (5 pages)
 - **Core System**: 100% documented (13 pages including filesystem, ELF loader, execve, minimal libc, build system)
-- **Services**: 100% documented (including new daemons)
+- **Networking Stack**: ⏳ Needs documentation pages (IP, TCP, UDP, ICMP, Port Manager, Ethernet drivers)
+- **Services**: 100% documented (including networkd, securityd)
 - **Rendering System**: 100% documented
 - **IPC System**: Documented in service pages
 - **User Interface**: 100% documented
@@ -214,6 +245,17 @@ Complete technical documentation for the FreeWorld Operating System.
 - ✅ **execve.html** - execve() system call for program execution
 - ✅ **minimal-libc.html** - Minimal C library documentation
 - ✅ **build-system.html** - Build system and cross-compilation toolchain
+
+### Networking Documentation Pages (To Create)
+- ⏳ **network-ip.html** - IP layer implementation
+- ⏳ **network-tcp.html** - TCP layer with full state machine
+- ⏳ **network-udp.html** - UDP layer implementation
+- ⏳ **network-icmp.html** - ICMP layer implementation
+- ⏳ **network-port-manager.html** - Port management system
+- ⏳ **ethernet-driver.html** - Ethernet driver core
+- ⏳ **ethernet-rtl8139.html** - RTL8139 hardware driver
+- ⏳ **ethernet-e1000.html** - E1000 hardware driver
+- ⏳ **ethernet-virtio.html** - VirtIO hardware driver
 
 ## Viewing
 
@@ -283,11 +325,11 @@ Every major component has:
 
 ## Next Steps
 
-1. Complete remaining GUI subsystem documentation pages
-2. Complete System Services documentation pages
-3. Add IPC system documentation page
+1. Create networking documentation pages (IP, TCP, UDP, ICMP, Port Manager, Ethernet drivers)
+2. Complete remaining GUI subsystem documentation pages
+3. Complete System Services documentation pages
 4. Update all pages with latest implementation status
-5. Add integration examples for IPC usage
-6. Document network stack implementation (when complete)
-7. Add more code examples and usage patterns
-8. Create troubleshooting guides for common issues
+5. Add integration examples for networking stack usage
+6. Add more code examples and usage patterns
+7. Create troubleshooting guides for common issues
+8. Document network service integration (GUI server, HTTP/WebSocket support)
