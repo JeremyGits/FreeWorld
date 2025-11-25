@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Security Daemon (securityd) - FreeWorld OS Documentation</title>
+    <title>Error Manager - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -76,98 +76,113 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Security Daemon (securityd)</h1>
+                <h1>Error Manager</h1>
                 <div class="meta">
-                    <strong>Status:</strong> ✅ Fully Implemented<br>
-                    <strong>Location:</strong> <code>services/securityd/securityd.c</code><br>
-                    <strong>Type:</strong> System Daemon (C)<br>
-                    <strong>Purpose:</strong> System security policies, access control, and authentication services<br>
-                    <strong>IPC:</strong> Unix domain socket (<code>/var/run/securityd.sock</code>)
+                    <strong>Location:</strong> <code>system/error.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Security Daemon (securityd) will manage system security policies, access control, and authentication services for FreeWorld OS. Currently, security functionality is provided by Node.js modules, but a dedicated daemon is planned for kernel-level security operations.</p>
+                <p>The Error Manager provides comprehensive error handling and debugging support for FreeWorld OS. It implements Windows-compatible error codes, GetLastError/SetLastError functionality, and OutputDebugString with logd integration.</p>
             </section>
 
             <section class="section">
-                <h2>Planned Functions</h2>
+                <h2>Features</h2>
                 <ul>
-                    <li><strong>Access Control Enforcement:</strong> Enforce file and system access permissions</li>
-                    <li><strong>User Permission Management:</strong> Manage user permissions and groups</li>
-                    <li><strong>Security Policy Enforcement:</strong> Enforce system-wide security policies</li>
-                    <li><strong>Audit Logging:</strong> Log security events for auditing</li>
-                    <li><strong>Intrusion Detection:</strong> Detect and respond to security threats</li>
-                    <li><strong>Session Management:</strong> Manage user sessions and tokens</li>
-                    <li><strong>ACL Management:</strong> Manage Access Control Lists</li>
-                </ul>
-            </section>
-
-            <section class="section">
-                <h2>Current Implementation</h2>
-                <p>Security functionality is currently provided by Node.js modules:</p>
-                <ul>
-                    <li><strong><code>system/security.js</code>:</strong> SecurityManager class with session and token management</li>
-                    <li><strong><code>system/security-manager.js</code>:</strong> Extended security management functionality</li>
-                </ul>
-                <p>These modules provide:</p>
-                <ul>
-                    <li>Session creation and management</li>
-                    <li>Access token generation</li>
-                    <li>Privilege calculation</li>
-                    <li>ACL (Access Control List) management</li>
-                    <li>User/group management</li>
+                    <li><strong>200+ Error Codes:</strong> Complete Windows-compatible error code set</li>
+                    <li><strong>GetLastError/SetLastError:</strong> Per-thread error tracking</li>
+                    <li><strong>OutputDebugString:</strong> Debug output with logd integration</li>
+                    <li><strong>Error Messages:</strong> Human-readable error messages</li>
+                    <li><strong>Error Formatting:</strong> Formatted error messages with context</li>
+                    <li><strong>Debug Output Management:</strong> Filtering and retrieval of debug output</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Future Daemon Implementation</h2>
-                <p>The securityd daemon will:</p>
+                <h2>Error Code Management</h2>
+                <p>Manage error codes per thread:</p>
                 <ul>
-                    <li>Run as a privileged system daemon</li>
-                    <li>Provide kernel-level security enforcement</li>
-                    <li>Handle security policy updates</li>
-                    <li>Coordinate with kernel security subsystem</li>
-                    <li>Provide IPC interface for security operations</li>
+                    <li><code class="code-inline">setLastError(errorCode, threadId)</code> - Set last error for thread</li>
+                    <li><code class="code-inline">getLastError(threadId)</code> - Get last error for thread</li>
+                    <li><code class="code-inline">clearLastError(threadId)</code> - Clear last error</li>
+                    <li><code class="code-inline">getErrorMessage(errorCode)</code> - Get error message for code</li>
+                    <li><code class="code-inline">formatError(errorCode, ...args)</code> - Format error message with placeholders</li>
                 </ul>
+            </section>
+
+            <section class="section">
+                <h2>Debug Output</h2>
+                <p>OutputDebugString equivalent functionality:</p>
+                <ul>
+                    <li><code class="code-inline">outputDebugString(message, category)</code> - Output debug message</li>
+                    <li><code class="code-inline">getDebugOutput(filter)</code> - Get debug output with optional filtering</li>
+                    <li><code class="code-inline">clearDebugOutput()</code> - Clear all debug output</li>
+                </ul>
+                <p>Debug output is automatically integrated with logd for persistent logging.</p>
+            </section>
+
+            <section class="section">
+                <h2>Error Codes</h2>
+                <p>The Error Manager supports 200+ Windows-compatible error codes, including:</p>
+                <ul>
+                    <li><strong>ERROR_SUCCESS:</strong> Operation completed successfully</li>
+                    <li><strong>ERROR_FILE_NOT_FOUND:</strong> File not found</li>
+                    <li><strong>ERROR_PATH_NOT_FOUND:</strong> Path not found</li>
+                    <li><strong>ERROR_ACCESS_DENIED:</strong> Access denied</li>
+                    <li><strong>ERROR_INVALID_HANDLE:</strong> Invalid handle</li>
+                    <li><strong>ERROR_INVALID_PARAMETER:</strong> Invalid parameter</li>
+                    <li><strong>ERROR_NOT_ENOUGH_MEMORY:</strong> Not enough memory</li>
+                    <li><strong>ERROR_ALREADY_EXISTS:</strong> File already exists</li>
+                    <li><strong>ERROR_SHARING_VIOLATION:</strong> File sharing violation</li>
+                    <li>And 190+ more error codes</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const ErrorManager = require('./system/error');
+
+const errorMgr = new ErrorManager();
+
+// Set error
+errorMgr.setLastError(ErrorManager.ERROR_CODES.ERROR_FILE_NOT_FOUND);
+
+// Get error
+const errorCode = errorMgr.getLastError();
+const message = errorMgr.getErrorMessage(errorCode);
+console.log(message); // "The system cannot find the file specified."
+
+// Output debug string
+errorMgr.outputDebugString('Application started', 'INFO');
+errorMgr.outputDebugString('File operation failed', 'ERROR');
+
+// Get debug output
+const debugLog = errorMgr.getDebugOutput({ category: 'ERROR' });</code></pre>
+                </div>
             </section>
 
             <section class="section">
                 <h2>Integration</h2>
-                <p>securityd will integrate with:</p>
+                <p>The Error Manager integrates with:</p>
                 <ul>
-                    <li><strong>Kernel Security Subsystem:</strong> Low-level security enforcement</li>
-                    <li><strong>SecurityManager (Node.js):</strong> High-level security API</li>
-                    <li><strong>logd:</strong> Security audit logging</li>
-                    <li><strong>freeworldlogon:</strong> Authentication services</li>
+                    <li><strong>logd:</strong> Automatic logging of debug output</li>
+                    <li><strong>All System Services:</strong> Error reporting throughout the system</li>
+                    <li><strong>Object Manager:</strong> Error codes for file operations</li>
+                    <li><strong>Security Manager:</strong> Access denied errors</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Status</h2>
-                <div class="status-grid">
-                    <div class="status-item complete">
-                        <strong>Node.js Security Modules</strong><br>
-                        ✅ Complete
-                    </div>
-                    <div class="status-item complete">
-                        <strong>securityd Daemon</strong><br>
-                        ✅ Fully Implemented
-                    </div>
-                    <div class="status-item complete">
-                        <strong>IPC Integration</strong><br>
-                        ✅ Complete
-                    </div>
-                    <div class="status-item complete">
-                        <strong>User/Group Management</strong><br>
-                        ✅ Complete
-                    </div>
-                    <div class="status-item complete">
-                        <strong>Access Control</strong><br>
-                        ✅ Complete
-                    </div>
-                </div>
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="logd.html">logd</a></li>
+                    <li><a href="object-manager.html">Object Manager</a></li>
+                    <li><a href="security.html">Security Manager</a></li>
+                </ul>
             </section>
         </main>
     </div>

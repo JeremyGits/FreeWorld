@@ -5,26 +5,111 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File System (Kernel) - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
-    <script src="../navigation.js"></script>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>File System (Kernel)</h1>
-            <p class="subtitle">Location: <code>kernel/fs/</code> | Type: Kernel Subsystem | Status: ✅ Fully Implemented</p>
-        </header>
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li><a href="user-accounts.html">User Account Management</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Rendering System</li>
+                <li><a href="rendering-engine.html">Native Rendering Engine</a></li>
+                <li><a href="browser-engine.html">ASM Browser Engine (Legacy)</a></li>
+                <li><a href="browser-nodejs.html">Node.js Integration</a></li>
+                <li><a href="browser-rendering.html">Rendering System</a></li>
+                <li><a href="browser-network.html">Network Stack</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
 
-        <nav class="sidebar" id="sidebar"></nav>
+        <main class="content">
+            <div class="page-header">
+                <h1>File System (Kernel)</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>kernel/fs/</code><br>
+                    <strong>Type:</strong> Kernel Subsystem<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
 
-        <main>
-            <section>
+            <section class="section">
                 <h2>Overview</h2>
                 <p>The FreeWorld OS kernel filesystem provides complete disk I/O and filesystem parsing capabilities. It includes a FAT32 filesystem parser and ATA disk driver for reading files from disk.</p>
                 
                 <div class="status-badge status-complete">✅ Fully Implemented</div>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Components</h2>
                 
                 <h3>1. FAT32 Filesystem Parser</h3>
@@ -77,7 +162,7 @@
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Architecture</h2>
                 
                 <h3>Filesystem Stack</h3>
@@ -105,7 +190,7 @@ Hardware (ATA/IDE Controller)</code></pre>
                 </ol>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>FAT32 Structure</h2>
                 
                 <h3>Boot Sector (BPB)</h3>
@@ -141,7 +226,7 @@ Hardware (ATA/IDE Controller)</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>File Operations</h2>
                 
                 <h3>Opening Files</h3>
@@ -164,7 +249,7 @@ if (bytes_read < 0) {
 fs_close(fd);</code></pre>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Implementation Details</h2>
                 
                 <h3>Memory Management</h3>
@@ -192,7 +277,7 @@ fs_close(fd);</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Integration Points</h2>
                 
                 <h3>With ELF Loader</h3>
@@ -205,7 +290,7 @@ fs_close(fd);</code></pre>
                 <p><code>execve()</code> uses the filesystem to load program files.</p>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Build System</h2>
                 <p>The filesystem is built as part of the kernel:</p>
                 <pre><code>cd kernel/fs
@@ -219,7 +304,7 @@ make</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Testing</h2>
                 <p>To test the filesystem:</p>
                 <ol>
@@ -230,7 +315,7 @@ make</code></pre>
                 </ol>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Future Enhancements</h2>
                 <ul>
                     <li>File writing support</li>
@@ -242,7 +327,7 @@ make</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Related Documentation</h2>
                 <ul>
                     <li><a href="syscalls.html">System Calls</a> - File operation syscalls</li>
@@ -253,5 +338,11 @@ make</code></pre>
             </section>
         </main>
     </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
 </body>
 </html>

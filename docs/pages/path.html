@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Path Parser - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Path Parser</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/path.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Path Parser provides comprehensive path resolution and management for FreeWorld OS. It handles virtual drives, UNC paths, path normalization, and drive management, providing Windows-compatible path handling.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Virtual Drive Management:</strong> Register and manage virtual drives (C:, D:, etc.)</li>
+                    <li><strong>UNC Path Support:</strong> Parse and handle UNC paths (<code class="code-inline">\\server\share\path</code>)</li>
+                    <li><strong>Path Normalization:</strong> Resolve <code class="code-inline">..</code> and <code class="code-inline">.</code> components</li>
+                    <li><strong>Path Resolution:</strong> Convert relative paths to absolute paths</li>
+                    <li><strong>Path Component Splitting:</strong> Extract directory, filename, extension</li>
+                    <li><strong>Drive Information:</strong> Query drive details and existence</li>
+                    <li><strong>Path Validation:</strong> Check if paths exist, are directories, or files</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Virtual Drives</h2>
+                <p>The Path Parser supports Windows-style virtual drives:</p>
+                <ul>
+                    <li><code class="code-inline">C:</code> - Root filesystem (maps to <code class="code-inline">/</code>)</li>
+                    <li><code class="code-inline">D:</code> - Secondary drive (maps to <code class="code-inline">/mnt/d</code>)</li>
+                    <li>Additional drives can be registered dynamically</li>
+                </ul>
+
+                <h3>Drive Management Functions</h3>
+                <ul>
+                    <li><code class="code-inline">registerDrive(letter, path)</code> - Register a virtual drive</li>
+                    <li><code class="code-inline">unregisterDrive(letter)</code> - Unregister a virtual drive</li>
+                    <li><code class="code-inline">getDrivePath(letter)</code> - Get path for a drive letter</li>
+                    <li><code class="code-inline">getAllDrives()</code> - Get all registered drives</li>
+                    <li><code class="code-inline">getDriveInfo(letter)</code> - Get detailed drive information</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Path Operations</h2>
+                
+                <h3>Path Parsing</h3>
+                <ul>
+                    <li><code class="code-inline">parsePath(path, currentDir)</code> - Parse and normalize a path</li>
+                    <li><code class="code-inline">normalizePath(path)</code> - Normalize path (resolve <code class="code-inline">..</code> and <code class="code-inline">.</code>)</li>
+                    <li><code class="code-inline">joinPaths(...paths)</code> - Join multiple path components</li>
+                    <li><code class="code-inline">resolvePath(processId, path)</code> - Resolve path using process's current directory</li>
+                    <li><code class="code-inline">resolveFullPath(path)</code> - Resolve all symbolic links and relative components</li>
+                </ul>
+
+                <h3>Path Component Extraction</h3>
+                <ul>
+                    <li><code class="code-inline">getDirectoryName(path)</code> - Get directory portion of path</li>
+                    <li><code class="code-inline">getFileName(path)</code> - Get filename from path</li>
+                    <li><code class="code-inline">getExtension(path)</code> - Get file extension</li>
+                    <li><code class="code-inline">splitPath(path)</code> - Split path into all components (root, dir, base, name, ext)</li>
+                </ul>
+
+                <h3>Path Validation</h3>
+                <ul>
+                    <li><code class="code-inline">isAbsolutePath(path)</code> - Check if path is absolute</li>
+                    <li><code class="code-inline">isUNCPath(path)</code> - Check if path is UNC</li>
+                    <li><code class="code-inline">pathExists(path)</code> - Check if path exists</li>
+                    <li><code class="code-inline">isDirectory(path)</code> - Check if path is a directory</li>
+                    <li><code class="code-inline">isFile(path)</code> - Check if path is a file</li>
+                    <li><code class="code-inline">getRootPath(path)</code> - Get root path (drive or UNC server/share)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>UNC Path Support</h2>
+                <p>The Path Parser supports UNC (Universal Naming Convention) paths for network shares:</p>
+                <div class="code-block">
+                    <pre><code>// Parse UNC path
+const unc = pathParser.parseUNCPath('\\\\server\\share\\path\\file.txt');
+// Returns: { server: 'server', share: 'share', path: 'path\\file.txt' }</code></pre>
+                </div>
+                <p>UNC paths are automatically detected and parsed separately from local paths.</p>
+            </section>
+
+            <section class="section">
+                <h2>Current Directory Management</h2>
+                <p>The Path Parser tracks current directory per process:</p>
+                <ul>
+                    <li><code class="code-inline">setCurrentDirectory(processId, path)</code> - Set current directory for process</li>
+                    <li><code class="code-inline">getCurrentDirectory(processId)</code> - Get current directory for process</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const PathParser = require('./system/path');
+
+const pathParser = new PathParser();
+
+// Register a new drive
+pathParser.registerDrive('E:', '/mnt/e');
+
+// Parse a path with virtual drive
+const resolved = pathParser.parsePath('C:\\Users\\test\\file.txt');
+// Returns: '/Users/test/file.txt'
+
+// Parse UNC path
+const unc = pathParser.parseUNCPath('\\\\server\\share\\file.txt');
+// Returns: { server: 'server', share: 'share', path: 'file.txt' }
+
+// Get path components
+const parts = pathParser.splitPath('/usr/bin/node');
+// Returns: { root: '/', dir: '/usr/bin', base: 'node', name: 'node', ext: '' }
+
+// Check if path exists
+if (pathParser.pathExists('/usr/bin/node')) {
+    console.log('Node.js found');
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Path Parser integrates with:</p>
+                <ul>
+                    <li><strong>Object Manager:</strong> Used for file path resolution</li>
+                    <li><strong>Shell:</strong> Used for command path resolution</li>
+                    <li><strong>ShellExecute:</strong> Used for executable path resolution</li>
+                    <li><strong>Filesystem:</strong> Used for all filesystem operations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="object-manager.html">Object Manager</a></li>
+                    <li><a href="filesystem-kernel.html">File System (Kernel)</a></li>
+                    <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

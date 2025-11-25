@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shell Ecosystem - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Shell Ecosystem</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/shell.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Shell Ecosystem provides the desktop environment, taskbar, and application launching functionality for FreeWorld OS. It includes DesktopWindow, Taskbar, and ShellExecute components that work together to provide a complete Windows-like shell experience.</p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. DesktopWindow</h3>
+                <p>The DesktopWindow provides the desktop background and icon management:</p>
+                <ul>
+                    <li><strong>Full-Screen Window:</strong> Desktop window covering entire screen</li>
+                    <li><strong>Icon Management:</strong> Add, remove, and manage desktop icons</li>
+                    <li><strong>Right-Click Menu:</strong> Context menu for desktop</li>
+                    <li><strong>Z-Order:</strong> Very low z-order (behind all windows)</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code class="code-inline">init()</code> - Initialize desktop window</li>
+                    <li><code class="code-inline">addIcon(name, x, y, iconPath, targetPath)</code> - Add desktop icon</li>
+                    <li><code class="code-inline">handleRightClick(x, y)</code> - Handle right-click on desktop</li>
+                </ul>
+
+                <h3>2. Taskbar</h3>
+                <p>The Taskbar provides task management and notification area:</p>
+                <ul>
+                    <li><strong>Task Buttons:</strong> Buttons for each open window</li>
+                    <li><strong>Notification Area:</strong> System tray icons</li>
+                    <li><strong>App Bar:</strong> Reserves screen space (windows can't maximize over it)</li>
+                    <li><strong>Positioning:</strong> Bottom of screen (configurable)</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code class="code-inline">init()</code> - Initialize taskbar</li>
+                    <li><code class="code-inline">addTask(hwnd, title, icon)</code> - Add task button</li>
+                    <li><code class="code-inline">removeTask(hwnd)</code> - Remove task button</li>
+                    <li><code class="code-inline">setActiveTask(hwnd)</code> - Set active task</li>
+                    <li><code class="code-inline">addNotificationIcon(icon, tooltip)</code> - Add notification icon</li>
+                    <li><code class="code-inline">setVisible(visible)</code> - Show/hide taskbar</li>
+                    <li><code class="code-inline">setPosition(position)</code> - Set taskbar position</li>
+                    <li><code class="code-inline">setAutoHide(autoHide)</code> - Enable/disable auto-hide</li>
+                </ul>
+
+                <h3>3. ShellExecute</h3>
+                <p>ShellExecute provides application launching and file association management:</p>
+                <ul>
+                    <li><strong>File Execution:</strong> Launch files based on extension</li>
+                    <li><strong>File Associations:</strong> Registry-integrated file type associations</li>
+                    <li><strong>Verb Support:</strong> open, edit, print, etc.</li>
+                    <li><strong>Process Launching:</strong> Launch processes with proper working directories</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code class="code-inline">execute(filePath, operation, parameters, directory, show)</code> - Execute file</li>
+                    <li><code class="code-inline">executeVerb(filePath, verb)</code> - Execute with verb</li>
+                    <li><code class="code-inline">launchProcess(command, args, directory, show)</code> - Launch process</li>
+                    <li><code class="code-inline">registerAssociation(extension, progId, command, args)</code> - Register file association</li>
+                    <li><code class="code-inline">unregisterAssociation(extension)</code> - Unregister association</li>
+                    <li><code class="code-inline">getAssociation(extension)</code> - Get file association</li>
+                    <li><code class="code-inline">getVerbs(filePath)</code> - Get available verbs for file</li>
+                    <li><code class="code-inline">listAssociations()</code> - List all associations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>File Associations</h2>
+                <p>ShellExecute manages file associations through the Registry:</p>
+                <ul>
+                    <li><strong>Registry Integration:</strong> Uses HKEY_CLASSES_ROOT for associations</li>
+                    <li><strong>ProgID Support:</strong> Supports programmatic identifiers</li>
+                    <li><strong>Command Templates:</strong> Supports %1, %L, %* placeholders</li>
+                    <li><strong>Default Associations:</strong> Built-in defaults for common file types</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const { DesktopWindow, Taskbar, ShellExecute } = require('./system/shell');
+const Registry = require('./system/registry');
+const PathParser = require('./system/path');
+
+const registry = new Registry();
+const pathParser = new PathParser();
+const shellExecute = new ShellExecute(registry, pathParser);
+
+// Execute a file
+const result = shellExecute.execute('/path/to/document.txt', 'open');
+if (result.success) {
+    console.log(`Process launched: PID ${result.processId}`);
+}
+
+// Register file association
+shellExecute.registerAssociation(
+    'txt',
+    'txtfile',
+    'notepad.exe',
+    '%1'
+);
+
+// Get available verbs
+const verbs = shellExecute.getVerbs('/path/to/document.txt');
+// Returns: ['open', 'edit', 'print']</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Shell Ecosystem integrates with:</p>
+                <ul>
+                    <li><strong>Registry:</strong> File association storage</li>
+                    <li><strong>Path Parser:</strong> Path resolution for executables</li>
+                    <li><strong>Window Manager:</strong> Desktop and taskbar windows</li>
+                    <li><strong>Process Management:</strong> Process launching</li>
+                    <li><strong>Event System:</strong> Taskbar updates via EventBus</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="registry.html">Registry</a></li>
+                    <li><a href="path.html">Path Parser</a></li>
+                    <li><a href="file-type-associations.html">File Type Associations</a></li>
+                    <li><a href="window.html">Window Management</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

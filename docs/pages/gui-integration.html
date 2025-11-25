@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compositor - FreeWorld OS Documentation</title>
+    <title>GUI Integration - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -57,11 +57,6 @@
                 <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="drivers.html">Graphics Drivers</a></li>
                 <li><a href="gui-integration.html">GUI Integration</a></li>
-                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
-                <li><a href="window-relationships.html">Window Relationships</a></li>
-                <li><a href="menu.html">Menu System</a></li>
-                <li><a href="nonclient.html">Non-Client Area</a></li>
-                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="timer.html">Timer Manager</a></li>
                 <li><a href="property.html">Property Manager</a></li>
                 <li><a href="hooks.html">Hook Manager</a></li>
@@ -99,89 +94,95 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Compositor</h1>
+                <h1>GUI Integration</h1>
                 <div class="meta">
-                    <strong>Location:</strong> system/compositor.js<br>
-                    <strong>Type:</strong> Node.js Module<br>
-                    <strong>Purpose:</strong> Merges off-screen buffers before sending to screen
+                    <strong>Location:</strong> <code>system/integration.js</code><br>
+                    <strong>Type:</strong> System Integration Module<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
-                
-                <div class="alert alert-info">
-                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
-                </div>
+                <p>The GUI Integration module (<code>FreeWorldSystem</code> class) ties all GUI subsystems together, providing a unified entry point that initializes and connects all components. It ensures proper initialization order and subsystem communication.</p>
             </section>
 
             <section class="section">
-                <h2>Key Features</h2>
+                <h2>Initialized Subsystems</h2>
+                <p>The <code>FreeWorldSystem</code> class initializes the following subsystems:</p>
                 <ul>
-                    <li>Z-order management</li>
-                    <li>Transparency and alpha blending</li>
-                    <li>Shadow rendering</li>
-                    <li>Invalidation region calculation</li>
-                    <li>Window buffer registration</li>
+                    <li><strong>Error Manager</strong> - System-wide error handling</li>
+                    <li><strong>Security Manager</strong> - Security and permissions</li>
+                    <li><strong>Resource Manager</strong> - Global resource registry</li>
+                    <li><strong>Window Manager</strong> - Window creation and management</li>
+                    <li><strong>Compositor</strong> - Window compositing and rendering</li>
+                    <li><strong>Input Manager</strong> - Mouse and keyboard input</li>
+                    <li><strong>Clipboard</strong> - System clipboard</li>
+                    <li><strong>Drag & Drop Manager</strong> - Drag and drop functionality</li>
+                    <li><strong>Window Relationships</strong> - Parent-child window management</li>
+                    <li><strong>Menu Loop</strong> - Menu system</li>
+                    <li><strong>Non-Client Area</strong> - Window frames and controls</li>
+                    <li><strong>Timer Manager</strong> - System timers</li>
+                    <li><strong>Property Manager</strong> - Window properties</li>
+                    <li><strong>Hook Manager</strong> - System hooks</li>
+                    <li><strong>Focus Manager</strong> - Window focus and activation</li>
+                    <li><strong>Object Manager</strong> - Handle management</li>
+                    <li><strong>Path Parser</strong> - Path resolution</li>
+                    <li><strong>Registry</strong> - System registry</li>
+                    <li><strong>File System Watcher</strong> - File change notifications</li>
+                    <li><strong>Desktop</strong> - Desktop window</li>
+                    <li><strong>Taskbar</strong> - Taskbar window</li>
+                    <li><strong>Shell Execute</strong> - Application launching</li>
+                    <li><strong>Event Manager</strong> - System event logging</li>
+                    <li><strong>Event Bus</strong> - Event communication</li>
+                    <li><strong>Services Manager</strong> - Service management</li>
+                    <li><strong>Task Manager</strong> - Process monitoring</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Methods</h2>
-                
-                <h3>registerWindow(hwnd, dc)</h3>
-                <p>Registers a window's Device Context with the compositor.</p>
+                <h2>Subsystem Connections</h2>
+                <p>The integration module connects subsystems together:</p>
+                <ul>
+                    <li><strong>Compositor ↔ Window Manager:</strong> Window position and visibility information</li>
+                    <li><strong>Input Manager ↔ Window Manager:</strong> Message delivery to windows</li>
+                    <li><strong>Window Relationships ↔ Window Manager:</strong> Parent-child relationships</li>
+                    <li><strong>Focus Manager ↔ Window Manager:</strong> Window activation and focus</li>
+                    <li><strong>Event Manager ↔ Event Bus:</strong> Event logging and routing</li>
+                    <li><strong>Services Manager ↔ Event Bus:</strong> Service event handling</li>
+                </ul>
+            </section>
 
-                <h3>render() / composite()</h3>
-                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
+            <section class="section">
+                <h2>Usage</h2>
                 <div class="code-block">
-                    <pre>render() {
-    const graphicsBridge = require('./graphics-bridge');
-    
-    // Initialize graphics if needed
-    if (!graphicsBridge.initialized) {
-        graphicsBridge.init();
-    }
-    
-    // Clear screen
-    graphicsBridge.clear(0xFF000000);
-    
-    // Blit all windows to framebuffer
-    for (const window of windows) {
-        if (window.visible && window.dirty) {
-            graphicsBridge.blitWindow(
-                window.x, window.y,
-                window.width, window.height,
-                window.dc.buffer  // RGBA buffer
-            );
-            window.dirty = false;
-        }
-    }
-}</pre>
+                    <pre><code>const FreeWorldSystem = require('./system/integration');
+
+// Initialize the system
+const system = new FreeWorldSystem();
+
+// Start the system
+system.init();
+
+// Access subsystems
+const windowManager = system.windowManager;
+const compositor = system.compositor;
+const inputManager = system.inputManager;
+
+// Shutdown
+system.shutdown();</code></pre>
                 </div>
-
-                <h3>invalidateRegion(x, y, width, height)</h3>
-                <p>Calculates which windows intersect with an invalidated region.</p>
-
-                <h3>bringToTop(hwnd) / sendToBottom(hwnd)</h3>
-                <p>Manages window z-order.</p>
             </section>
 
             <section class="section">
-                <h2>Graphics Integration</h2>
-                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <h2>Related Documentation</h2>
                 <ul>
-                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
-                    <li>Blits window RGBA buffers directly to framebuffer</li>
-                    <li>Supports 1024x768x32 graphics mode</li>
-                    <li>Handles window dirty regions for efficient updates</li>
+                    <li><a href="integration.html">System Integration</a> - Overall system integration</li>
+                    <li><a href="dc.html">Device Context</a> - Rendering surfaces</li>
+                    <li><a href="compositor.html">Compositor</a> - Window compositing</li>
+                    <li><a href="input-manager.html">Input Manager</a> - Input handling</li>
+                    <li><a href="window.html">Window Management</a> - Window system</li>
                 </ul>
-                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
             </section>
         </main>
     </div>

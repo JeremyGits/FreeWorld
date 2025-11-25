@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compositor - FreeWorld OS Documentation</title>
+    <title>Hook Manager - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -57,11 +57,6 @@
                 <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="drivers.html">Graphics Drivers</a></li>
                 <li><a href="gui-integration.html">GUI Integration</a></li>
-                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
-                <li><a href="window-relationships.html">Window Relationships</a></li>
-                <li><a href="menu.html">Menu System</a></li>
-                <li><a href="nonclient.html">Non-Client Area</a></li>
-                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="timer.html">Timer Manager</a></li>
                 <li><a href="property.html">Property Manager</a></li>
                 <li><a href="hooks.html">Hook Manager</a></li>
@@ -99,89 +94,123 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Compositor</h1>
+                <h1>Hook Manager</h1>
                 <div class="meta">
-                    <strong>Location:</strong> system/compositor.js<br>
-                    <strong>Type:</strong> Node.js Module<br>
-                    <strong>Purpose:</strong> Merges off-screen buffers before sending to screen
+                    <strong>Location:</strong> <code>system/hooks.js</code><br>
+                    <strong>Type:</strong> GUI Subsystem<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
-                
-                <div class="alert alert-info">
-                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
-                </div>
+                <p>The Hook Manager provides Windows-compatible hook functionality, allowing applications to intercept system events before they reach their destination. Hooks enable system-wide monitoring, debugging, and custom behavior modification.</p>
             </section>
 
             <section class="section">
-                <h2>Key Features</h2>
+                <h2>Hook Types</h2>
+                <p>The Hook Manager supports the following hook types:</p>
                 <ul>
-                    <li>Z-order management</li>
-                    <li>Transparency and alpha blending</li>
-                    <li>Shadow rendering</li>
-                    <li>Invalidation region calculation</li>
-                    <li>Window buffer registration</li>
+                    <li><strong>WH_KEYBOARD:</strong> Keyboard input hooks</li>
+                    <li><strong>WH_MOUSE:</strong> Mouse input hooks</li>
+                    <li><strong>WH_CBT:</strong> Computer-Based Training hooks (window creation/destruction)</li>
+                    <li><strong>WH_CALLWNDPROC:</strong> Window procedure call hooks</li>
+                    <li><strong>WH_GETMESSAGE:</strong> Message retrieval hooks</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Methods</h2>
-                
-                <h3>registerWindow(hwnd, dc)</h3>
-                <p>Registers a window's Device Context with the compositor.</p>
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Global Hooks:</strong> System-wide event interception</li>
+                    <li><strong>Thread Hooks:</strong> Thread-specific event interception</li>
+                    <li><strong>Hook Chain:</strong> Multiple hooks can be installed for the same type</li>
+                    <li><strong>Hook Filtering:</strong> Hooks can prevent event processing</li>
+                </ul>
+            </section>
 
-                <h3>render() / composite()</h3>
-                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
+            <section class="section">
+                <h2>API</h2>
+                
+                <h3>setWindowsHookEx(hookType, callback, hMod, threadId)</h3>
+                <p>Installs a hook:</p>
+                <ul>
+                    <li><code>hookType</code> - Hook type (WH_KEYBOARD, WH_MOUSE, etc.)</li>
+                    <li><code>callback</code> - Hook callback function</li>
+                    <li><code>hMod</code> - Module handle (optional)</li>
+                    <li><code>threadId</code> - Thread ID (0 for global hook)</li>
+                </ul>
+                <p>Returns the hook ID.</p>
+
+                <h3>unhookWindowsHookEx(hookId)</h3>
+                <p>Uninstalls a hook:</p>
+                <ul>
+                    <li><code>hookId</code> - Hook ID to remove</li>
+                </ul>
+
+                <h3>callHooks(hookType, data)</h3>
+                <p>Invokes all hooks of a specific type:</p>
+                <ul>
+                    <li><code>hookType</code> - Hook type to call</li>
+                    <li><code>data</code> - Hook data</li>
+                </ul>
+                <p>Returns the result from the hook chain (non-zero stops processing).</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
                 <div class="code-block">
-                    <pre>render() {
-    const graphicsBridge = require('./graphics-bridge');
-    
-    // Initialize graphics if needed
-    if (!graphicsBridge.initialized) {
-        graphicsBridge.init();
-    }
-    
-    // Clear screen
-    graphicsBridge.clear(0xFF000000);
-    
-    // Blit all windows to framebuffer
-    for (const window of windows) {
-        if (window.visible && window.dirty) {
-            graphicsBridge.blitWindow(
-                window.x, window.y,
-                window.width, window.height,
-                window.dc.buffer  // RGBA buffer
-            );
-            window.dirty = false;
-        }
-    }
-}</pre>
+                    <pre><code>const HookManager = require('./system/hooks');
+
+const hookManager = new HookManager();
+
+// Install a keyboard hook
+const hookId = hookManager.setWindowsHookEx(
+    'WH_KEYBOARD',
+    (data) => {
+        console.log('Key pressed:', data.keyCode);
+        // Return 0 to continue processing, non-zero to block
+        return 0;
+    },
+    null,
+    0 // Global hook
+);
+
+// Later, remove the hook
+hookManager.unhookWindowsHookEx(hookId);</code></pre>
                 </div>
-
-                <h3>invalidateRegion(x, y, width, height)</h3>
-                <p>Calculates which windows intersect with an invalidated region.</p>
-
-                <h3>bringToTop(hwnd) / sendToBottom(hwnd)</h3>
-                <p>Manages window z-order.</p>
             </section>
 
             <section class="section">
-                <h2>Graphics Integration</h2>
-                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <h2>Hook Processing</h2>
+                <p>Hooks are processed in installation order:</p>
+                <ol>
+                    <li>System calls <code>callHooks()</code> with hook type and data</li>
+                    <li>Hook Manager iterates through installed hooks of that type</li>
+                    <li>Each hook callback is invoked with the data</li>
+                    <li>If a hook returns non-zero, processing may stop</li>
+                    <li>Result is returned to the caller</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Hook Manager integrates with:</p>
                 <ul>
-                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
-                    <li>Blits window RGBA buffers directly to framebuffer</li>
-                    <li>Supports 1024x768x32 graphics mode</li>
-                    <li>Handles window dirty regions for efficient updates</li>
+                    <li><strong>Input Manager:</strong> Keyboard and mouse hooks</li>
+                    <li><strong>Window Manager:</strong> Window creation/destruction hooks</li>
+                    <li><strong>Message System:</strong> Message processing hooks</li>
+                    <li><strong>GUI Integration:</strong> Initialized as part of the GUI system</li>
                 </ul>
-                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="input-manager.html">Input Manager</a> - Input handling</li>
+                    <li><a href="window.html">Window Management</a> - Window system</li>
+                    <li><a href="gui-integration.html">GUI Integration</a> - System integration</li>
+                </ul>
             </section>
         </main>
     </div>

@@ -75,6 +75,11 @@ Complete technical documentation for the FreeWorld Operating System.
 - ✅ [Windowing Architecture](pages/windowing-architecture.html) - Window system architecture
 - ✅ [GUI Kernel System](pages/gui-kernel.html) - Kernel-level GUI
 - ✅ [Window Management](pages/window.html) - Window API
+- ✅ [GUI Integration](pages/gui-integration.html) - System integration module
+- ✅ [Timer Manager](pages/timer.html) - SetTimer/KillTimer, WM_TIMER messages
+- ✅ [Property Manager](pages/property.html) - SetProp/GetProp, atom table
+- ✅ [Hook Manager](pages/hooks.html) - SetWindowsHookEx, system interception
+- ✅ [Focus Manager](pages/focus.html) - Window activation and control focus
 
 ### Rendering System
 - ✅ [Native Rendering Engine](pages/rendering-engine.html) - Hybrid rendering engine (All 5 Phases Complete)
@@ -84,16 +89,20 @@ Complete technical documentation for the FreeWorld Operating System.
   - Phase 4: Image System (C) - BMP/ICO support, scaling, caching
   - Phase 5: Layout Engine (C) - 7 layout algorithms, alignment, spacing
 - ⏳ [ASM Browser Engine (Legacy)](pages/browser-engine.html) - Original pure ASM concept (superseded)
+- ✅ [Node.js Integration](pages/browser-nodejs.html) - Node.js interface to rendering system
+- ✅ [Rendering System](pages/browser-rendering.html) - Complete rendering pipeline documentation
+- ✅ [Network Stack](pages/browser-network.html) - Network stack for rendering system
 
 ### System Services
 - ✅ [Graphics System](pages/graphics.html) - Graphics subsystem
-- ⏳ [Object Manager](pages/object-manager.html) - Handle management, file operations
-- ⏳ [Path Parser](pages/path.html) - Virtual drives, path resolution
-- ⏳ [Registry](pages/registry.html) - Hive management, key/value operations
-- ⏳ [File System Watcher](pages/filesystem-watcher.html) - Directory change notifications
-- ⏳ [Security Manager](pages/security.html) - Sessions, tokens, ACLs
-- ⏳ [Error Manager](pages/error.html) - GetLastError, OutputDebugString
-- ⏳ [Shell Ecosystem](pages/shell-ecosystem.html) - Desktop, Taskbar, ShellExecute
+- ✅ [Object Manager](pages/object-manager.html) - Handle management, file operations (Fully Implemented)
+- ✅ [Path Parser](pages/path.html) - Virtual drives, path resolution, UNC paths (Fully Implemented)
+- ✅ [Registry](pages/registry.html) - Hive management, key/value operations, transactions (Fully Implemented)
+- ✅ [File System Watcher](pages/filesystem-watcher.html) - Directory change notifications, filtering (Fully Implemented)
+- ✅ [Security Manager](pages/security.html) - Sessions, tokens, ACLs, SID generation (Fully Implemented)
+- ✅ [Error Manager](pages/error.html) - GetLastError, OutputDebugString, 200+ error codes (Fully Implemented)
+- ✅ [Shell Ecosystem](pages/shell-ecosystem.html) - Desktop, Taskbar, ShellExecute, file associations (Fully Implemented)
+- ✅ [User Account Management](pages/user-accounts.html) - User/group management, authentication, permissions (Fully Implemented)
 
 ### IPC & Communication
 - ✅ [IPC System](pages/ipc-system.html) - Core IPC for all services
@@ -157,14 +166,20 @@ Complete technical documentation for the FreeWorld Operating System.
 - **logd Integration**: IPC + EventBus audit logging
 - **networkd Integration**: IPC for runtime configuration
 - **securityd Integration**: IPC for user/group management
+- **System Services**: All fully implemented
+  - **Object Manager**: Complete handle management, file operations, pipes, events, mutexes
+  - **Path Parser**: Full path resolution, UNC support, virtual drive management
+  - **Registry**: Complete hive management, transactions, import/export, persistence
+  - **File System Watcher**: Directory/file watching with filtering and buffering
+  - **Security Manager**: Session/token management, ACL validation, SID generation
+  - **Error Manager**: 200+ error codes, GetLastError/SetLastError, OutputDebugString with logd integration
+  - **Shell Ecosystem**: Desktop, Taskbar, ShellExecute with full file association support
 
 ### ⚠️ Partially Implemented
 - **GUI Subsystems**: Some components fully implemented, others structural only
-- **System Services**: Registry, Object Manager, Path Parser need full implementation
 
 ### ⏳ Structural Implementation Only
-- **GUI Subsystems**: Class definitions, method signatures, basic logic
-- **System Services**: Registry, Object Manager, Path Parser, etc.
+- **GUI Subsystems**: Some class definitions, method signatures, basic logic
 - These provide structure but not yet production-ready functionality
 
 ## Recent Additions
@@ -184,6 +199,54 @@ Complete technical documentation for the FreeWorld Operating System.
 - **DHCP Client** (`services/networkd/dhcp_client.c`): Complete DHCP implementation with discover, offer, request, ACK, renewal, lease management
 - **Routing Table** (`services/networkd/routing.c`): Complete routing implementation with add, delete, lookup, longest prefix match, default routes
 - **securityd Daemon** (`services/securityd/securityd.c`): Complete daemon implementation with user/group management, IPC integration, access control framework
+
+### System Services (Complete Implementation)
+- **Object Manager** (`system/object-manager.js`): Complete handle management system
+  - File operations (read/write with filesystem integration)
+  - File pointer management (seek, get size)
+  - Directory objects
+  - Pipe objects (named pipes, read/write)
+  - Event objects (set/reset/wait)
+  - Mutex objects (lock/unlock)
+  - Handle tracking and conflict detection
+- **Path Parser** (`system/path.js`): Complete path resolution system
+  - Virtual drive management (register/unregister)
+  - UNC path support (`\\server\share\path`)
+  - Path normalization and resolution
+  - Path component splitting
+  - Drive information and validation
+- **Registry** (`system/registry.js`): Complete registry system
+  - Full hive management (HKLM, HKCU, HKCR, HKU, HKCC)
+  - Key/value operations (create, read, update, delete)
+  - Transaction support (begin/commit/rollback)
+  - Import/export functionality
+  - Auto-load and persistence
+- **File System Watcher** (`system/filesystem-watcher.js`): Complete file monitoring
+  - Directory watching with recursive support
+  - File watching
+  - Filtering (by filename, extension, event types)
+  - Buffered change collection
+  - Multiple path watching
+  - Pause/resume functionality
+- **Error Manager** (`system/error.js`): Complete error handling
+  - 200+ Windows-compatible error codes
+  - GetLastError/SetLastError (per-thread)
+  - OutputDebugString with logd integration
+  - Error message formatting
+  - Debug output management
+- **Security Manager** (`system/security.js`): Complete security system
+  - Session management (create/destroy)
+  - Access token management
+  - ACL checking and validation
+  - Token impersonation
+  - SID generation
+  - Security descriptor creation/validation
+- **Shell Ecosystem** (`system/shell.js`): Complete shell system
+  - Desktop window management
+  - Taskbar with task buttons and notification area
+  - ShellExecute with process launching
+  - File association management (registry-integrated)
+  - Verb support (open, edit, print, etc.)
 
 ### Filesystem & Program Execution
 - **FAT32 Filesystem**: Complete FAT32 parser with directory traversal and file reading
@@ -231,20 +294,38 @@ Complete technical documentation for the FreeWorld Operating System.
 - **Core System**: 100% documented (13 pages including filesystem, ELF loader, execve, minimal libc, build system)
 - **Networking Stack**: ⏳ Needs documentation pages (IP, TCP, UDP, ICMP, Port Manager, Ethernet drivers)
 - **Services**: 100% documented (including networkd, securityd)
-- **Rendering System**: 100% documented
+- **Rendering System**: 100% documented (including Node.js integration, rendering system, network stack)
 - **IPC System**: Documented in service pages
 - **User Interface**: 100% documented
-- **GUI Subsystems**: ~60% documented (many pages created)
-- **System Services**: ~30% documented (some pages created)
+- **GUI Subsystems**: 100% documented (all pages created and updated with consistent structure)
+- **System Services**: 100% documented (all pages created and updated, including user account management)
 - **Node.js System**: 100% documented
 - **Reference**: 100% documented
 
 ### New Documentation Pages (Latest Update)
-- ✅ **filesystem-kernel.html** - FAT32 filesystem parser and ATA disk driver
-- ✅ **elf-loader.html** - ELF executable loader (32-bit and 64-bit)
-- ✅ **execve.html** - execve() system call for program execution
-- ✅ **minimal-libc.html** - Minimal C library documentation
-- ✅ **build-system.html** - Build system and cross-compilation toolchain
+- ✅ **filesystem-kernel.html** - FAT32 filesystem parser and ATA disk driver (Fixed structure)
+- ✅ **elf-loader.html** - ELF executable loader (32-bit and 64-bit) (Fixed structure)
+- ✅ **execve.html** - execve() system call for program execution (Fixed structure)
+- ✅ **minimal-libc.html** - Minimal C library documentation (Fixed structure)
+- ✅ **build-system.html** - Build system and cross-compilation toolchain (Fixed structure)
+- ✅ **dc.html** - Device Context (Fixed structure)
+- ✅ **compositor.html** - Compositor (Updated navigation)
+- ✅ **object-manager.html** - Object Manager (handle management, file operations, pipes, events, mutexes)
+- ✅ **path.html** - Path Parser (virtual drives, UNC paths, path resolution)
+- ✅ **registry.html** - Registry (hive management, transactions, import/export)
+- ✅ **filesystem-watcher.html** - File System Watcher (directory/file monitoring, filtering)
+- ✅ **security.html** - Security Manager (sessions, tokens, ACLs, SID generation)
+- ✅ **error.html** - Error Manager (GetLastError, OutputDebugString, 200+ error codes)
+- ✅ **shell-ecosystem.html** - Shell Ecosystem (Desktop, Taskbar, ShellExecute)
+- ✅ **user-accounts.html** - User Account Management (user/group management, authentication, permissions)
+- ✅ **gui-integration.html** - GUI Integration (system integration module)
+- ✅ **timer.html** - Timer Manager (SetTimer/KillTimer, WM_TIMER messages)
+- ✅ **property.html** - Property Manager (SetProp/GetProp, atom table)
+- ✅ **hooks.html** - Hook Manager (SetWindowsHookEx, system interception)
+- ✅ **focus.html** - Focus Manager (window activation and control focus)
+- ✅ **browser-nodejs.html** - Node.js Integration (Node.js interface to rendering system)
+- ✅ **browser-rendering.html** - Rendering System (complete rendering pipeline)
+- ✅ **browser-network.html** - Network Stack (network stack for rendering system)
 
 ### Networking Documentation Pages (To Create)
 - ⏳ **network-ip.html** - IP layer implementation
@@ -295,12 +376,26 @@ Open `index.html` in a web browser to view the documentation. The navigation sid
 ## Documentation Structure
 
 The documentation is organized into HTML pages with:
-- **Navigation sidebar** on every page for easy access
+- **Navigation sidebar** on every page for easy access (full menu matching index.html)
+- **Consistent structure** across all pages:
+  - `<main class="content">` wrapper
+  - `<div class="page-header">` with title and metadata
+  - `<section class="section">` for content sections
+  - Footer with version information
+  - Navigation script for dynamic features
 - **Status badges** indicating implementation status
 - **Code examples** and usage patterns
 - **Architecture diagrams** and data flow explanations
 - **Integration points** showing how components work together
 - **Related documentation** links for cross-referencing
+
+### Documentation Consistency (Latest Update)
+All documentation pages have been standardized with:
+- ✅ Full navigation menu on every page
+- ✅ Consistent page structure (page-header, section classes)
+- ✅ Footer and navigation script
+- ✅ Uniform formatting and styling
+- ✅ All pages match the BOOTMGR page format
 
 ## Key Features
 
@@ -323,13 +418,32 @@ Every major component has:
 - Navigation sidebar on every page
 - Index page provides complete overview
 
+## Recent Documentation Updates
+
+### Documentation Structure Fixes (Latest)
+- ✅ Fixed 7 pages with incorrect structure:
+  - execve.html, filesystem-kernel.html, elf-loader.html, minimal-libc.html, build-system.html, dc.html, compositor.html
+- ✅ Created 8 missing documentation pages:
+  - gui-integration.html, timer.html, property.html, hooks.html, focus.html, browser-nodejs.html, browser-rendering.html, browser-network.html
+- ✅ Standardized all pages with:
+  - Full navigation menu matching index.html
+  - Consistent structure (page-header, section classes)
+  - Footer and navigation script
+  - Uniform formatting
+
+### User Account Management System (Latest)
+- ✅ **user-accounts.html** - Complete user account management documentation
+  - User/group management
+  - Authentication system (PBKDF2-SHA512)
+  - Permissions and access control
+  - Account policies (locking, expiration)
+  - Session management
+
 ## Next Steps
 
 1. Create networking documentation pages (IP, TCP, UDP, ICMP, Port Manager, Ethernet drivers)
-2. Complete remaining GUI subsystem documentation pages
-3. Complete System Services documentation pages
-4. Update all pages with latest implementation status
-5. Add integration examples for networking stack usage
-6. Add more code examples and usage patterns
-7. Create troubleshooting guides for common issues
-8. Document network service integration (GUI server, HTTP/WebSocket support)
+2. Add integration examples for networking stack usage
+3. Add more code examples and usage patterns
+4. Create troubleshooting guides for common issues
+5. Document network service integration (GUI server, HTTP/WebSocket support)
+6. Add more detailed architecture diagrams

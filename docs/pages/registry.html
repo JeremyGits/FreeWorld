@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registry - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Registry</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/registry.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Registry provides Windows-compatible registry functionality for FreeWorld OS. It manages registry hives (HKLM, HKCU, HKCR, etc.), keys, values, and provides transaction support, import/export, and automatic persistence.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Hive Management:</strong> Complete support for all standard Windows registry hives</li>
+                    <li><strong>Key/Value Operations:</strong> Create, read, update, delete keys and values</li>
+                    <li><strong>Transaction Support:</strong> Begin, commit, and rollback registry transactions</li>
+                    <li><strong>Import/Export:</strong> Save and load registry hives to/from disk</li>
+                    <li><strong>Auto-Load:</strong> Automatic persistence on startup</li>
+                    <li><strong>Value Types:</strong> Support for REG_SZ, REG_DWORD, REG_QWORD, REG_BINARY, REG_MULTI_SZ</li>
+                    <li><strong>Key Enumeration:</strong> List subkeys and values</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Registry Hives</h2>
+                <p>The Registry supports all standard Windows registry hives:</p>
+                <ul>
+                    <li><strong>HKEY_LOCAL_MACHINE (HKLM):</strong> System-wide configuration</li>
+                    <li><strong>HKEY_CURRENT_USER (HKCU):</strong> User-specific configuration</li>
+                    <li><strong>HKEY_CLASSES_ROOT (HKCR):</strong> File associations and COM classes</li>
+                    <li><strong>HKEY_USERS (HKU):</strong> All user profiles</li>
+                    <li><strong>HKEY_CURRENT_CONFIG (HKCC):</strong> Current hardware configuration</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Key Operations</h2>
+                <ul>
+                    <li><code class="code-inline">openKey(hKey, subKey, access)</code> - Open a registry key</li>
+                    <li><code class="code-inline">createKeyPath(hKey, subKey)</code> - Create a registry key path</li>
+                    <li><code class="code-inline">deleteKey(hKey, subKey)</code> - Delete a registry key</li>
+                    <li><code class="code-inline">enumerateKeys(hKey, subKey)</code> - List all subkeys</li>
+                    <li><code class="code-inline">keyExists(hKey, subKey)</code> - Check if key exists</li>
+                    <li><code class="code-inline">getKeyInfo(hKey, subKey)</code> - Get key information</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Value Operations</h2>
+                <ul>
+                    <li><code class="code-inline">setValue(hKey, subKey, valueName, value, type)</code> - Set a registry value</li>
+                    <li><code class="code-inline">queryValue(hKey, subKey, valueName)</code> - Query a registry value</li>
+                    <li><code class="code-inline">queryValues(hKey, subKey)</code> - Query all values in a key</li>
+                    <li><code class="code-inline">deleteValue(hKey, subKey, valueName)</code> - Delete a registry value</li>
+                    <li><code class="code-inline">enumerateValues(hKey, subKey)</code> - List all values</li>
+                    <li><code class="code-inline">valueExists(hKey, subKey, valueName)</code> - Check if value exists</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Value Types</h2>
+                <p>The Registry supports the following value types:</p>
+                <ul>
+                    <li><strong>REG_SZ:</strong> String value</li>
+                    <li><strong>REG_DWORD:</strong> 32-bit integer</li>
+                    <li><strong>REG_QWORD:</strong> 64-bit integer</li>
+                    <li><strong>REG_BINARY:</strong> Binary data</li>
+                    <li><strong>REG_MULTI_SZ:</strong> Multiple strings</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Transactions</h2>
+                <p>The Registry supports transactions for atomic operations:</p>
+                <ul>
+                    <li><code class="code-inline">beginTransaction()</code> - Begin a transaction (creates snapshot)</li>
+                    <li><code class="code-inline">commitTransaction(transaction)</code> - Commit transaction (saves to disk)</li>
+                    <li><code class="code-inline">rollbackTransaction(transaction)</code> - Rollback transaction (restore from snapshot)</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Persistence</h2>
+                <p>The Registry automatically saves and loads hives from disk:</p>
+                <ul>
+                    <li><code class="code-inline">flush()</code> - Save all hives to disk</li>
+                    <li><code class="code-inline">saveHiveToDisk(hiveName, filePath)</code> - Save single hive to disk</li>
+                    <li><code class="code-inline">loadHiveFromDisk(hiveName, filePath)</code> - Load single hive from disk</li>
+                    <li><code class="code-inline">exportKey(hKey, subKey, filePath)</code> - Export key to file</li>
+                    <li><code class="code-inline">importKey(hKey, subKey, filePath)</code> - Import key from file</li>
+                    <li><code class="code-inline">autoLoad()</code> - Automatically load all hives on startup</li>
+                </ul>
+                <p>Registry data is stored in JSON format in the <code class="code-inline">registry/</code> directory.</p>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const Registry = require('./system/registry');
+
+const registry = new Registry();
+
+// Set a value
+registry.setValue('HKEY_LOCAL_MACHINE', 'SOFTWARE\\FreeWorld', 'Version', '1.0.0', 'REG_SZ');
+
+// Query a value
+const version = registry.queryValue('HKEY_LOCAL_MACHINE', 'SOFTWARE\\FreeWorld', 'Version');
+console.log(version.data); // '1.0.0'
+
+// Create a key
+registry.createKeyPath('HKEY_CURRENT_USER', 'Software\\MyApp');
+
+// Set multiple values
+registry.setValue('HKEY_CURRENT_USER', 'Software\\MyApp', 'Setting1', 'value1', 'REG_SZ');
+registry.setValue('HKEY_CURRENT_USER', 'Software\\MyApp', 'Setting2', 42, 'REG_DWORD');
+
+// Enumerate values
+const values = registry.enumerateValues('HKEY_CURRENT_USER', 'Software\\MyApp');
+// Returns: ['Setting1', 'Setting2']
+
+// Flush to disk
+registry.flush();</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Registry integrates with:</p>
+                <ul>
+                    <li><strong>ShellExecute:</strong> Used for file association management</li>
+                    <li><strong>System Configuration:</strong> Stores system-wide settings</li>
+                    <li><strong>Application Settings:</strong> Stores application-specific settings</li>
+                    <li><strong>File Associations:</strong> Manages file type associations</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                    <li><a href="file-type-associations.html">File Type Associations</a></li>
+                    <li><a href="object-manager.html">Object Manager</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

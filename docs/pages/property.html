@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compositor - FreeWorld OS Documentation</title>
+    <title>Property Manager - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -57,11 +57,6 @@
                 <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="drivers.html">Graphics Drivers</a></li>
                 <li><a href="gui-integration.html">GUI Integration</a></li>
-                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
-                <li><a href="window-relationships.html">Window Relationships</a></li>
-                <li><a href="menu.html">Menu System</a></li>
-                <li><a href="nonclient.html">Non-Client Area</a></li>
-                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="timer.html">Timer Manager</a></li>
                 <li><a href="property.html">Property Manager</a></li>
                 <li><a href="hooks.html">Hook Manager</a></li>
@@ -99,89 +94,107 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Compositor</h1>
+                <h1>Property Manager</h1>
                 <div class="meta">
-                    <strong>Location:</strong> system/compositor.js<br>
-                    <strong>Type:</strong> Node.js Module<br>
-                    <strong>Purpose:</strong> Merges off-screen buffers before sending to screen
+                    <strong>Location:</strong> <code>system/property.js</code><br>
+                    <strong>Type:</strong> GUI Subsystem<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
-                
-                <div class="alert alert-info">
-                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
-                </div>
+                <p>The Property Manager provides Windows-compatible property storage, allowing applications to attach arbitrary data to window handles without modifying the window class. This enables flexible data storage and retrieval for windows and controls.</p>
             </section>
 
             <section class="section">
-                <h2>Key Features</h2>
+                <h2>Features</h2>
                 <ul>
-                    <li>Z-order management</li>
-                    <li>Transparency and alpha blending</li>
-                    <li>Shadow rendering</li>
-                    <li>Invalidation region calculation</li>
-                    <li>Window buffer registration</li>
+                    <li><strong>SetProp:</strong> Attach data to window handles</li>
+                    <li><strong>GetProp:</strong> Retrieve data from window handles</li>
+                    <li><strong>RemoveProp:</strong> Remove properties from windows</li>
+                    <li><strong>Atom Table:</strong> String-to-integer atom mapping</li>
+                    <li><strong>Custom Atoms:</strong> User-defined atom IDs (starting at 0xC000)</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Methods</h2>
-                
-                <h3>registerWindow(hwnd, dc)</h3>
-                <p>Registers a window's Device Context with the compositor.</p>
+                <h2>Atom Management</h2>
+                <p>Atoms are integer identifiers for strings, similar to Windows atom tables:</p>
+                <ul>
+                    <li><strong>findAtom(string):</strong> Find atom ID for a string</li>
+                    <li><strong>addAtom(string):</strong> Create or retrieve atom for a string</li>
+                    <li><strong>Custom Atoms:</strong> Start at 0xC000 (Windows-compatible)</li>
+                </ul>
+            </section>
 
-                <h3>render() / composite()</h3>
-                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
+            <section class="section">
+                <h2>API</h2>
+                
+                <h3>setProp(hwnd, atomOrString, value)</h3>
+                <p>Attaches a property to a window:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle</li>
+                    <li><code>atomOrString</code> - Atom ID or string name</li>
+                    <li><code>value</code> - Property value (any type)</li>
+                </ul>
+
+                <h3>getProp(hwnd, atomOrString)</h3>
+                <p>Retrieves a property from a window:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle</li>
+                    <li><code>atomOrString</code> - Atom ID or string name</li>
+                </ul>
+                <p>Returns the property value or <code>null</code> if not found.</p>
+
+                <h3>removeProp(hwnd, atomOrString)</h3>
+                <p>Removes a property from a window:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle</li>
+                    <li><code>atomOrString</code> - Atom ID or string name</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
                 <div class="code-block">
-                    <pre>render() {
-    const graphicsBridge = require('./graphics-bridge');
-    
-    // Initialize graphics if needed
-    if (!graphicsBridge.initialized) {
-        graphicsBridge.init();
-    }
-    
-    // Clear screen
-    graphicsBridge.clear(0xFF000000);
-    
-    // Blit all windows to framebuffer
-    for (const window of windows) {
-        if (window.visible && window.dirty) {
-            graphicsBridge.blitWindow(
-                window.x, window.y,
-                window.width, window.height,
-                window.dc.buffer  // RGBA buffer
-            );
-            window.dirty = false;
-        }
-    }
-}</pre>
+                    <pre><code>const PropertyManager = require('./system/property');
+
+const propManager = new PropertyManager();
+
+// Set a property using a string
+propManager.setProp(hwnd, 'MyProperty', { data: 'value' });
+
+// Get the property
+const value = propManager.getProp(hwnd, 'MyProperty');
+
+// Or use an atom
+const atom = propManager.addAtom('MyProperty');
+propManager.setProp(hwnd, atom, { data: 'value' });
+const value2 = propManager.getProp(hwnd, atom);
+
+// Remove the property
+propManager.removeProp(hwnd, 'MyProperty');</code></pre>
                 </div>
-
-                <h3>invalidateRegion(x, y, width, height)</h3>
-                <p>Calculates which windows intersect with an invalidated region.</p>
-
-                <h3>bringToTop(hwnd) / sendToBottom(hwnd)</h3>
-                <p>Manages window z-order.</p>
             </section>
 
             <section class="section">
-                <h2>Graphics Integration</h2>
-                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <h2>Integration</h2>
+                <p>The Property Manager integrates with:</p>
                 <ul>
-                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
-                    <li>Blits window RGBA buffers directly to framebuffer</li>
-                    <li>Supports 1024x768x32 graphics mode</li>
-                    <li>Handles window dirty regions for efficient updates</li>
+                    <li><strong>Window Manager:</strong> Properties are stored per window handle</li>
+                    <li><strong>GUI Integration:</strong> Initialized as part of the GUI system</li>
+                    <li><strong>Controls:</strong> Used by controls to store internal state</li>
                 </ul>
-                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="window.html">Window Management</a> - Window handles</li>
+                    <li><a href="gui-integration.html">GUI Integration</a> - System integration</li>
+                    <li><a href="controls.html">Standard Controls</a> - Control properties</li>
+                </ul>
             </section>
         </main>
     </div>

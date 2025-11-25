@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Account Management - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li><a href="user-accounts.html">User Account Management</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>User Account Management</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/user-accounts.js</code>, <code>system/authentication.js</code>, <code>system/permissions.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The User Account Management system provides comprehensive user and group management, authentication, and permissions for FreeWorld OS. It includes user account creation/deletion, password management, account policies, privilege management, and access control.</p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>1. UserAccountManager</h3>
+                <p><strong>Location:</strong> <code>system/user-accounts.js</code></p>
+                <p>Manages user accounts and groups:</p>
+                <ul>
+                    <li>User creation, deletion, and modification</li>
+                    <li>Group management</li>
+                    <li>Account policies (locking, expiration)</li>
+                    <li>Persistent storage (JSON files)</li>
+                </ul>
+
+                <h3>2. AuthenticationSystem</h3>
+                <p><strong>Location:</strong> <code>system/authentication.js</code></p>
+                <p>Handles authentication and password management:</p>
+                <ul>
+                    <li>Password hashing (PBKDF2-SHA512)</li>
+                    <li>Password verification</li>
+                    <li>Login sessions</li>
+                    <li>Password policies</li>
+                </ul>
+
+                <h3>3. PermissionsManager</h3>
+                <p><strong>Location:</strong> <code>system/permissions.js</code></p>
+                <p>Manages privileges and access control:</p>
+                <ul>
+                    <li>Privilege definition and assignment</li>
+                    <li>Access control checking</li>
+                    <li>ACL (Access Control List) support</li>
+                    <li>Policy enforcement</li>
+                </ul>
+
+                <h3>4. FreeWorldLogon</h3>
+                <p><strong>Location:</strong> <code>system/freeworldlogon.js</code></p>
+                <p>Provides login service integration:</p>
+                <ul>
+                    <li>User login/logout</li>
+                    <li>Session management</li>
+                    <li>Integration with authentication and permissions</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>User Management</h2>
+                
+                <h3>Creating Users</h3>
+                <div class="code-block">
+                    <pre><code>const UserAccountManager = require('./system/user-accounts');
+
+const userAccounts = new UserAccountManager();
+
+// Create a new user
+const user = userAccounts.createUser('john', {
+    home: '/home/john',
+    shell: '/bin/sh',
+    groups: ['Users'],
+    fullName: 'John Doe',
+    email: 'john@example.com',
+    description: 'Regular user account'
+});
+
+console.log('Created user:', user.username, 'UID:', user.uid);</code></pre>
+                </div>
+
+                <h3>User Properties</h3>
+                <p>Each user has the following properties:</p>
+                <ul>
+                    <li><code class="code-inline">username</code> - Username (1-32 characters)</li>
+                    <li><code class="code-inline">uid</code> - User ID (unique numeric identifier)</li>
+                    <li><code class="code-inline">gid</code> - Primary group ID</li>
+                    <li><code class="code-inline">home</code> - Home directory path</li>
+                    <li><code class="code-inline">shell</code> - Default shell</li>
+                    <li><code class="code-inline">groups</code> - Array of group names</li>
+                    <li><code class="code-inline">passwordHash</code> - Hashed password (PBKDF2)</li>
+                    <li><code class="code-inline">accountLocked</code> - Whether account is locked</li>
+                    <li><code class="code-inline">accountExpires</code> - Account expiration date</li>
+                    <li><code class="code-inline">lastLogin</code> - Last login timestamp</li>
+                    <li><code class="code-inline">failedLoginAttempts</code> - Number of failed login attempts</li>
+                </ul>
+
+                <h3>Modifying Users</h3>
+                <div class="code-block">
+                    <pre><code>// Modify user properties
+userAccounts.modifyUser('john', {
+    home: '/home/john.doe',
+    fullName: 'John A. Doe',
+    email: 'john.doe@example.com'
+});</code></pre>
+                </div>
+
+                <h3>Deleting Users</h3>
+                <div class="code-block">
+                    <pre><code>// Delete user (cannot delete root or SYSTEM)
+userAccounts.deleteUser('john');</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Authentication</h2>
+                
+                <h3>Password Management</h3>
+                <div class="code-block">
+                    <pre><code>const AuthenticationSystem = require('./system/authentication');
+
+const auth = new AuthenticationSystem();
+
+// Set user password (validates strength)
+auth.setUserPassword('john', 'SecurePassword123!');
+
+// Change password (requires old password)
+auth.changeUserPassword('john', 'OldPassword', 'NewPassword123!');</code></pre>
+                </div>
+
+                <h3>Password Requirements</h3>
+                <ul>
+                    <li>Minimum 8 characters</li>
+                    <li>Maximum 128 characters</li>
+                    <li>At least one uppercase letter</li>
+                    <li>At least one lowercase letter</li>
+                    <li>At least one number</li>
+                </ul>
+
+                <h3>Login</h3>
+                <div class="code-block">
+                    <pre><code>const FreeWorldLogon = require('./system/freeworldlogon');
+
+const logon = new FreeWorldLogon();
+
+// Login user
+const loginResult = logon.login('john', 'SecurePassword123!');
+
+if (loginResult.success) {
+    console.log('Session ID:', loginResult.session.sessionId);
+    console.log('User:', loginResult.user.username);
+} else {
+    console.error('Login failed:', loginResult.error);
+}</code></pre>
+                </div>
+
+                <h3>Password Hashing</h3>
+                <p>Passwords are hashed using PBKDF2-SHA512:</p>
+                <ul>
+                    <li><strong>Algorithm:</strong> PBKDF2 with SHA-512</li>
+                    <li><strong>Iterations:</strong> 100,000</li>
+                    <li><strong>Key Length:</strong> 512 bits (64 bytes)</li>
+                    <li><strong>Salt:</strong> 32-byte random salt per password</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Account Policies</h2>
+                
+                <h3>Account Locking</h3>
+                <div class="code-block">
+                    <pre><code>// Lock account
+userAccounts.lockAccount('john');
+
+// Unlock account
+userAccounts.unlockAccount('john');
+
+// Check if account is locked
+const isLocked = userAccounts.isAccountLocked('john');</code></pre>
+                </div>
+
+                <h3>Account Expiration</h3>
+                <div class="code-block">
+                    <pre><code>// Set account expiration (1 year from now)
+const expirationDate = new Date();
+expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+userAccounts.setAccountExpiration('john', expirationDate.toISOString());
+
+// Remove expiration
+userAccounts.setAccountExpiration('john', null);</code></pre>
+                </div>
+
+                <h3>Failed Login Tracking</h3>
+                <p>The system automatically tracks failed login attempts:</p>
+                <ul>
+                    <li>After 5 failed attempts, account is automatically locked</li>
+                    <li>Failed attempts are reset on successful login</li>
+                    <li>Failed attempts can be manually reset</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Group Management</h2>
+                
+                <h3>Creating Groups</h3>
+                <div class="code-block">
+                    <pre><code>// Create a new group
+const group = userAccounts.createGroup('Developers', {
+    description: 'Software developers'
+});
+
+console.log('Created group:', group.name, 'GID:', group.gid);</code></pre>
+                </div>
+
+                <h3>Adding Users to Groups</h3>
+                <div class="code-block">
+                    <pre><code>// Add user to group
+userAccounts.addUserToGroup('john', 'Developers');
+
+// Remove user from group
+userAccounts.removeUserFromGroup('john', 'Developers');
+
+// Get user's groups
+const groups = userAccounts.getUserGroups('john');</code></pre>
+                </div>
+
+                <h3>Default Groups</h3>
+                <ul>
+                    <li><strong>root</strong> (GID 0) - Root user group</li>
+                    <li><strong>wheel</strong> (GID 1) - Administrative group</li>
+                    <li><strong>Users</strong> (GID 1000) - Regular users</li>
+                    <li><strong>Administrators</strong> (GID 544) - Administrators</li>
+                    <li><strong>SYSTEM</strong> (GID 18) - System accounts</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Permissions and Privileges</h2>
+                
+                <h3>Privileges</h3>
+                <p>The system supports the following privileges:</p>
+                <ul>
+                    <li><strong>SeSystemtimePrivilege</strong> - Change system time</li>
+                    <li><strong>SeShutdownPrivilege</strong> - Shut down the system</li>
+                    <li><strong>SeBackupPrivilege</strong> - Back up files</li>
+                    <li><strong>SeRestorePrivilege</strong> - Restore files</li>
+                    <li><strong>SeCreateUserPrivilege</strong> - Create user accounts</li>
+                    <li><strong>SeDeleteUserPrivilege</strong> - Delete user accounts</li>
+                    <li><strong>SeModifyUserPrivilege</strong> - Modify user accounts</li>
+                    <li><strong>SeTakeOwnershipPrivilege</strong> - Take ownership of files</li>
+                    <li><strong>SeSecurityPrivilege</strong> - Manage security settings</li>
+                    <li><strong>SeNetworkLogonRight</strong> - Network logon</li>
+                    <li><strong>SeInteractiveLogonRight</strong> - Local logon</li>
+                </ul>
+
+                <h3>Granting Privileges</h3>
+                <div class="code-block">
+                    <pre><code>const PermissionsManager = require('./system/permissions');
+
+const permissions = new PermissionsManager();
+
+// Grant privilege to user
+permissions.grantPrivilege('john', 'SeCreateUserPrivilege');
+
+// Revoke privilege
+permissions.revokePrivilege('john', 'SeCreateUserPrivilege');
+
+// Check if user has privilege
+const hasPrivilege = permissions.hasPrivilege('john', 'SeCreateUserPrivilege');
+
+// Get user's privileges
+const userPrivileges = permissions.getUserPrivileges('john');</code></pre>
+                </div>
+
+                <h3>Access Control</h3>
+                <div class="code-block">
+                    <pre><code>// Check if user can access resource
+const resource = {
+    path: '/home/john/document.txt',
+    owner: 'john',
+    ownerUid: 1001,
+    group: 'Users',
+    permissions: {
+        owner: { read: true, write: true, execute: false },
+        group: { read: true, write: false, execute: false },
+        others: { read: false, write: false, execute: false }
+    }
+};
+
+const accessResult = permissions.checkAccess('john', resource, 'read');
+console.log('Can read:', accessResult.allowed, accessResult.reason);</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Storage</h2>
+                <p>User and group data is stored in JSON files:</p>
+                <ul>
+                    <li><code class="code-inline">var/lib/users.json</code> - User accounts</li>
+                    <li><code class="code-inline">var/lib/groups.json</code> - Groups</li>
+                </ul>
+                <p>Data is automatically saved after each modification operation.</p>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The User Account Management system integrates with:</p>
+                <ul>
+                    <li><strong>FreeWorld Logon:</strong> User authentication and login</li>
+                    <li><strong>Security Manager:</strong> Session and token management</li>
+                    <li><strong>File System:</strong> File ownership and permissions</li>
+                    <li><strong>Shell:</strong> User context for commands</li>
+                    <li><strong>Process Management:</strong> Process ownership and privileges</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="security.html">Security Manager</a></li>
+                    <li><a href="securityd.html">securityd</a></li>
+                    <li><a href="freeworldlogon.html">FreeWorld Logon</a></li>
+                    <li><a href="filesystem-kernel.html">File System</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

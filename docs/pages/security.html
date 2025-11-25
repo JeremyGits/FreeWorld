@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Security Manager</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/security.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Security Manager provides comprehensive security and access control for FreeWorld OS. It manages user sessions, access tokens, ACLs (Access Control Lists), and provides Windows-compatible security functionality including SID generation and security descriptors.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Session Management:</strong> Create and manage user sessions</li>
+                    <li><strong>Access Token Management:</strong> Create, validate, and manage access tokens</li>
+                    <li><strong>ACL Support:</strong> Access Control List checking and validation</li>
+                    <li><strong>Token Impersonation:</strong> Impersonate tokens for service operations</li>
+                    <li><strong>SID Generation:</strong> Security Identifier generation (Windows-compatible)</li>
+                    <li><strong>Security Descriptors:</strong> Create and validate security descriptors</li>
+                    <li><strong>Privilege Management:</strong> Calculate and check user privileges</li>
+                    <li><strong>Group Membership:</strong> Check user group membership</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Session Management</h2>
+                <p>Manage user sessions:</p>
+                <ul>
+                    <li><code class="code-inline">createSession(userId, username, groups)</code> - Create a new user session</li>
+                    <li><code class="code-inline">destroySession(sessionId)</code> - Destroy a session</li>
+                    <li><code class="code-inline">getCurrentSession()</code> - Get current active session</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Access Token Management</h2>
+                <p>Manage access tokens:</p>
+                <ul>
+                    <li><code class="code-inline">createToken(userId, username, groups)</code> - Create access token</li>
+                    <li><code class="code-inline">destroyToken(tokenId)</code> - Destroy token</li>
+                    <li><code class="code-inline">getToken(tokenId)</code> - Get token by ID</li>
+                    <li><code class="code-inline">getCurrentToken()</code> - Get current session's token</li>
+                    <li><code class="code-inline">impersonateToken(tokenId)</code> - Impersonate a token</li>
+                    <li><code class="code-inline">revertToSelf()</code> - Revert impersonation</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Access Control</h2>
+                <p>Check access permissions:</p>
+                <ul>
+                    <li><code class="code-inline">checkAccess(token, resource, requestedAccess)</code> - Check if token has access to resource</li>
+                    <li><code class="code-inline">checkACL(token, acl, requestedAccess)</code> - Check ACL entries</li>
+                    <li><code class="code-inline">hasPrivilege(token, privilege)</code> - Check if token has privilege</li>
+                    <li><code class="code-inline">isAdministrator(token)</code> - Check if user is administrator</li>
+                    <li><code class="code-inline">isUserInGroup(token, groupName)</code> - Check group membership</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>ACL Management</h2>
+                <p>Create and manage Access Control Lists:</p>
+                <ul>
+                    <li><code class="code-inline">createACL(entries)</code> - Create ACL with entries</li>
+                    <li><code class="code-inline">createACLEntry(principal, accessRights, type)</code> - Create ACL entry</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>SID Generation</h2>
+                <p>Generate Security Identifiers (Windows-compatible):</p>
+                <ul>
+                    <li><code class="code-inline">getUserSID(userId)</code> - Get user SID</li>
+                    <li><code class="code-inline">getGroupSID(groupId)</code> - Get group SID</li>
+                </ul>
+                <p>SID format: <code class="code-inline">S-1-5-21-{uid}-{uid}-{uid}</code></p>
+            </section>
+
+            <section class="section">
+                <h2>Security Descriptors</h2>
+                <p>Create and validate security descriptors:</p>
+                <ul>
+                    <li><code class="code-inline">createSecurityDescriptor(owner, group, dacl, sacl)</code> - Create security descriptor</li>
+                    <li><code class="code-inline">validateSecurityDescriptor(descriptor)</code> - Validate security descriptor</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Access Rights</h2>
+                <p>The Security Manager supports the following access rights:</p>
+                <ul>
+                    <li><strong>GENERIC_READ:</strong> Generic read access</li>
+                    <li><strong>GENERIC_WRITE:</strong> Generic write access</li>
+                    <li><strong>GENERIC_EXECUTE:</strong> Generic execute access</li>
+                    <li><strong>GENERIC_ALL:</strong> All access rights</li>
+                    <li><strong>FILE_READ_DATA:</strong> Read file data</li>
+                    <li><strong>FILE_WRITE_DATA:</strong> Write file data</li>
+                    <li><strong>FILE_EXECUTE:</strong> Execute file</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const SecurityManager = require('./system/security');
+
+const securityMgr = new SecurityManager();
+
+// Create session
+const session = securityMgr.createSession(1000, 'user1', ['Users', 'Administrators']);
+const token = session.token;
+
+// Check access
+if (securityMgr.checkAccess(token, resource, SecurityManager.ACCESS_RIGHTS.GENERIC_READ)) {
+    // Allow access
+}
+
+// Check if administrator
+if (securityMgr.isAdministrator(token)) {
+    // User is administrator
+}
+
+// Create ACL
+const acl = securityMgr.createACL([
+    securityMgr.createACLEntry('user1', SecurityManager.ACCESS_RIGHTS.GENERIC_ALL, 'ALLOW'),
+    securityMgr.createACLEntry('Users', SecurityManager.ACCESS_RIGHTS.GENERIC_READ, 'ALLOW')
+]);</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Security Manager integrates with:</p>
+                <ul>
+                    <li><strong>Object Manager:</strong> Access control for file operations</li>
+                    <li><strong>Filesystem:</strong> File permission checking</li>
+                    <li><strong>Process Management:</strong> Process security context</li>
+                    <li><strong>Error Manager:</strong> Error reporting for access denied</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="securityd.html">securityd</a></li>
+                    <li><a href="object-manager.html">Object Manager</a></li>
+                    <li><a href="error.html">Error Manager</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>
+

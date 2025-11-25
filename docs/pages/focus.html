@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compositor - FreeWorld OS Documentation</title>
+    <title>Focus Manager - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -57,11 +57,6 @@
                 <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="drivers.html">Graphics Drivers</a></li>
                 <li><a href="gui-integration.html">GUI Integration</a></li>
-                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
-                <li><a href="window-relationships.html">Window Relationships</a></li>
-                <li><a href="menu.html">Menu System</a></li>
-                <li><a href="nonclient.html">Non-Client Area</a></li>
-                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="timer.html">Timer Manager</a></li>
                 <li><a href="property.html">Property Manager</a></li>
                 <li><a href="hooks.html">Hook Manager</a></li>
@@ -99,89 +94,129 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Compositor</h1>
+                <h1>Focus Manager</h1>
                 <div class="meta">
-                    <strong>Location:</strong> system/compositor.js<br>
-                    <strong>Type:</strong> Node.js Module<br>
-                    <strong>Purpose:</strong> Merges off-screen buffers before sending to screen
+                    <strong>Location:</strong> <code>system/focus.js</code><br>
+                    <strong>Type:</strong> GUI Subsystem<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
-                
-                <div class="alert alert-info">
-                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
-                </div>
+                <p>The Focus Manager handles window activation and keyboard focus, distinguishing between "active" (top-level window) and "focused" (control with keyboard focus). This is essential for proper window behavior and keyboard input routing.</p>
             </section>
 
             <section class="section">
-                <h2>Key Features</h2>
+                <h2>Concepts</h2>
                 <ul>
-                    <li>Z-order management</li>
-                    <li>Transparency and alpha blending</li>
-                    <li>Shadow rendering</li>
-                    <li>Invalidation region calculation</li>
-                    <li>Window buffer registration</li>
+                    <li><strong>Active Window:</strong> The top-level window that is currently active (receives WM_ACTIVATE messages)</li>
+                    <li><strong>Focused Window:</strong> The control that currently has keyboard focus (receives keyboard input)</li>
+                    <li><strong>Z-Order:</strong> The stacking order of windows (topmost window is active)</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Methods</h2>
-                
-                <h3>registerWindow(hwnd, dc)</h3>
-                <p>Registers a window's Device Context with the compositor.</p>
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Window Activation:</strong> WM_ACTIVATE messages for top-level windows</li>
+                    <li><strong>Focus Management:</strong> WM_SETFOCUS and WM_KILLFOCUS messages</li>
+                    <li><strong>Z-Order Management:</strong> Maintains window stacking order</li>
+                    <li><strong>Focus Traversal:</strong> Tab key navigation between controls</li>
+                </ul>
+            </section>
 
-                <h3>render() / composite()</h3>
-                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
+            <section class="section">
+                <h2>API</h2>
+                
+                <h3>activateWindow(hwnd)</h3>
+                <p>Activates a top-level window:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle to activate</li>
+                </ul>
+                <p>Sends WM_ACTIVATE to old and new active windows, and brings window to top of z-order.</p>
+
+                <h3>deactivateWindow(hwnd)</h3>
+                <p>Deactivates a window:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle to deactivate</li>
+                </ul>
+
+                <h3>setFocus(hwnd)</h3>
+                <p>Sets keyboard focus to a control:</p>
+                <ul>
+                    <li><code>hwnd</code> - Control handle to focus</li>
+                </ul>
+                <p>Sends WM_SETFOCUS to new focused control and WM_KILLFOCUS to previously focused control.</p>
+
+                <h3>getFocus()</h3>
+                <p>Returns the currently focused window handle.</p>
+
+                <h3>getActiveWindow()</h3>
+                <p>Returns the currently active top-level window handle.</p>
+
+                <h3>bringToTop(hwnd)</h3>
+                <p>Brings a window to the top of the z-order:</p>
+                <ul>
+                    <li><code>hwnd</code> - Window handle</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
                 <div class="code-block">
-                    <pre>render() {
-    const graphicsBridge = require('./graphics-bridge');
-    
-    // Initialize graphics if needed
-    if (!graphicsBridge.initialized) {
-        graphicsBridge.init();
-    }
-    
-    // Clear screen
-    graphicsBridge.clear(0xFF000000);
-    
-    // Blit all windows to framebuffer
-    for (const window of windows) {
-        if (window.visible && window.dirty) {
-            graphicsBridge.blitWindow(
-                window.x, window.y,
-                window.width, window.height,
-                window.dc.buffer  // RGBA buffer
-            );
-            window.dirty = false;
-        }
-    }
-}</pre>
+                    <pre><code>const FocusManager = require('./system/focus');
+
+const focusManager = new FocusManager();
+
+// Activate a window
+focusManager.activateWindow(windowHwnd);
+
+// Set focus to a control
+focusManager.setFocus(buttonHwnd);
+
+// Get current focus
+const focusedHwnd = focusManager.getFocus();
+
+// Get active window
+const activeHwnd = focusManager.getActiveWindow();</code></pre>
                 </div>
-
-                <h3>invalidateRegion(x, y, width, height)</h3>
-                <p>Calculates which windows intersect with an invalidated region.</p>
-
-                <h3>bringToTop(hwnd) / sendToBottom(hwnd)</h3>
-                <p>Manages window z-order.</p>
             </section>
 
             <section class="section">
-                <h2>Graphics Integration</h2>
-                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <h2>Message Flow</h2>
+                <p>When a window is activated:</p>
+                <ol>
+                    <li>Old active window receives WM_ACTIVATE (active=false)</li>
+                    <li>New window is brought to top of z-order</li>
+                    <li>New active window receives WM_ACTIVATE (active=true)</li>
+                </ol>
+                <p>When focus changes:</p>
+                <ol>
+                    <li>Previously focused control receives WM_KILLFOCUS</li>
+                    <li>New focused control receives WM_SETFOCUS</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Focus Manager integrates with:</p>
                 <ul>
-                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
-                    <li>Blits window RGBA buffers directly to framebuffer</li>
-                    <li>Supports 1024x768x32 graphics mode</li>
-                    <li>Handles window dirty regions for efficient updates</li>
+                    <li><strong>Window Manager:</strong> Window activation and focus</li>
+                    <li><strong>Input Manager:</strong> Keyboard input routing</li>
+                    <li><strong>Controls:</strong> Focus visual feedback</li>
+                    <li><strong>GUI Integration:</strong> Initialized as part of the GUI system</li>
                 </ul>
-                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="window.html">Window Management</a> - Window system</li>
+                    <li><a href="input-manager.html">Input Manager</a> - Keyboard input</li>
+                    <li><a href="controls.html">Standard Controls</a> - Control focus</li>
+                    <li><a href="gui-integration.html">GUI Integration</a> - System integration</li>
+                </ul>
             </section>
         </main>
     </div>

@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Object Manager - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="boot-analysis.html">Boot Analysis</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>Object Manager</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>system/object-manager.js</code><br>
+                    <strong>Type:</strong> System Service<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The Object Manager provides handle-based object management for the FreeWorld OS. It manages file handles, directory handles, pipes, events, mutexes, and other kernel objects, similar to Windows' object manager.</p>
+            </section>
+
+            <section class="section">
+                <h2>Features</h2>
+                <ul>
+                    <li><strong>Handle Management:</strong> Unique handle generation and tracking</li>
+                    <li><strong>File Operations:</strong> Complete file read/write with filesystem integration</li>
+                    <li><strong>File Pointer Management:</strong> Seek operations and file size queries</li>
+                    <li><strong>Directory Objects:</strong> Directory handle management</li>
+                    <li><strong>Pipe Objects:</strong> Named pipes with read/write operations</li>
+                    <li><strong>Event Objects:</strong> Event synchronization (set/reset/wait)</li>
+                    <li><strong>Mutex Objects:</strong> Mutual exclusion locks</li>
+                    <li><strong>Access Control:</strong> Access mode and share mode checking</li>
+                    <li><strong>Conflict Detection:</strong> Share mode conflict detection</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Object Types</h2>
+                
+                <h3>1. File Objects</h3>
+                <p>File objects represent open files with read/write capabilities:</p>
+                <ul>
+                    <li><strong>Access Modes:</strong> GENERIC_READ, GENERIC_WRITE, GENERIC_EXECUTE, GENERIC_ALL</li>
+                    <li><strong>Share Modes:</strong> FILE_SHARE_READ, FILE_SHARE_WRITE, FILE_SHARE_DELETE, FILE_SHARE_NONE</li>
+                    <li><strong>Creation Dispositions:</strong> CREATE_NEW, CREATE_ALWAYS, OPEN_EXISTING, OPEN_ALWAYS, TRUNCATE_EXISTING</li>
+                    <li><strong>File Pointer:</strong> Tracks current read/write position</li>
+                </ul>
+
+                <h4>Key Functions</h4>
+                <ul>
+                    <li><code class="code-inline">createFile(path, accessMode, shareMode, creationDisposition)</code> - Create/open file handle</li>
+                    <li><code class="code-inline">readFile(handle, buffer, bytesToRead)</code> - Read data from file</li>
+                    <li><code class="code-inline">writeFile(handle, buffer, bytesToWrite)</code> - Write data to file</li>
+                    <li><code class="code-inline">setFilePointer(handle, distance, moveMethod)</code> - Move file pointer</li>
+                    <li><code class="code-inline">getFileSize(handle)</code> - Get file size</li>
+                </ul>
+
+                <h3>2. Directory Objects</h3>
+                <p>Directory objects represent open directories:</p>
+                <ul>
+                    <li><code class="code-inline">createDirectory(path)</code> - Create directory handle</li>
+                </ul>
+
+                <h3>3. Pipe Objects</h3>
+                <p>Named pipes for inter-process communication:</p>
+                <ul>
+                    <li><code class="code-inline">createPipe(name, mode)</code> - Create named pipe</li>
+                    <li><code class="code-inline">readPipe(handle, buffer, bytesToRead)</code> - Read from pipe</li>
+                    <li><code class="code-inline">writePipe(handle, buffer, bytesToWrite)</code> - Write to pipe</li>
+                </ul>
+
+                <h3>4. Event Objects</h3>
+                <p>Event objects for synchronization:</p>
+                <ul>
+                    <li><code class="code-inline">createEvent(name, initialState, manualReset)</code> - Create event</li>
+                    <li><code class="code-inline">setEvent(handle)</code> - Set event to signaled state</li>
+                    <li><code class="code-inline">resetEvent(handle)</code> - Reset event to non-signaled state</li>
+                </ul>
+
+                <h3>5. Mutex Objects</h3>
+                <p>Mutex objects for mutual exclusion:</p>
+                <ul>
+                    <li><code class="code-inline">createMutex(name, initialOwner)</code> - Create mutex</li>
+                    <li><code class="code-inline">releaseMutex(handle)</code> - Release mutex ownership</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Handle Management</h2>
+                <p>The Object Manager generates unique handles for all objects:</p>
+                <ul>
+                    <li><code class="code-inline">createHandle(object)</code> - Create handle for object</li>
+                    <li><code class="code-inline">getObject(handle)</code> - Get object from handle</li>
+                    <li><code class="code-inline">closeHandle(handle)</code> - Close handle and cleanup object</li>
+                    <li><code class="code-inline">findHandlesForFile(filePath)</code> - Find all handles for a file</li>
+                    <li><code class="code-inline">getObjectTypeName(handle)</code> - Get object type name</li>
+                    <li><code class="code-inline">getAllHandles()</code> - Get all active handles</li>
+                    <li><code class="code-inline">getHandleCount()</code> - Get total handle count</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Access Control</h2>
+                <p>The Object Manager enforces access control:</p>
+                <ul>
+                    <li><code class="code-inline">checkAccess(handle, requiredAccess)</code> - Check if handle has required access</li>
+                    <li><code class="code-inline">checkShareConflict(file1, file2)</code> - Check for share mode conflicts</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Object Manager integrates with:</p>
+                <ul>
+                    <li><strong>Filesystem:</strong> Uses Node.js <code class="code-inline">fs</code> module for file operations</li>
+                    <li><strong>Error Manager:</strong> Returns error codes for failed operations</li>
+                    <li><strong>Process Management:</strong> Tracks handles per process</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <div class="code-block">
+                    <pre><code>const ObjectManager = require('./system/object-manager');
+
+const objMgr = new ObjectManager();
+
+// Open file for reading
+const handle = objMgr.createFile(
+    '/path/to/file.txt',
+    ObjectManager.ACCESS_MODE.GENERIC_READ,
+    ObjectManager.SHARE_MODE.FILE_SHARE_READ,
+    ObjectManager.CREATION_DISPOSITION.OPEN_EXISTING
+);
+
+// Read file
+const buffer = Buffer.alloc(1024);
+const result = objMgr.readFile(handle, buffer, 1024);
+if (result.success) {
+    console.log(`Read ${result.bytesRead} bytes`);
+}
+
+// Close handle
+objMgr.closeHandle(handle);</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="filesystem-kernel.html">File System (Kernel)</a></li>
+                    <li><a href="error.html">Error Manager</a></li>
+                    <li><a href="process.html">Process Management</a></li>
+                </ul>
+            </section>
+        </main>
+    </div>
+
+    <footer>
+        <p>FreeWorld OS Documentation v0.1.0</p>
+    </footer>
+
+    <script src="../navigation.js"></script>
+</body>
+</html>

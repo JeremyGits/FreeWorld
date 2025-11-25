@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Compositor - FreeWorld OS Documentation</title>
+    <title>Network Stack - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -57,11 +57,6 @@
                 <li><a href="graphics.html">Graphics System</a></li>
                 <li><a href="drivers.html">Graphics Drivers</a></li>
                 <li><a href="gui-integration.html">GUI Integration</a></li>
-                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
-                <li><a href="window-relationships.html">Window Relationships</a></li>
-                <li><a href="menu.html">Menu System</a></li>
-                <li><a href="nonclient.html">Non-Client Area</a></li>
-                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="timer.html">Timer Manager</a></li>
                 <li><a href="property.html">Property Manager</a></li>
                 <li><a href="hooks.html">Hook Manager</a></li>
@@ -99,89 +94,133 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>Compositor</h1>
+                <h1>Network Stack</h1>
                 <div class="meta">
-                    <strong>Location:</strong> system/compositor.js<br>
-                    <strong>Type:</strong> Node.js Module<br>
-                    <strong>Purpose:</strong> Merges off-screen buffers before sending to screen
+                    <strong>Location:</strong> <code>kernel/network/</code>, <code>services/networkd/</code><br>
+                    <strong>Type:</strong> Rendering System Component<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
                 <h2>Overview</h2>
-                <p>The Compositor merges off-screen window buffers into a final image before sending to the screen. Modern OSs don't let windows draw over each other directly; they draw to off-screen buffers, and the Compositor handles transparency, shadows, and z-order.</p>
-                
-                <div class="alert alert-info">
-                    <strong>Architecture Update:</strong> The compositor will be integrated into the <strong>fwcompositor</strong> window manager service. Applications will send window buffers via IPC, and the fwcompositor service will handle compositing and send the final composite to the kernel. See <a href="windowing-architecture.html">Windowing Architecture</a> for details.
-                </div>
-                
-                <div class="alert alert-success">
-                    <strong>Current Implementation:</strong> The Node.js compositor (<code>system/compositor.js</code>) is a structural implementation that demonstrates the compositing logic. It will be used by the fwcompositor service once implemented.
-                </div>
+                <p>The Network Stack provides complete TCP/IP networking capabilities for FreeWorld OS, enabling network communication, web browsing, and network-based rendering operations. It includes kernel-level protocol implementations and user-space network daemon services.</p>
             </section>
 
             <section class="section">
-                <h2>Key Features</h2>
+                <h2>Architecture</h2>
+                <p>The network stack is organized in layers:</p>
                 <ul>
-                    <li>Z-order management</li>
-                    <li>Transparency and alpha blending</li>
-                    <li>Shadow rendering</li>
-                    <li>Invalidation region calculation</li>
-                    <li>Window buffer registration</li>
+                    <li><strong>Application Layer:</strong> HTTP, WebSocket, and other application protocols</li>
+                    <li><strong>Transport Layer:</strong> TCP and UDP</li>
+                    <li><strong>Network Layer:</strong> IP (IPv4)</li>
+                    <li><strong>Link Layer:</strong> Ethernet frame handling</li>
+                    <li><strong>Hardware Layer:</strong> Ethernet drivers (RTL8139, E1000, VirtIO)</li>
                 </ul>
             </section>
 
             <section class="section">
-                <h2>Methods</h2>
+                <h2>Components</h2>
                 
-                <h3>registerWindow(hwnd, dc)</h3>
-                <p>Registers a window's Device Context with the compositor.</p>
+                <h3>1. IP Layer</h3>
+                <p><strong>Location:</strong> <code>kernel/network/ip.asm</code></p>
+                <p>IP packet handling:</p>
+                <ul>
+                    <li>Packet transmission and reception</li>
+                    <li>IP checksum calculation</li>
+                    <li>Routing table integration</li>
+                    <li>Fragmentation and reassembly</li>
+                </ul>
 
-                <h3>render() / composite()</h3>
-                <p>Renders all windows to the framebuffer. The <code>render()</code> method (aliased as <code>composite()</code>) uses the graphics bridge to blit window buffers directly to the VESA framebuffer. Draws from bottom to top in Z-order.</p>
-                <div class="code-block">
-                    <pre>render() {
-    const graphicsBridge = require('./graphics-bridge');
-    
-    // Initialize graphics if needed
-    if (!graphicsBridge.initialized) {
-        graphicsBridge.init();
-    }
-    
-    // Clear screen
-    graphicsBridge.clear(0xFF000000);
-    
-    // Blit all windows to framebuffer
-    for (const window of windows) {
-        if (window.visible && window.dirty) {
-            graphicsBridge.blitWindow(
-                window.x, window.y,
-                window.width, window.height,
-                window.dc.buffer  // RGBA buffer
-            );
-            window.dirty = false;
-        }
-    }
-}</pre>
-                </div>
+                <h3>2. TCP Layer</h3>
+                <p><strong>Location:</strong> <code>kernel/network/tcp.asm</code></p>
+                <p>TCP connection management:</p>
+                <ul>
+                    <li>Full TCP state machine (SYN, ACK, FIN, RST)</li>
+                    <li>Connection establishment and termination</li>
+                    <li>Flow control (window size)</li>
+                    <li>Sequence number management</li>
+                    <li>TCP checksum calculation</li>
+                </ul>
 
-                <h3>invalidateRegion(x, y, width, height)</h3>
-                <p>Calculates which windows intersect with an invalidated region.</p>
+                <h3>3. UDP Layer</h3>
+                <p><strong>Location:</strong> <code>kernel/network/udp.asm</code></p>
+                <p>UDP datagram handling:</p>
+                <ul>
+                    <li>Socket management</li>
+                    <li>Port binding</li>
+                    <li>Datagram transmission and reception</li>
+                    <li>UDP checksum calculation</li>
+                </ul>
 
-                <h3>bringToTop(hwnd) / sendToBottom(hwnd)</h3>
-                <p>Manages window z-order.</p>
+                <h3>4. ICMP Layer</h3>
+                <p><strong>Location:</strong> <code>kernel/network/icmp.asm</code></p>
+                <p>ICMP message handling:</p>
+                <ul>
+                    <li>Echo request/reply (ping)</li>
+                    <li>Error messages</li>
+                    <li>ICMP checksum calculation</li>
+                </ul>
+
+                <h3>5. Port Manager</h3>
+                <p><strong>Location:</strong> <code>kernel/network/port_manager.asm</code></p>
+                <p>Centralized port management:</p>
+                <ul>
+                    <li>Port binding and unbinding</li>
+                    <li>Port conflict detection</li>
+                    <li>Dynamic port allocation</li>
+                </ul>
+
+                <h3>6. Ethernet Drivers</h3>
+                <p><strong>Location:</strong> <code>kernel/drivers/ethernet_hw.asm</code></p>
+                <p>Hardware-specific drivers:</p>
+                <ul>
+                    <li>RTL8139 (TX/RX buffer management)</li>
+                    <li>E1000 (TX/RX descriptor rings)</li>
+                    <li>VirtIO (queue management)</li>
+                </ul>
+
+                <h3>7. Network Daemon (networkd)</h3>
+                <p><strong>Location:</strong> <code>services/networkd/</code></p>
+                <p>User-space network services:</p>
+                <ul>
+                    <li>Interface management</li>
+                    <li>DHCP client</li>
+                    <li>Routing table management</li>
+                    <li>DNS configuration</li>
+                </ul>
             </section>
 
             <section class="section">
-                <h2>Graphics Integration</h2>
-                <p>The Compositor is fully integrated with the kernel graphics system:</p>
+                <h2>Network Flow</h2>
+                <ol>
+                    <li><strong>Application:</strong> Application sends data via socket</li>
+                    <li><strong>TCP/UDP:</strong> Transport layer adds header and checksum</li>
+                    <li><strong>IP:</strong> Network layer adds IP header and routes packet</li>
+                    <li><strong>Ethernet:</strong> Link layer constructs Ethernet frame</li>
+                    <li><strong>Hardware:</strong> Ethernet driver transmits packet</li>
+                    <li><strong>Reception:</strong> Reverse process for incoming packets</li>
+                </ol>
+            </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The Network Stack integrates with:</p>
                 <ul>
-                    <li>Uses <code>graphics-bridge.js</code> to access kernel VESA driver</li>
-                    <li>Blits window RGBA buffers directly to framebuffer</li>
-                    <li>Supports 1024x768x32 graphics mode</li>
-                    <li>Handles window dirty regions for efficient updates</li>
+                    <li><strong>Rendering System:</strong> Network-based content loading</li>
+                    <li><strong>Browser Engine:</strong> HTTP/HTTPS support</li>
+                    <li><strong>GUI Server:</strong> WebSocket connections</li>
+                    <li><strong>System Services:</strong> Network configuration and management</li>
                 </ul>
-                <p>See <a href="graphics.html">Graphics System</a> for complete details on the graphics bridge and VESA driver.</p>
+            </section>
+
+            <section class="section">
+                <h2>Related Documentation</h2>
+                <ul>
+                    <li><a href="networkd.html">networkd</a> - Network daemon</li>
+                    <li><a href="browser-nodejs.html">Node.js Integration</a> - Network usage</li>
+                    <li><a href="drivers.html">Device Drivers</a> - Ethernet drivers</li>
+                </ul>
             </section>
         </main>
     </div>
