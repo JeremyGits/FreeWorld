@@ -33,13 +33,26 @@ Complete technical documentation for the FreeWorld Operating System.
 - ✅ [Minimal C Library](pages/minimal-libc.html) - Essential C runtime library
 - ✅ [Build System](pages/build-system.html) - Cross-compilation toolchain and build infrastructure
 
+### Networking Stack
+- ✅ **TCP/IP Stack** - Complete implementation
+  - ✅ [IP Layer](pages/network-ip.html) - IP packet routing, checksums, fragmentation support
+  - ✅ [TCP Layer](pages/network-tcp.html) - Full TCP state machine, connection management, flow control
+  - ✅ [UDP Layer](pages/network-udp.html) - UDP socket management, datagram handling
+  - ✅ [ICMP Layer](pages/network-icmp.html) - ICMP echo (ping), error messages
+  - ✅ [Port Manager](pages/network-port-manager.html) - Centralized port binding and management
+- ✅ **Ethernet Drivers** - Complete hardware support
+  - ✅ [Ethernet Driver](pages/ethernet-driver.html) - Frame construction, routing, validation
+  - ✅ [RTL8139 Driver](pages/ethernet-rtl8139.html) - RTL8139 TX/RX buffer management
+  - ✅ [E1000 Driver](pages/ethernet-e1000.html) - E1000 TX/RX descriptor rings
+  - ✅ [VirtIO Driver](pages/ethernet-virtio.html) - VirtIO queue management
+
 ### Services
 - ✅ [smss.exe](pages/smss.html) - Session Manager Subsystem (Fully Implemented)
 - ✅ [csrss.exe](pages/csrss.html) - Client Server Runtime Subsystem (Fully Implemented)
 - ✅ [freeworldlogon.exe](pages/freeworldlogon.html) - Login Manager
 - ✅ [logd](pages/logd.html) - Logging Daemon (Fully Implemented with IPC)
-- ✅ [networkd](pages/networkd.html) - Network Daemon (Fully Implemented: DHCP, Routing, Ethernet)
-- ✅ [securityd](pages/securityd.html) - Security Daemon (Node.js modules, daemon planned)
+- ✅ [networkd](pages/networkd.html) - Network Daemon (Fully Implemented: DHCP, Routing, IPC)
+- ✅ [securityd](pages/securityd.html) - Security Daemon (Fully Implemented: User/Group Management, IPC)
 - ✅ [display-manager](pages/display-manager.html) - Graphical login and session management
 
 ### User Interface
@@ -132,10 +145,8 @@ Complete technical documentation for the FreeWorld Operating System.
 - **networkd Integration**: IPC for runtime configuration
 
 ### ⚠️ Partially Implemented
-- **networkd**: Core complete, DHCP client and routing need full implementation
-- **securityd**: Node.js modules complete, daemon implementation planned
-- **Ethernet Driver**: Structure complete, needs hardware-specific code
-- **TCP/IP Stack**: Foundation exists, needs full implementation
+- **GUI Subsystems**: Some components fully implemented, others structural only
+- **System Services**: Registry, Object Manager, Path Parser need full implementation
 
 ### ⏳ Structural Implementation Only
 - **GUI Subsystems**: Class definitions, method signatures, basic logic
