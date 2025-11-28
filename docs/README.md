@@ -244,6 +244,159 @@ Complete technical documentation for the FreeWorld Operating System.
 
 ## Recent Additions
 
+### C++ Standard Library (Complete Implementation)
+- **Core Runtime** (`libc++/core/`): Assembly implementation
+  - **new/delete operators**: Single object and array allocation/deallocation, nothrow variants
+  - **Exception Handling**: __cxa_allocate_exception, __cxa_throw, __cxa_begin_catch, __cxa_end_catch, __cxa_rethrow, std::terminate
+  - **RTTI**: __dynamic_cast, type_info, type comparison
+- **STL Containers** (`libc++/stl/containers/`): C++ template implementations
+  - **std::vector**: Dynamic array with iterators, move semantics, automatic resizing
+  - **std::string**: String class with substring, concatenation, search, C-string compatibility
+- **I/O Streams** (`libc++/io/`): Formatted I/O
+  - **std::ostream/std::istream**: Formatted output/input with << and >> operators
+  - **Standard Streams**: std::cout, std::cerr, std::cin
+  - **Stream Manipulators**: std::endl, std::flush
+- **Smart Pointers** (`libc++/memory/`): Automatic memory management
+  - **std::unique_ptr**: Exclusive ownership, move semantics, array specialization
+  - **std::shared_ptr**: Shared ownership with reference counting
+  - **std::weak_ptr**: Non-owning reference to break circular dependencies
+  - **make_unique/make_shared**: Factory functions
+- **Utility Functions** (`libc++/utility/`): General-purpose utilities
+  - **std::pair**: Two-element tuple with comparison operators
+  - **std::move/std::forward**: Perfect forwarding and move semantics
+  - **std::swap**: Generic value exchange
+- **Type Traits** (`libc++/type_traits/`): Compile-time type information
+  - **Type Modifications**: remove_const, remove_reference, decay, etc.
+  - **Type Properties**: is_integral, is_pointer, is_class, is_same, etc.
+  - **Conditional Compilation**: enable_if, SFINAE support
+- **Build System**: Makefile for building `lib64/libc++.a`
+- **Documentation**: Complete HTML documentation page
+
+### Kernel Core Enhancements (Complete Implementation)
+- **UEFI Boot** (`boot/uefi/`): Modern UEFI bootloader
+  - C-based bootloader (bootx64.efi)
+  - Kernel loading from ESP
+  - Memory map handling
+  - Boot services exit
+  - Boot parameter passing
+- **Early Hardware Detection** (`kernel/hardware/early_detection.asm`): Comprehensive hardware detection
+  - CPU detection (vendor, brand, features, count)
+  - Memory detection (E820 map, total, available)
+  - ACPI detection (RSDP search and validation)
+  - PCI detection (BIOS and direct config space)
+  - APIC detection (CPUID and MSR)
+  - NUMA detection (ACPI-aware)
+  - Network adapters (PCI enumeration)
+  - Mouse detection (PS/2 controller)
+  - Storage detection (ATA ports)
+  - Display detection (VGA/VESA)
+- **ACPI Support** (`kernel/acpi/`): Advanced Configuration and Power Interface
+  - RSDP, RSDT/XSDT parsing
+  - FADT, MADT, DSDT, SSDT support
+  - SRAT, SLIT, MCFG, HPET, DMAR tables
+  - Device tree building
+- **Boot Parameters** (`kernel/boot/boot_params.asm`): Command-line argument parsing
+  - UTF-16 to ASCII conversion
+  - Tokenization
+  - Supported flags (quiet, debug, verbose, single, nosmp, nomodeset, etc.)
+  - Supported parameters (root, initrd, vga, console, loglevel, maxcpus, mem)
+- **Virtual Memory** (`kernel/memory/`): Full 64-bit virtual memory system
+  - 4-level paging (PML4, PDPT, PD, PT)
+  - Dynamic page table allocation
+  - Page mapping/unmapping
+  - TLB invalidation
+  - Page fault handling (demand paging, swap-in, access violations)
+  - Swap system (swap space management, slot allocation/freeing)
+  - Frame allocator (64-bit bitmap-based)
+- **Process Scheduling** (`kernel/process/`): Advanced scheduler
+  - **CFS (Completely Fair Scheduler)**: Red-black tree, virtual runtime, load weights, nice values
+  - **Deadline Scheduler**: EDF (Earliest Deadline First), period/runtime tracking, deadline miss detection
+  - **Real-Time Scheduler**: Priority-based, FIFO within priority levels, preemption
+  - **Unified Scheduler Interface**: Priority ordering (RT > Deadline > CFS), statistics tracking
+- **Interrupt Handling** (`kernel/interrupts/`): Complete IRQ system
+  - IDT setup (64-bit with IST)
+  - Interrupt and trap gates
+  - Local APIC initialization and management
+  - APIC-based IRQ handling
+  - I/O APIC enumeration from ACPI MADT
+- **Exception Handling** (`kernel/interrupts/exceptions.asm`): All 32 CPU exceptions
+  - Generic exception handler
+  - Specific handlers for exceptions with error codes
+  - Exception statistics
+  - Integration with page fault handler
+- **Kernel Debugging** (`kernel/debug/`): Comprehensive debugging system
+  - **KDB (Kernel Debugger)**: Interactive debugger with command parsing
+  - **Stack Traces**: Call stack generation using RBP chain
+  - **Panic Handler**: Detailed system state dumps
+  - **Breakpoints**: Breakpoint management and handling
+  - **Serial Debugging**: Low-level serial I/O
+- **Kernel Logging** (`kernel/logging/`): Complete logging system
+  - **klog**: Thread-safe circular buffer with timestamp and log level filtering
+  - **dmesg**: Reading and filtering messages from klog buffer
+  - **syslog**: RFC 3164 syslog protocol integration, priority levels and facilities
+- **Kernel Modules** (`kernel/modules/`): Loadable Kernel Modules (LKM) system
+  - ELF module parsing
+  - Module loading/unloading
+  - Symbol export/import
+  - Dependency resolution
+  - Reference counting
+- **Power Management** (`kernel/power/`): Complete power management
+  - CPU P-states (frequency scaling)
+  - CPU C-states (idle management)
+  - System suspend/resume
+  - Thermal management
+  - Power policies
+  - ACPI integration (sleep states, P-state/C-state enumeration)
+
+### Device Drivers (Complete Implementation)
+- **Storage Drivers** (`kernel/drivers/`):
+  - **AHCI/SATA**: NCQ, DMA, port enumeration, device identification, read/write
+  - **NVMe**: Admin/I/O queue support, multiple namespaces, command submission/completion
+  - **USB Mass Storage**: BOT protocol, SCSI command passthrough, multiple LUNs
+  - **SCSI**: SCSI command set, multiple controller types, command routing
+  - **CD/DVD**: ATAPI support, disc detection, TOC reading
+- **Graphics Drivers** (`kernel/drivers/`):
+  - **VESA/VBE Enhanced**: 64-bit implementation, mode enumeration/switching, multiple color depths, double buffering
+  - **Intel GPU**: HD Graphics, Iris, GTT, display output (up to 4 displays), power management
+  - **AMD GPU**: Radeon, RX series, GART, display output (up to 6 displays), power management
+  - **NVIDIA GPU**: GeForce, Quadro, GMMU, display output (up to 4 displays), power management
+  - **Unified GPU Driver**: Automatic detection, vendor-specific initialization, multi-GPU support
+- **Display Output** (`kernel/drivers/`):
+  - **DisplayPort**: DP 1.2+, link training, EDID, hot-plug
+  - **HDMI**: HDMI 1.4+, HDCP, audio, CEC, EDID, hot-plug
+  - **DVI**: Single/dual-link, TMDS, EDID, hot-plug
+  - **Multi-monitor**: Display management, configuration, arrangement, rotation, hot-plug, virtual desktop
+- **USB System** (`kernel/drivers/`):
+  - **USB Host Controllers**: UHCI, OHCI, EHCI, xHCI support
+  - **USB HID**: Device detection, keyboard/mouse support, input/output endpoints
+  - **USB Audio**: Device detection, playback/recording, format negotiation
+  - **USB Transfer Management**: Control, interrupt, bulk, isochronous transfers
+
+### Filesystem (Complete Implementation)
+- **Native Filesystems** (`kernel/fs/`):
+  - **ext2/ext3/ext4**: Full read/write operations, block allocation, inode management
+  - **NTFS**: Full read/write operations, MFT record reading, attribute parsing, cluster operations
+  - **exFAT**: FAT operations, cluster R/W, directory operations, path resolution
+  - **Btrfs**: B-tree operations, key-based search, inode operations, extent management
+  - **XFS**: Allocation group management, inode operations, extent operations
+  - **ZFS**: Uberblock reading/validation, block pointer operations, DNode operations
+- **Virtual Filesystems** (`kernel/fs/`):
+  - **/proc**: Process and system information, dynamic data callbacks
+  - **/sys**: System information, device hierarchy, kernel object representation
+  - **/dev**: Device nodes, major/minor number management, dynamic device registration
+  - **/tmp (tmpfs)**: In-memory file storage, dynamic size management
+  - **devtmpfs**: Automatic device node creation
+- **Filesystem Features** (`kernel/fs/`):
+  - **Mount Points**: Mount/unmount filesystems, mount point registration
+  - **Hard/Symbolic Links**: Link creation/deletion, link count management
+  - **Extended Attributes**: Set/get/remove/list xattrs, namespace support
+  - **ACLs**: POSIX ACL support, permission checking, default ACLs
+  - **Journaling**: Transaction management, write-ahead logging, checkpointing, recovery
+  - **Compression**: Multiple algorithms (gzip, xz, zstd, lz4, zlib), transparent compression
+  - **Encryption**: Multiple algorithms (AES-256/128-XTS, AES-256/128-CBC, ChaCha20-Poly1305), key management
+  - **Quotas**: User, group, and project quotas, soft/hard limits, grace periods
+  - **Removable Media**: Hot-plug detection, auto-mount, media ejection, event callbacks
+
 ### Networking Stack (Complete Implementation)
 - **TCP/IP Stack**: Full networking stack implementation
   - **IP Layer** (`kernel/network/ip.asm`): IP packet transmission/reception, checksum calculation, routing integration
@@ -363,6 +516,30 @@ Complete technical documentation for the FreeWorld Operating System.
 - **Reference**: 100% documented
 
 ### New Documentation Pages (Latest Update)
+- ✅ **uefi-boot.html** - UEFI bootloader implementation
+- ✅ **early-hardware-detection.html** - Early hardware detection capabilities
+- ✅ **acpi-support.html** - ACPI support and device tree
+- ✅ **boot-parameters.html** - Boot parameter parsing
+- ✅ **virtual-memory.html** - Virtual memory system (paging, page faults, swap)
+- ✅ **process-scheduling.html** - Advanced scheduler (CFS, deadline, real-time)
+- ✅ **interrupt-handling.html** - Complete IRQ system, APIC/IOAPIC
+- ✅ **exception-handling.html** - All 32 CPU exceptions
+- ✅ **debugging.html** - Kernel debugging (KDB, stack traces, panic handler)
+- ✅ **logging.html** - Kernel logging (klog, dmesg, syslog)
+- ✅ **modules.html** - Loadable kernel modules (LKM) system
+- ✅ **power-management.html** - Power management (CPU frequency scaling, suspend/resume)
+- ✅ **storage-drivers.html** - Storage drivers (AHCI/SATA, NVMe, USB storage, SCSI, CD/DVD)
+- ✅ **vesa-graphics.html** - Enhanced VESA/VBE graphics driver
+- ✅ **gpu-drivers.html** - GPU drivers (Intel, AMD, NVIDIA)
+- ✅ **display-output.html** - Display output (DisplayPort, HDMI, DVI, multi-monitor)
+- ✅ **usb-system.html** - USB system (host controllers, HID, audio, transfers)
+- ✅ **filesystem-drivers.html** - Filesystem drivers (native and virtual filesystems, features)
+- ✅ **kernel-decompression.html** - Kernel decompression (gzip, LZMA2/XZ, ZSTD)
+- ✅ **c-library.html** - Complete C library (glibc equivalent)
+- ✅ **cpp-library.html** - Complete C++ standard library
+- ✅ **network-protocols.html** - Network protocols (HTTP/HTTPS, FTP, SSH, NFS, SMB/CIFS, WebSocket)
+- ✅ **network-stack.html** - Network stack (ARP, DNS, DHCP, NAT, Firewall, VPN, IPv6)
+- ✅ **system-services.html** - System services (Service Manager, Cron/At, Syslog, Udev/Devd, D-Bus)
 - ✅ **filesystem-kernel.html** - FAT32 filesystem parser and ATA disk driver (Fixed structure)
 - ✅ **elf-loader.html** - ELF executable loader (32-bit and 64-bit) (Fixed structure)
 - ✅ **execve.html** - execve() system call for program execution (Fixed structure)
@@ -433,29 +610,7 @@ Open `index.html` in a web browser to view the documentation. The navigation sid
 - **GUI Resource Manager**: Fonts, icons, cursors, brushes
 - **Both**: Fully documented and implemented
 
-## Documentation Structure
 
-The documentation is organized into HTML pages with:
-- **Navigation sidebar** on every page for easy access (full menu matching index.html)
-- **Consistent structure** across all pages:
-  - `<main class="content">` wrapper
-  - `<div class="page-header">` with title and metadata
-  - `<section class="section">` for content sections
-  - Footer with version information
-  - Navigation script for dynamic features
-- **Status badges** indicating implementation status
-- **Code examples** and usage patterns
-- **Architecture diagrams** and data flow explanations
-- **Integration points** showing how components work together
-- **Related documentation** links for cross-referencing
-
-### Documentation Consistency (Latest Update)
-All documentation pages have been standardized with:
-- ✅ Full navigation menu on every page
-- ✅ Consistent page structure (page-header, section classes)
-- ✅ Footer and navigation script
-- ✅ Uniform formatting and styling
-- ✅ All pages match the BOOTMGR page format
 
 ## Key Features
 
@@ -477,12 +632,3 @@ Every major component has:
 - All pages link to related components
 - Navigation sidebar on every page
 - Index page provides complete overview
-
-
-### User Account Management System (Latest)
-- ✅ **user-accounts.html** - Complete user account management documentation
-  - User/group management
-  - Authentication system (PBKDF2-SHA512)
-  - Permissions and access control
-  - Account policies (locking, expiration)
-  - Session management
