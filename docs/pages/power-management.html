@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeWorld Logon (freeworldlogon.exe) - FreeWorld OS Documentation</title>
+    <title>Power Management - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -112,57 +112,184 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>FreeWorld Logon (freeworldlogon.exe)</h1>
+                <h1>Power Management System</h1>
                 <div class="meta">
-                    <strong>Location:</strong> services/freeworldlogon.exe<br>
-                    <strong>Type:</strong> Service (Node.js)<br>
-                    <strong>Purpose:</strong> User authentication and session initialization<br>
+                    <strong>Location:</strong> kernel/power/<br>
+                    <strong>Type:</strong> Kernel Power Management (Assembly)<br>
                     <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
-                <h2>Overview</h2>
-                <p>FreeWorld Logon is the authentication service that displays the login screen and manages user sessions, similar to Windows Winlogon.</p>
-            </section>
+            <h2>Overview</h2>
+            <p>The FreeWorld OS power management system provides comprehensive power management capabilities including CPU frequency scaling, suspend/resume, and ACPI state management.</p>
+        </section>
 
             <section class="section">
-                <h2>Functions</h2>
-                <ul>
-                    <li>Display login screen</li>
-                    <li>User authentication</li>
-                    <li>Password verification</li>
-                    <li>Session creation</li>
-                    <li>Desktop environment startup</li>
-                </ul>
-            </section>
+                <h2>Components</h2>
+            
+            <h3>CPU Frequency Scaling (P-States)</h3>
+            <p>Dynamic CPU frequency adjustment:</p>
+            <ul>
+                <li><strong>Up to 16 P-States</strong>: Multiple performance levels</li>
+                <li><strong>Dynamic Scaling</strong>: Automatic frequency adjustment</li>
+                <li><strong>Policy-Based</strong>: Performance, Balanced, Power Save modes</li>
+                <li><strong>ACPI Integration</strong>: P-state enumeration from ACPI _PSS</li>
+                <li><strong>Thermal Throttling</strong>: Automatic frequency reduction on overheating</li>
+            </ul>
+
+            <h3>CPU Idle States (C-States)</h3>
+            <p>CPU idle management:</p>
+            <ul>
+                <li><strong>C0</strong>: Active (no idle)</li>
+                <li><strong>C1</strong>: HLT (halt instruction)</li>
+                <li><strong>C2</strong>: MWAIT (if supported)</li>
+                <li><strong>C3</strong>: Deep sleep</li>
+                <li><strong>Policy-Based</strong>: Idle depth based on power policy</li>
+                <li><strong>Scheduler Integration</strong>: Automatic idle entry when system is idle</li>
+            </ul>
+
+            <h3>System Suspend/Resume</h3>
+            <p>Complete suspend and resume support:</p>
+            <ul>
+                <li><strong>S1</strong>: Standby (CPU stopped, RAM on)</li>
+                <li><strong>S2</strong>: Standby (CPU off, RAM on)</li>
+                <li><strong>S3</strong>: Suspend to RAM</li>
+                <li><strong>S4</strong>: Suspend to disk (hibernate)</li>
+                <li><strong>Context Save/Restore</strong>: Full CPU state preservation</li>
+                <li><strong>Device Restoration</strong>: Device state restoration after resume</li>
+            </ul>
+
+            <h3>ACPI Power States</h3>
+            <p>ACPI sleep state management:</p>
+            <ul>
+                <li><strong>S0</strong>: Working (full power)</li>
+                <li><strong>S1-S4</strong>: Suspend states</li>
+                <li><strong>S5</strong>: Soft off (shutdown)</li>
+                <li><strong>ACPI Integration</strong>: FADT/DSDT integration</li>
+                <li><strong>PM1a/PM1b Control</strong>: ACPI power control registers</li>
+            </ul>
+
+            <h3>Thermal Management</h3>
+            <p>CPU temperature monitoring and throttling:</p>
+            <ul>
+                <li><strong>Temperature Monitoring</strong>: Periodic temperature reading</li>
+                <li><strong>Thermal Throttling</strong>: Automatic frequency reduction</li>
+                <li><strong>Throttle Levels</strong>: Graduated throttling based on temperature</li>
+                <li><strong>ACPI Integration</strong>: Thermal zone support</li>
+            </ul>
+        </section>
 
             <section class="section">
-                <h2>Login Process</h2>
-                <ol>
-                    <li>Display login screen</li>
-                    <li>Capture username and password</li>
-                    <li>Verify credentials</li>
-                    <li>Create user session</li>
-                    <li>Start user shell/desktop</li>
-                </ol>
-            </section>
+                <h2>Power Policies</h2>
+            <table>
+                <tr>
+                    <th>Policy</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>Performance</td>
+                    <td>Highest P-state (P0), shallow idle (C1)</td>
+                </tr>
+                <tr>
+                    <td>Balanced</td>
+                    <td>Middle P-state, medium idle (C2)</td>
+                </tr>
+                <tr>
+                    <td>Power Save</td>
+                    <td>Lowest P-state, deep idle (C3)</td>
+                </tr>
+            </table>
+        </section>
 
             <section class="section">
-                <h2>Security</h2>
-                <ul>
-                    <li>Password hashing (SHA-256)</li>
-                    <li>Account lockout after failed attempts</li>
-                    <li>Session token generation</li>
-                    <li>Secure credential storage</li>
-                </ul>
-            </section>
+                <h2>Power API</h2>
+            <table>
+                <tr>
+                    <th>Function</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>power_management_init()</code></td>
+                    <td>Initialize power management</td>
+                </tr>
+                <tr>
+                    <td><code>power_set_policy()</code></td>
+                    <td>Set power policy</td>
+                </tr>
+                <tr>
+                    <td><code>power_enter_idle()</code></td>
+                    <td>Enter CPU idle state</td>
+                </tr>
+                <tr>
+                    <td><code>power_suspend()</code></td>
+                    <td>Suspend system</td>
+                </tr>
+                <tr>
+                    <td><code>power_resume()</code></td>
+                    <td>Resume system</td>
+                </tr>
+                <tr>
+                    <td><code>power_get_state()</code></td>
+                    <td>Get current ACPI state</td>
+                </tr>
+                <tr>
+                    <td><code>power_get_temperature()</code></td>
+                    <td>Get CPU temperature</td>
+                </tr>
+                <tr>
+                    <td><code>power_get_p_state()</code></td>
+                    <td>Get current P-state</td>
+                </tr>
+                <tr>
+                    <td><code>power_get_c_state()</code></td>
+                    <td>Get current C-state</td>
+                </tr>
+                <tr>
+                    <td><code>acpi_enter_sleep_state()</code></td>
+                    <td>Enter ACPI sleep state</td>
+                </tr>
+            </table>
+        </section>
+
+            <section class="section">
+                <h2>Features</h2>
+            <ul>
+                <li>CPU P-states (performance scaling)</li>
+                <li>CPU C-states (idle management)</li>
+                <li>System suspend (S1-S4)</li>
+                <li>System resume</li>
+                <li>ACPI sleep states (S0-S5)</li>
+                <li>Thermal throttling</li>
+                <li>Power policies (Performance, Balanced, Power Save)</li>
+                <li>Context save/restore</li>
+                <li>CPU temperature monitoring</li>
+                <li>Scheduler integration (idle handler)</li>
+                <li>Timer integration (thermal handler)</li>
+            </ul>
+        </section>
 
             <section class="section">
                 <h2>Implementation</h2>
-                <p>FreeWorld Logon is implemented as a Node.js application with a graphical login interface using the kernel GUI system.</p>
+            <p><strong>Total Lines of Code</strong>: ~1,014 lines</p>
+            <ul>
+                <li><code>kernel/power/power_management.asm</code> (~750 lines) - Power management core</li>
+                <li><code>kernel/power/acpi_power.asm</code> (~260 lines) - ACPI power integration</li>
+            </ul>
+        </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The power management system is integrated with:</p>
+                <ul>
+                    <li>Kernel initialization sequence</li>
+                    <li>ACPI system (FADT, DSDT)</li>
+                    <li>Scheduler (idle handler)</li>
+                    <li>Timer (thermal handler)</li>
+                </ul>
             </section>
         </main>
     </div>
 </body>
 </html>
+

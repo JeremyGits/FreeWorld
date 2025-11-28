@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeWorld Logon (freeworldlogon.exe) - FreeWorld OS Documentation</title>
+    <title>Kernel Logging - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -112,57 +112,131 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>FreeWorld Logon (freeworldlogon.exe)</h1>
+                <h1>Kernel Logging System</h1>
                 <div class="meta">
-                    <strong>Location:</strong> services/freeworldlogon.exe<br>
-                    <strong>Type:</strong> Service (Node.js)<br>
-                    <strong>Purpose:</strong> User authentication and session initialization<br>
+                    <strong>Location:</strong> kernel/logging/<br>
+                    <strong>Type:</strong> Kernel Logging (Assembly)<br>
                     <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
-                <h2>Overview</h2>
-                <p>FreeWorld Logon is the authentication service that displays the login screen and manages user sessions, similar to Windows Winlogon.</p>
-            </section>
+            <h2>Overview</h2>
+            <p>The FreeWorld OS kernel logging system provides comprehensive logging capabilities with klog (kernel log buffer), dmesg (display messages), and syslog integration.</p>
+        </section>
 
             <section class="section">
-                <h2>Functions</h2>
-                <ul>
-                    <li>Display login screen</li>
-                    <li>User authentication</li>
-                    <li>Password verification</li>
-                    <li>Session creation</li>
-                    <li>Desktop environment startup</li>
-                </ul>
-            </section>
+                <h2>Components</h2>
+            
+            <h3>klog (Kernel Log Buffer)</h3>
+            <p>Circular buffer for kernel messages:</p>
+            <ul>
+                <li><strong>64KB Circular Buffer</strong>: Efficient memory usage with automatic wrapping</li>
+                <li><strong>Timestamp Support</strong>: All messages include timestamps (ticks since boot)</li>
+                <li><strong>Log Level Filtering</strong>: DEBUG, INFO, WARNING, ERROR, CRITICAL</li>
+                <li><strong>Thread-Safe</strong>: Spinlock-protected operations</li>
+                <li><strong>Multiple Outputs</strong>: Serial, buffer, and file (future) support</li>
+                <li><strong>Up to 1024 Entries</strong>: Indexed entry management</li>
+                <li><strong>Message Formatting</strong>: Timestamps, levels, facilities, and messages</li>
+            </ul>
+
+            <h3>dmesg (Display Messages)</h3>
+            <p>Read and display kernel messages:</p>
+            <ul>
+                <li><strong>Read All Messages</strong>: Display all messages from klog buffer</li>
+                <li><strong>Level Filtering</strong>: Filter by log level (bitmask)</li>
+                <li><strong>Facility Filtering</strong>: Filter by facility (bitmask)</li>
+                <li><strong>Clear Buffer</strong>: Option to clear buffer after reading</li>
+                <li><strong>Follow Mode</strong>: Continuous output of new messages</li>
+                <li><strong>Thread-Safe Reading</strong>: Safe concurrent access</li>
+            </ul>
+
+            <h3>syslog Integration</h3>
+            <p>syslog protocol support (RFC 3164):</p>
+            <ul>
+                <li><strong>8 Priority Levels</strong>: EMERG, ALERT, CRIT, ERR, WARNING, NOTICE, INFO, DEBUG</li>
+                <li><strong>24 Facilities</strong>: KERN, USER, MAIL, DAEMON, AUTH, SYSLOG, LPR, NEWS, UUCP, CRON, AUTHPRIV, FTP, NTP, SECURITY, CONSOLE, LOCAL0-7</li>
+                <li><strong>Local syslog</strong>: Integrated with klog</li>
+                <li><strong>Remote syslog</strong>: Structure ready for network syslog</li>
+                <li><strong>Priority Mapping</strong>: Automatic mapping to klog levels</li>
+                <li><strong>RFC 3164 Format</strong>: Standard syslog message format</li>
+            </ul>
+        </section>
 
             <section class="section">
-                <h2>Login Process</h2>
-                <ol>
-                    <li>Display login screen</li>
-                    <li>Capture username and password</li>
-                    <li>Verify credentials</li>
-                    <li>Create user session</li>
-                    <li>Start user shell/desktop</li>
-                </ol>
-            </section>
+                <h2>Log Levels</h2>
+            <table>
+                <tr>
+                    <th>Level</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td>DEBUG</td>
+                    <td>0</td>
+                    <td>Debug messages (lowest priority)</td>
+                </tr>
+                <tr>
+                    <td>INFO</td>
+                    <td>1</td>
+                    <td>Informational messages</td>
+                </tr>
+                <tr>
+                    <td>WARNING</td>
+                    <td>2</td>
+                    <td>Warning messages</td>
+                </tr>
+                <tr>
+                    <td>ERROR</td>
+                    <td>3</td>
+                    <td>Error messages</td>
+                </tr>
+                <tr>
+                    <td>CRITICAL</td>
+                    <td>4</td>
+                    <td>Critical messages (highest priority)</td>
+                </tr>
+            </table>
+        </section>
 
             <section class="section">
-                <h2>Security</h2>
-                <ul>
-                    <li>Password hashing (SHA-256)</li>
-                    <li>Account lockout after failed attempts</li>
-                    <li>Session token generation</li>
-                    <li>Secure credential storage</li>
-                </ul>
-            </section>
+                <h2>Features</h2>
+            <ul>
+                <li>64KB circular buffer for kernel messages</li>
+                <li>Timestamp support (ticks since boot)</li>
+                <li>Thread-safe operations (spinlock)</li>
+                <li>Log level filtering</li>
+                <li>Multiple output destinations</li>
+                <li>Message formatting with timestamps, levels, and facilities</li>
+                <li>dmesg command for viewing messages</li>
+                <li>Follow mode for continuous monitoring</li>
+                <li>syslog protocol support (RFC 3164)</li>
+                <li>Priority and facility support</li>
+                <li>Local and remote syslog support</li>
+            </ul>
+        </section>
 
             <section class="section">
                 <h2>Implementation</h2>
-                <p>FreeWorld Logon is implemented as a Node.js application with a graphical login interface using the kernel GUI system.</p>
+            <p><strong>Total Lines of Code</strong>: ~1,238 lines</p>
+            <ul>
+                <li><code>kernel/logging/klog.asm</code> (~650 lines) - Kernel log buffer</li>
+                <li><code>kernel/logging/dmesg.asm</code> (~200 lines) - Display messages</li>
+                <li><code>kernel/logging/syslog.asm</code> (~380 lines) - syslog integration</li>
+            </ul>
+        </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The logging system is integrated with:</p>
+                <ul>
+                    <li>Kernel initialization sequence</li>
+                    <li>Serial port (output destination)</li>
+                    <li>All kernel components (for logging)</li>
+                </ul>
             </section>
         </main>
     </div>
 </body>
 </html>
+

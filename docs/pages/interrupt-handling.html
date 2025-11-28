@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interrupt Handling - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="../index.html" class="nav-logo">FreeWorld OS</a>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li><a href="kernel.html">Kernel</a></li>
+                <li><a href="memory.html">Memory</a></li>
+                <li><a href="process.html">Process</a></li>
+                <li><a href="filesystem-kernel.html">Filesystem</a></li>
+                <li><a href="interrupt-handling.html" class="active">Interrupts</a></li>
+                <li><a href="debugging.html">Debugging</a></li>
+                <li><a href="logging.html">Logging</a></li>
+                <li><a href="modules.html">Modules</a></li>
+                <li><a href="power-management.html">Power</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <main class="content">
+        <h1>Interrupt Handling System</h1>
+        
+        <section>
+            <h2>Overview</h2>
+            <p>The FreeWorld OS interrupt handling system provides complete support for hardware interrupts and CPU exceptions, with both legacy PIC and modern APIC/IOAPIC support.</p>
+        </section>
+
+        <section>
+            <h2>Components</h2>
+            
+            <h3>IDT (Interrupt Descriptor Table)</h3>
+            <p>The IDT is a 256-entry table that defines interrupt handlers for all interrupts and exceptions:</p>
+            <ul>
+                <li><strong>Exception Handlers (0-31)</strong>: All 32 CPU exceptions are handled</li>
+                <li><strong>Interrupt Handlers (32-255)</strong>: Hardware interrupts and software interrupts</li>
+                <li><strong>IST Support</strong>: Interrupt Stack Table for critical exceptions (double fault, machine check)</li>
+                <li><strong>Ring Levels</strong>: Support for both Ring 0 (kernel) and Ring 3 (user) interrupts</li>
+            </ul>
+
+            <h3>Exception Handlers</h3>
+            <p>Complete exception handling for all CPU exceptions:</p>
+            <ul>
+                <li><strong>Exception 0</strong>: Divide by Zero</li>
+                <li><strong>Exception 1</strong>: Debug</li>
+                <li><strong>Exception 2</strong>: Non-Maskable Interrupt</li>
+                <li><strong>Exception 3</strong>: Breakpoint (INT3)</li>
+                <li><strong>Exception 4</strong>: Overflow</li>
+                <li><strong>Exception 5</strong>: Bound Range Exceeded</li>
+                <li><strong>Exception 6</strong>: Invalid Opcode</li>
+                <li><strong>Exception 7</strong>: Device Not Available</li>
+                <li><strong>Exception 8</strong>: Double Fault (with error code)</li>
+                <li><strong>Exception 10</strong>: Invalid TSS (with error code)</li>
+                <li><strong>Exception 11</strong>: Segment Not Present (with error code)</li>
+                <li><strong>Exception 12</strong>: Stack Segment Fault (with error code)</li>
+                <li><strong>Exception 13</strong>: General Protection Fault (with error code)</li>
+                <li><strong>Exception 14</strong>: Page Fault (with error code, integrated with virtual memory)</li>
+                <li><strong>Exception 16</strong>: x87 FPU Error</li>
+                <li><strong>Exception 17</strong>: Alignment Check (with error code)</li>
+                <li><strong>Exception 18</strong>: Machine Check (with error code)</li>
+                <li><strong>Exception 19</strong>: SIMD Floating Point Exception</li>
+                <li><strong>Exception 20</strong>: Virtualization Exception</li>
+            </ul>
+
+            <h3>APIC Support</h3>
+            <p>Modern Advanced Programmable Interrupt Controller support:</p>
+            <ul>
+                <li><strong>Local APIC</strong>: Per-CPU interrupt controller</li>
+                <li><strong>I/O APIC</strong>: System-wide interrupt controller</li>
+                <li><strong>IRQ Routing</strong>: Dynamic IRQ routing and redirection</li>
+                <li><strong>IPI Support</strong>: Inter-Processor Interrupts for SMP</li>
+                <li><strong>APIC Timer</strong>: Local APIC timer configuration</li>
+                <li><strong>EOI Handling</strong>: End of Interrupt acknowledgment</li>
+            </ul>
+
+            <h3>Legacy PIC Support</h3>
+            <p>Fallback support for legacy 8259 PIC:</p>
+            <ul>
+                <li><strong>PIC Remapping</strong>: Remap IRQs to avoid conflicts with exceptions</li>
+                <li><strong>IRQ Management</strong>: Enable/disable individual IRQs</li>
+                <li><strong>EOI Handling</strong>: End of Interrupt for PIC</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Features</h2>
+            <ul>
+                <li>Complete IDT setup (256 entries)</li>
+                <li>All 32 CPU exceptions handled</li>
+                <li>Error code handling for applicable exceptions</li>
+                <li>Exception statistics tracking</li>
+                <li>Critical exception detection and handling</li>
+                <li>Page fault integration with virtual memory system</li>
+                <li>Local APIC initialization and configuration</li>
+                <li>I/O APIC enumeration from ACPI MADT</li>
+                <li>IRQ handler registration</li>
+                <li>Thread-safe interrupt handling</li>
+                <li>Legacy PIC fallback support</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Implementation</h2>
+            <p><strong>Total Lines of Code</strong>: ~1,330 lines</p>
+            <ul>
+                <li><code>kernel/interrupts/idt.asm</code> (~200 lines) - IDT setup</li>
+                <li><code>kernel/interrupts/exceptions.asm</code> (~400 lines) - Exception handlers</li>
+                <li><code>kernel/interrupts/apic.asm</code> (~450 lines) - APIC support</li>
+                <li><code>kernel/interrupts/irq_apic.asm</code> (~150 lines) - APIC IRQ handling</li>
+                <li><code>kernel/acpi/ioapic.asm</code> (~130 lines) - I/O APIC enumeration</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2>Integration</h2>
+            <p>The interrupt handling system is integrated with:</p>
+            <ul>
+                <li>Kernel initialization sequence</li>
+                <li>ACPI system (for I/O APIC discovery)</li>
+                <li>Virtual memory system (page fault handler)</li>
+                <li>Debugging system (breakpoint exceptions)</li>
+            </ul>
+        </section>
+    </main>
+</body>
+</html>
+

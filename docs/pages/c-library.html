@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C Library (glibc equivalent) - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="storage-drivers.html">Storage Drivers</a></li>
+                <li><a href="vesa-graphics.html">VESA/VBE Graphics</a></li>
+                <li><a href="gpu-drivers.html">GPU Drivers</a></li>
+                <li><a href="display-output.html">Display Output</a></li>
+                <li><a href="usb-system.html">USB System</a></li>
+                <li><a href="filesystem-drivers.html">Filesystem Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="interrupt-handling.html">Interrupt Handling</a></li>
+                <li><a href="debugging.html">Kernel Debugging</a></li>
+                <li><a href="logging.html">Kernel Logging</a></li>
+                <li><a href="modules.html">Kernel Modules</a></li>
+                <li><a href="power-management.html">Power Management</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="c-library.html">C Library (glibc equivalent)</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li><a href="display-manager.html">display-manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li><a href="file-type-associations.html">File Type Associations</a></li>
+                <li><a href="icon-system.html">Icon System</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="window-relationships.html">Window Relationships</a></li>
+                <li><a href="menu.html">Menu System</a></li>
+                <li><a href="nonclient.html">Non-Client Area</a></li>
+                <li><a href="controls.html">Standard Controls</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>C Library (glibc equivalent)</h1>
+                <div class="meta">
+                    <strong>Location:</strong> libc/<br>
+                    <strong>Type:</strong> Standard Library (Assembly)<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>
+                    The FreeWorld OS C Library is a complete implementation of the C standard library,
+                    equivalent to glibc. It provides all standard C library functions required for
+                    C program execution, including I/O, memory management, string operations, math
+                    functions, and more.
+                </p>
+                <p>
+                    The library is implemented in x64 assembly for maximum performance and direct
+                    kernel integration. All functions follow the System V AMD64 ABI calling convention.
+                </p>
+            </section>
+
+            <section class="section">
+                <h2>Components</h2>
+                
+                <h3>stdio - Standard I/O</h3>
+                <p>
+                    Complete file I/O and formatted I/O support:
+                </p>
+                <ul>
+                    <li><strong>File Operations:</strong> fopen, fclose, fread, fwrite, fseek, ftell</li>
+                    <li><strong>Formatted I/O:</strong> printf, fprintf, sprintf, scanf, fscanf</li>
+                    <li><strong>Character I/O:</strong> fgetc, fputc, getchar, putchar</li>
+                    <li><strong>String I/O:</strong> fgets, fputs, gets, puts</li>
+                    <li><strong>Stream Management:</strong> Buffering, flushing, error handling</li>
+                    <li><strong>Standard Streams:</strong> stdin, stdout, stderr</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/stdio/stdio_core.asm</code>, <code>libc/stdio/stdio_helpers.asm</code></p>
+
+                <h3>stdlib - Standard Library</h3>
+                <p>
+                    Memory allocation, conversions, and utility functions:
+                </p>
+                <ul>
+                    <li><strong>Memory Management:</strong> malloc, free, realloc, calloc</li>
+                    <li><strong>String Conversions:</strong> atoi, atol, atoll, strtol, strtoul</li>
+                    <li><strong>Integer Conversions:</strong> itoa, ltoa, ultoa</li>
+                    <li><strong>Random Numbers:</strong> rand, srand, random, srandom</li>
+                    <li><strong>Environment:</strong> getenv, setenv, unsetenv</li>
+                    <li><strong>Program Control:</strong> exit, abort, atexit</li>
+                    <li><strong>Search & Sort:</strong> bsearch, qsort</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/stdlib/stdlib_core.asm</code></p>
+
+                <h3>string - String Functions</h3>
+                <p>
+                    Complete string manipulation and memory operations:
+                </p>
+                <ul>
+                    <li><strong>String Length:</strong> strlen, strnlen</li>
+                    <li><strong>String Copy:</strong> strcpy, strncpy, strdup, strndup</li>
+                    <li><strong>String Concatenation:</strong> strcat, strncat</li>
+                    <li><strong>String Comparison:</strong> strcmp, strncmp, strcasecmp, strncasecmp</li>
+                    <li><strong>String Search:</strong> strchr, strrchr, strstr, strpbrk, strspn, strcspn</li>
+                    <li><strong>String Tokens:</strong> strtok, strtok_r</li>
+                    <li><strong>Memory Operations:</strong> memcpy, memmove, memset, memcmp, memchr</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/string/string_core.asm</code></p>
+
+                <h3>math - Math Functions</h3>
+                <p>
+                    Complete mathematical function library:
+                </p>
+                <ul>
+                    <li><strong>Trigonometric:</strong> sin, cos, tan, asin, acos, atan, atan2</li>
+                    <li><strong>Hyperbolic:</strong> sinh, cosh, tanh, asinh, acosh, atanh</li>
+                    <li><strong>Exponential/Logarithmic:</strong> exp, log, log10, log2, pow, sqrt, cbrt</li>
+                    <li><strong>Rounding:</strong> floor, ceil, trunc, round, nearbyint</li>
+                    <li><strong>Remainder:</strong> fmod, remainder, remquo</li>
+                    <li><strong>Absolute Value:</strong> fabs, fabsf, fabsl</li>
+                    <li><strong>Other:</strong> hypot, fma, copysign, nan, nextafter</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/math/math_core.asm</code></p>
+
+                <h3>ctype - Character Classification</h3>
+                <p>
+                    Character classification and conversion functions:
+                </p>
+                <ul>
+                    <li><strong>Classification:</strong> isalnum, isalpha, isdigit, isxdigit</li>
+                    <li><strong>Case:</strong> islower, isupper, isblank, isspace</li>
+                    <li><strong>Printability:</strong> isprint, isgraph, ispunct, iscntrl</li>
+                    <li><strong>Conversion:</strong> tolower, toupper</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/ctype/ctype_core.asm</code></p>
+
+                <h3>time - Time Functions</h3>
+                <p>
+                    Time and date manipulation:
+                </p>
+                <ul>
+                    <li><strong>Time Retrieval:</strong> time, gettimeofday, clock_gettime</li>
+                    <li><strong>Time Conversion:</strong> localtime, gmtime, mktime, timegm</li>
+                    <li><strong>Time Formatting:</strong> strftime, asctime, ctime</li>
+                    <li><strong>Time Arithmetic:</strong> difftime</li>
+                    <li><strong>Time Structures:</strong> tm structure, time_t type</li>
+                </ul>
+                <p><strong>Files:</strong> <code>libc/time/time_core.asm</code></p>
+            </section>
+
+            <section class="section">
+                <h2>Implementation Details</h2>
+                
+                <h3>Architecture</h3>
+                <p>
+                    The C library is implemented entirely in x64 assembly (NASM) for:
+                </p>
+                <ul>
+                    <li>Maximum performance and direct kernel integration</li>
+                    <li>Full control over system calls and kernel interfaces</li>
+                    <li>No external dependencies beyond the kernel</li>
+                    <li>Optimized for FreeWorld OS architecture</li>
+                </ul>
+
+                <h3>Calling Convention</h3>
+                <p>
+                    All functions follow the System V AMD64 ABI:
+                </p>
+                <ul>
+                    <li>Integer arguments: RDI, RSI, RDX, RCX, R8, R9</li>
+                    <li>Floating-point arguments: XMM0-XMM7</li>
+                    <li>Return value: RAX (integer), XMM0 (floating-point)</li>
+                    <li>Caller-saved registers: RAX, RCX, RDX, RSI, RDI, R8-R11, XMM0-XMM15</li>
+                    <li>Stack alignment: 16-byte aligned</li>
+                </ul>
+
+                <h3>Memory Management</h3>
+                <p>
+                    The library uses kernel memory allocation functions:
+                </p>
+                <ul>
+                    <li><code>kmalloc</code> - Allocate kernel memory</li>
+                    <li><code>kfree</code> - Free kernel memory</li>
+                    <li>Heap management for user-space programs</li>
+                    <li>Automatic alignment to 16-byte boundaries</li>
+                </ul>
+
+                <h3>System Calls</h3>
+                <p>
+                    The library interfaces with kernel system calls:
+                </p>
+                <ul>
+                    <li><code>syscall_open</code> - Open files</li>
+                    <li><code>syscall_read</code> - Read from files</li>
+                    <li><code>syscall_write</code> - Write to files</li>
+                    <li><code>syscall_close</code> - Close files</li>
+                    <li><code>syscall_lseek</code> - Seek in files</li>
+                    <li><code>syscall_time</code> - Get system time</li>
+                    <li><code>syscall_gettimeofday</code> - Get time with microseconds</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Build System</h2>
+                <p>
+                    The C library is built using the Makefile in <code>libc/Makefile</code>:
+                </p>
+                <pre><code>make -C libc all</code></pre>
+                <p>
+                    This produces <code>lib/libc.a</code>, a static library archive containing
+                    all C library functions.
+                </p>
+                <p>
+                    To link against the library:
+                </p>
+                <pre><code>ld -o program program.o -Llibc/lib -lc</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Usage Examples</h2>
+                
+                <h3>File I/O</h3>
+                <pre><code>FILE *fp = fopen("file.txt", "r");
+if (fp) {
+    char buffer[256];
+    fread(buffer, 1, 256, fp);
+    fclose(fp);
+}</code></pre>
+
+                <h3>String Operations</h3>
+                <pre><code>char *str = "Hello, World!";
+size_t len = strlen(str);
+char *copy = malloc(len + 1);
+strcpy(copy, str);</code></pre>
+
+                <h3>Math Functions</h3>
+                <pre><code>double x = 3.14159;
+double sin_x = sin(x);
+double sqrt_x = sqrt(x);
+double pow_x = pow(x, 2.0);</code></pre>
+
+                <h3>Time Functions</h3>
+                <pre><code>time_t now = time(NULL);
+struct tm *tm_info = localtime(&now);
+char buffer[80];
+strftime(buffer, 80, "%Y-%m-%d %H:%M:%S", tm_info);</code></pre>
+            </section>
+
+            <section class="section">
+                <h2>Status</h2>
+                <p>
+                    <strong>Status:</strong> ✅ Complete
+                </p>
+                <p>
+                    The C library is fully implemented and provides complete glibc-equivalent
+                    functionality for all standard C library components. All functions are
+                    optimized for x64 architecture and integrated with the FreeWorld OS kernel.
+                </p>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

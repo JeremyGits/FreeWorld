@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C++ Standard Library - FreeWorld OS Documentation</title>
+    <link rel="stylesheet" href="../styles.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar">
+            <h2>Navigation</h2>
+            <ul class="nav-menu">
+                <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="storage-drivers.html">Storage Drivers</a></li>
+                <li><a href="vesa-graphics.html">VESA/VBE Graphics</a></li>
+                <li><a href="gpu-drivers.html">GPU Drivers</a></li>
+                <li><a href="display-output.html">Display Output</a></li>
+                <li><a href="usb-system.html">USB System</a></li>
+                <li><a href="filesystem-drivers.html">Filesystem Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="interrupt-handling.html">Interrupt Handling</a></li>
+                <li><a href="debugging.html">Kernel Debugging</a></li>
+                <li><a href="logging.html">Kernel Logging</a></li>
+                <li><a href="modules.html">Kernel Modules</a></li>
+                <li><a href="power-management.html">Power Management</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="c-library.html">C Library (glibc equivalent)</a></li>
+                <li><a href="cpp-library.html">C++ Standard Library</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li><a href="display-manager.html">display-manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li><a href="file-type-associations.html">File Type Associations</a></li>
+                <li><a href="icon-system.html">Icon System</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
+                <li><a href="dc.html">Device Context</a></li>
+                <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="window-relationships.html">Window Relationships</a></li>
+                <li><a href="menu.html">Menu System</a></li>
+                <li><a href="nonclient.html">Non-Client Area</a></li>
+                <li><a href="controls.html">Standard Controls</a></li>
+                <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="page-header">
+                <h1>C++ Standard Library</h1>
+                <div class="meta">
+                    <strong>Location:</strong> <code>libc++/</code><br>
+                    <strong>Type:</strong> System Library<br>
+                    <strong>Status:</strong> ✅ Fully Implemented<br>
+                    <strong>Library:</strong> <code>lib64/libc++.a</code>
+                </div>
+            </div>
+
+            <section class="section">
+                <h2>Overview</h2>
+                <p>The FreeWorld OS C++ Standard Library provides a comprehensive implementation of the C++ standard library, including core runtime support, STL containers, I/O streams, smart pointers, and utility functions. The library is designed to be compatible with C++17 standards and provides both assembly-level core runtime and C++ template-based implementations.</p>
+                
+                <div class="alert alert-info">
+                    <strong>Note:</strong> The C++ standard library builds upon the C library (glibc equivalent) for low-level operations, while providing high-level C++ abstractions for modern C++ development.
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Core Runtime (Assembly)</h2>
+                <p>The core runtime components are implemented in assembly for maximum performance and direct kernel integration:</p>
+                
+                <h3>Memory Management</h3>
+                <ul>
+                    <li><strong>operator new/delete</strong> - Single object allocation/deallocation</li>
+                    <li><strong>operator new[]/delete[]</strong> - Array allocation/deallocation</li>
+                    <li><strong>nothrow variants</strong> - Exception-safe allocation</li>
+                </ul>
+                
+                <h3>Exception Handling</h3>
+                <ul>
+                    <li><strong>__cxa_allocate_exception</strong> - Allocate exception object</li>
+                    <li><strong>__cxa_throw</strong> - Throw exception</li>
+                    <li><strong>__cxa_begin_catch</strong> - Begin exception handling</li>
+                    <li><strong>__cxa_end_catch</strong> - End exception handling</li>
+                    <li><strong>__cxa_rethrow</strong> - Rethrow exception</li>
+                    <li><strong>std::terminate</strong> - Terminate handler</li>
+                </ul>
+                
+                <h3>Runtime Type Information (RTTI)</h3>
+                <ul>
+                    <li><strong>__dynamic_cast</strong> - Dynamic type casting</li>
+                    <li><strong>type_info</strong> - Type information</li>
+                    <li><strong>Type comparison</strong> - Type equality checking</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>STL Containers</h2>
+                <p>Standard Template Library containers provide efficient data structures:</p>
+                
+                <h3>std::vector</h3>
+                <p>Dynamic array with automatic resizing:</p>
+                <ul>
+                    <li>Random access iterators</li>
+                    <li>Automatic capacity management</li>
+                    <li>Element insertion/erasure</li>
+                    <li>Move semantics support</li>
+                    <li>Initializer list support</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;vector&gt;
+#include &lt;iostream&gt;
+
+std::vector&lt;int&gt; vec = {1, 2, 3, 4, 5};
+vec.push_back(6);
+for (int val : vec) {
+    std::cout &lt;&lt; val &lt;&lt; " ";
+}</code></pre>
+                </div>
+                
+                <h3>std::string</h3>
+                <p>String class with comprehensive functionality:</p>
+                <ul>
+                    <li>Dynamic string management</li>
+                    <li>Substring operations</li>
+                    <li>String concatenation</li>
+                    <li>Search and replace</li>
+                    <li>C-string compatibility</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;string&gt;
+
+std::string str = "Hello";
+str += " World";
+std::string substr = str.substr(0, 5);  // "Hello"</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>I/O Streams</h2>
+                <p>Input/output stream library for formatted I/O:</p>
+                
+                <h3>std::ostream / std::istream</h3>
+                <ul>
+                    <li>Formatted output with <code>&lt;&lt;</code> operator</li>
+                    <li>Formatted input with <code>&gt;&gt;</code> operator</li>
+                    <li>Type-safe I/O operations</li>
+                    <li>Stream manipulators (endl, flush)</li>
+                </ul>
+                
+                <h3>Standard Streams</h3>
+                <ul>
+                    <li><strong>std::cout</strong> - Standard output</li>
+                    <li><strong>std::cerr</strong> - Standard error</li>
+                    <li><strong>std::cin</strong> - Standard input</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;iostream&gt;
+
+std::cout &lt;&lt; "Hello, World!" &lt;&lt; std::endl;
+int value;
+std::cin &gt;&gt; value;</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Smart Pointers</h2>
+                <p>Automatic memory management with RAII:</p>
+                
+                <h3>std::unique_ptr</h3>
+                <ul>
+                    <li>Exclusive ownership</li>
+                    <li>Automatic deletion</li>
+                    <li>Move semantics</li>
+                    <li>Array specialization</li>
+                </ul>
+                
+                <h3>std::shared_ptr</h3>
+                <ul>
+                    <li>Shared ownership</li>
+                    <li>Reference counting</li>
+                    <li>Thread-safe reference counting</li>
+                    <li>Automatic cleanup when last reference is destroyed</li>
+                </ul>
+                
+                <h3>std::weak_ptr</h3>
+                <ul>
+                    <li>Non-owning reference</li>
+                    <li>Break circular references</li>
+                    <li>Lock to shared_ptr</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;memory&gt;
+
+// unique_ptr
+auto ptr = std::make_unique&lt;int&gt;(42);
+
+// shared_ptr
+auto shared = std::make_shared&lt;int&gt;(42);
+auto weak = std::weak_ptr&lt;int&gt;(shared);</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Utility Functions</h2>
+                <p>General-purpose utility functions and classes:</p>
+                
+                <h3>std::pair</h3>
+                <ul>
+                    <li>Two-element tuple</li>
+                    <li>Comparison operators</li>
+                    <li>make_pair helper</li>
+                </ul>
+                
+                <h3>std::move / std::forward</h3>
+                <ul>
+                    <li><strong>std::move</strong> - Convert to rvalue reference</li>
+                    <li><strong>std::forward</strong> - Perfect forwarding</li>
+                    <li>Enable move semantics</li>
+                </ul>
+                
+                <h3>std::swap</h3>
+                <ul>
+                    <li>Generic swap function</li>
+                    <li>Specialized for types with swap member</li>
+                    <li>Efficient value exchange</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;utility&gt;
+
+auto p = std::make_pair(1, "hello");
+int a = 10, b = 20;
+std::swap(a, b);  // a=20, b=10</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Type Traits</h2>
+                <p>Compile-time type information and transformations:</p>
+                
+                <h3>Type Modifications</h3>
+                <ul>
+                    <li><strong>remove_const</strong> - Remove const qualifier</li>
+                    <li><strong>remove_volatile</strong> - Remove volatile qualifier</li>
+                    <li><strong>remove_reference</strong> - Remove reference</li>
+                    <li><strong>remove_pointer</strong> - Remove pointer</li>
+                    <li><strong>decay</strong> - Array/function to pointer</li>
+                </ul>
+                
+                <h3>Type Properties</h3>
+                <ul>
+                    <li><strong>is_integral</strong> - Check if integral type</li>
+                    <li><strong>is_floating_point</strong> - Check if floating point</li>
+                    <li><strong>is_pointer</strong> - Check if pointer</li>
+                    <li><strong>is_reference</strong> - Check if reference</li>
+                    <li><strong>is_class</strong> - Check if class type</li>
+                    <li><strong>is_same</strong> - Check if types are same</li>
+                </ul>
+                
+                <h3>Conditional Compilation</h3>
+                <ul>
+                    <li><strong>enable_if</strong> - SFINAE helper</li>
+                    <li><strong>conditional</strong> - Conditional type selection</li>
+                </ul>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;type_traits&gt;
+
+static_assert(std::is_integral_v&lt;int&gt;);
+static_assert(std::is_same_v&lt;std::remove_const_t&lt;const int&gt;, int&gt;);</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Build System</h2>
+                <p>The C++ standard library is built using the Makefile in <code>libc++/</code>:</p>
+                
+                <div class="code-block">
+                    <pre><code>cd libc++
+make</code></pre>
+                </div>
+                
+                <p>This produces <code>lib64/libc++.a</code>, a static library containing:</p>
+                <ul>
+                    <li>Core runtime functions (assembly)</li>
+                    <li>Exception handling infrastructure</li>
+                    <li>RTTI support</li>
+                </ul>
+                
+                <p>Header files are located in:</p>
+                <ul>
+                    <li><code>libc++/stl/containers/</code> - STL containers</li>
+                    <li><code>libc++/string/</code> - String class</li>
+                    <li><code>libc++/io/</code> - I/O streams</li>
+                    <li><code>libc++/memory/</code> - Smart pointers</li>
+                    <li><code>libc++/utility/</code> - Utility functions</li>
+                    <li><code>libc++/type_traits/</code> - Type traits</li>
+                </ul>
+            </section>
+
+            <section class="section">
+                <h2>Usage Example</h2>
+                <p>Complete example demonstrating C++ standard library usage:</p>
+                
+                <div class="code-block">
+                    <pre><code>#include &lt;vector&gt;
+#include &lt;string&gt;
+#include &lt;memory&gt;
+#include &lt;iostream&gt;
+#include &lt;utility&gt;
+
+int main() {
+    // Vector
+    std::vector&lt;int&gt; numbers = {1, 2, 3, 4, 5};
+    numbers.push_back(6);
+    
+    // String
+    std::string message = "Hello";
+    message += " World!";
+    
+    // Smart pointer
+    auto ptr = std::make_unique&lt;std::string&gt;("Test");
+    
+    // Output
+    std::cout &lt;&lt; message &lt;&lt; std::endl;
+    std::cout &lt;&lt; "Vector size: " &lt;&lt; numbers.size() &lt;&lt; std::endl;
+    
+    return 0;
+}</code></pre>
+                </div>
+            </section>
+
+            <section class="section">
+                <h2>Integration with C Library</h2>
+                <p>The C++ standard library integrates with the C library (glibc equivalent) for:</p>
+                <ul>
+                    <li>Memory allocation (malloc/free)</li>
+                    <li>I/O operations (stdio functions)</li>
+                    <li>String operations (C string functions)</li>
+                    <li>Mathematical functions</li>
+                </ul>
+                
+                <p>This ensures compatibility and efficient resource sharing between C and C++ code.</p>
+            </section>
+
+            <section class="section">
+                <h2>Future Enhancements</h2>
+                <p>Additional components planned for future implementation:</p>
+                <ul>
+                    <li>Additional STL containers (list, map, set, deque, etc.)</li>
+                    <li>STL algorithms (sort, find, transform, etc.)</li>
+                    <li>File streams (fstream, ifstream, ofstream)</li>
+                    <li>String streams (sstream)</li>
+                    <li>Threading support (thread, mutex, condition_variable)</li>
+                    <li>Filesystem support (C++17 filesystem)</li>
+                    <li>Regular expressions (regex)</li>
+                    <li>Chrono library (time utilities)</li>
+                </ul>
+            </section>
+        </main>
+    </div>
+</body>
+</html>
+

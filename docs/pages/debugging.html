@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeWorld Logon (freeworldlogon.exe) - FreeWorld OS Documentation</title>
+    <title>Kernel Debugging - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -112,57 +112,159 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>FreeWorld Logon (freeworldlogon.exe)</h1>
+                <h1>Kernel Debugging System</h1>
                 <div class="meta">
-                    <strong>Location:</strong> services/freeworldlogon.exe<br>
-                    <strong>Type:</strong> Service (Node.js)<br>
-                    <strong>Purpose:</strong> User authentication and session initialization<br>
+                    <strong>Location:</strong> kernel/debug/<br>
+                    <strong>Type:</strong> Kernel Debugging (Assembly)<br>
                     <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
-                <h2>Overview</h2>
-                <p>FreeWorld Logon is the authentication service that displays the login screen and manages user sessions, similar to Windows Winlogon.</p>
-            </section>
+            <h2>Overview</h2>
+            <p>The FreeWorld OS kernel debugging system provides comprehensive debugging capabilities including KDB (Kernel Debugger), stack traces, and panic handling.</p>
+        </section>
 
             <section class="section">
-                <h2>Functions</h2>
-                <ul>
-                    <li>Display login screen</li>
-                    <li>User authentication</li>
-                    <li>Password verification</li>
-                    <li>Session creation</li>
-                    <li>Desktop environment startup</li>
-                </ul>
-            </section>
+                <h2>Components</h2>
+            
+            <h3>KDB (Kernel Debugger)</h3>
+            <p>Interactive kernel debugger accessible via serial port:</p>
+            <ul>
+                <li><strong>Breakpoints</strong>: Up to 64 breakpoints with INT3 installation</li>
+                <li><strong>Register Inspection</strong>: View and modify all CPU registers</li>
+                <li><strong>Memory Inspection</strong>: Read and write memory at any address</li>
+                <li><strong>Stack Inspection</strong>: View current stack contents</li>
+                <li><strong>Single-Step Execution</strong>: Step through code instruction by instruction</li>
+                <li><strong>Command Interface</strong>: Full command-line interface with help system</li>
+            </ul>
+
+            <h3>Stack Trace</h3>
+            <p>Frame pointer-based stack walking:</p>
+            <ul>
+                <li><strong>Call Stack Display</strong>: Shows up to 64 frames</li>
+                <li><strong>Frame Pointer Walking</strong>: Uses RBP chain to walk stack</li>
+                <li><strong>Address Display</strong>: Shows return addresses in hex</li>
+                <li><strong>Integration</strong>: Available from KDB and panic handler</li>
+            </ul>
+
+            <h3>Panic Handler</h3>
+            <p>Comprehensive kernel panic handler:</p>
+            <ul>
+                <li><strong>Panic Information</strong>: Displays panic message, file, and line number</li>
+                <li><strong>Register Dump</strong>: Complete CPU register state</li>
+                <li><strong>Stack Trace</strong>: Automatic stack trace on panic</li>
+                <li><strong>Memory Dump</strong>: Memory contents around fault address</li>
+                <li><strong>System State</strong>: CPU ID, memory info, process info</li>
+                <li><strong>Graceful Halt</strong>: Safe system halt after panic</li>
+            </ul>
+
+            <h3>Breakpoint Management</h3>
+            <p>Advanced breakpoint system:</p>
+            <ul>
+                <li><strong>Breakpoint Installation</strong>: INT3 instruction installation</li>
+                <li><strong>Original Byte Saving</strong>: Preserves original instruction</li>
+                <li><strong>Breakpoint Restoration</strong>: Restores original byte on continue</li>
+                <li><strong>Exception Integration</strong>: INT3 exceptions trigger KDB</li>
+            </ul>
+        </section>
 
             <section class="section">
-                <h2>Login Process</h2>
-                <ol>
-                    <li>Display login screen</li>
-                    <li>Capture username and password</li>
-                    <li>Verify credentials</li>
-                    <li>Create user session</li>
-                    <li>Start user shell/desktop</li>
-                </ol>
-            </section>
+                <h2>KDB Commands</h2>
+            <table>
+                <tr>
+                    <th>Command</th>
+                    <th>Alias</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>help</code></td>
+                    <td><code>h</code></td>
+                    <td>Show help message</td>
+                </tr>
+                <tr>
+                    <td><code>break &lt;addr&gt;</code></td>
+                    <td><code>b &lt;addr&gt;</code></td>
+                    <td>Set breakpoint at address</td>
+                </tr>
+                <tr>
+                    <td><code>continue</code></td>
+                    <td><code>c</code></td>
+                    <td>Continue execution</td>
+                </tr>
+                <tr>
+                    <td><code>step</code></td>
+                    <td><code>s</code></td>
+                    <td>Single step execution</td>
+                </tr>
+                <tr>
+                    <td><code>registers</code></td>
+                    <td><code>reg</code></td>
+                    <td>Show all registers</td>
+                </tr>
+                <tr>
+                    <td><code>memory &lt;addr&gt;</code></td>
+                    <td><code>mem &lt;addr&gt;</code></td>
+                    <td>Inspect memory at address</td>
+                </tr>
+                <tr>
+                    <td><code>stack</code></td>
+                    <td>-</td>
+                    <td>Show stack contents</td>
+                </tr>
+                <tr>
+                    <td><code>backtrace</code></td>
+                    <td><code>bt</code></td>
+                    <td>Show call stack</td>
+                </tr>
+                <tr>
+                    <td><code>quit</code></td>
+                    <td><code>q</code></td>
+                    <td>Exit debugger</td>
+                </tr>
+            </table>
+        </section>
 
             <section class="section">
-                <h2>Security</h2>
-                <ul>
-                    <li>Password hashing (SHA-256)</li>
-                    <li>Account lockout after failed attempts</li>
-                    <li>Session token generation</li>
-                    <li>Secure credential storage</li>
-                </ul>
-            </section>
+                <h2>Features</h2>
+            <ul>
+                <li>Interactive debugging via serial port</li>
+                <li>64 breakpoints with automatic management</li>
+                <li>Register inspection and modification</li>
+                <li>Memory inspection and modification</li>
+                <li>Stack inspection</li>
+                <li>Single-step execution (Trap Flag)</li>
+                <li>Stack trace with frame pointer walking</li>
+                <li>Comprehensive panic handler</li>
+                <li>System state dumping</li>
+                <li>Exception integration (INT3 breakpoints)</li>
+            </ul>
+        </section>
 
             <section class="section">
                 <h2>Implementation</h2>
-                <p>FreeWorld Logon is implemented as a Node.js application with a graphical login interface using the kernel GUI system.</p>
+            <p><strong>Total Lines of Code</strong>: ~1,835 lines</p>
+            <ul>
+                <li><code>kernel/debug/kdb.asm</code> (~900 lines) - KDB implementation</li>
+                <li><code>kernel/debug/stack_trace.asm</code> (~150 lines) - Stack trace</li>
+                <li><code>kernel/debug/panic.asm</code> (~250 lines) - Panic handler</li>
+                <li><code>kernel/debug/serial_debug.asm</code> (~60 lines) - Serial I/O</li>
+                <li><code>kernel/debug/kdb_breakpoints.asm</code> (~120 lines) - Breakpoint management</li>
+            </ul>
+        </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The debugging system is integrated with:</p>
+                <ul>
+                    <li>Kernel initialization sequence</li>
+                    <li>Exception handler (INT3 breakpoints)</li>
+                    <li>Panic handler (error handler integration)</li>
+                    <li>Serial port (debugging interface)</li>
+                </ul>
             </section>
         </main>
     </div>
 </body>
 </html>
+

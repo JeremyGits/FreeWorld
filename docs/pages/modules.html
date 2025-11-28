@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FreeWorld Logon (freeworldlogon.exe) - FreeWorld OS Documentation</title>
+    <title>Kernel Modules - FreeWorld OS Documentation</title>
     <link rel="stylesheet" href="../styles.css">
 </head>
 <body>
@@ -112,57 +112,152 @@
 
         <main class="content">
             <div class="page-header">
-                <h1>FreeWorld Logon (freeworldlogon.exe)</h1>
+                <h1>Loadable Kernel Modules (LKM) System</h1>
                 <div class="meta">
-                    <strong>Location:</strong> services/freeworldlogon.exe<br>
-                    <strong>Type:</strong> Service (Node.js)<br>
-                    <strong>Purpose:</strong> User authentication and session initialization<br>
+                    <strong>Location:</strong> kernel/modules/<br>
+                    <strong>Type:</strong> Kernel Module System (Assembly)<br>
                     <strong>Status:</strong> ✅ Fully Implemented
                 </div>
             </div>
 
             <section class="section">
-                <h2>Overview</h2>
-                <p>FreeWorld Logon is the authentication service that displays the login screen and manages user sessions, similar to Windows Winlogon.</p>
-            </section>
+            <h2>Overview</h2>
+            <p>The FreeWorld OS Loadable Kernel Modules (LKM) system provides dynamic loading and unloading of kernel code at runtime, enabling drivers and kernel extensions to be loaded without rebooting.</p>
+        </section>
 
             <section class="section">
-                <h2>Functions</h2>
-                <ul>
-                    <li>Display login screen</li>
-                    <li>User authentication</li>
-                    <li>Password verification</li>
-                    <li>Session creation</li>
-                    <li>Desktop environment startup</li>
-                </ul>
-            </section>
+                <h2>Components</h2>
+            
+            <h3>Module Loader</h3>
+            <p>Complete module loading system:</p>
+            <ul>
+                <li><strong>ELF Module Parsing</strong>: Supports ELF64 relocatable and shared objects</li>
+                <li><strong>Module Loading</strong>: Loads modules into kernel space</li>
+                <li><strong>Module Initialization</strong>: Calls module init function</li>
+                <li><strong>Module Cleanup</strong>: Calls module exit function</li>
+                <li><strong>State Management</strong>: UNLOADED, LOADED, RUNNING, UNLOADING states</li>
+                <li><strong>Reference Counting</strong>: Prevents premature unloading</li>
+                <li><strong>Module List</strong>: Linked list of all loaded modules</li>
+                <li><strong>Metadata Support</strong>: Name, version, license, description</li>
+            </ul>
+
+            <h3>Symbol System</h3>
+            <p>Symbol export/import system:</p>
+            <ul>
+                <li><strong>Hash Table</strong>: Fast symbol lookup (256 buckets)</li>
+                <li><strong>Symbol Export</strong>: Kernel and module symbol export</li>
+                <li><strong>Symbol Import</strong>: Module symbol resolution</li>
+                <li><strong>Symbol Types</strong>: FUNCTION, DATA, OBJECT</li>
+                <li><strong>Kernel Symbols</strong>: Automatic export of kernel symbols (kmalloc, kfree, etc.)</li>
+                <li><strong>Thread-Safe</strong>: Spinlock-protected operations</li>
+            </ul>
+
+            <h3>Dependency System</h3>
+            <p>Module dependency management:</p>
+            <ul>
+                <li><strong>Dependency Tracking</strong>: Tracks module dependencies</li>
+                <li><strong>Dependency Resolution</strong>: Automatic dependency loading</li>
+                <li><strong>Circular Detection</strong>: Detects circular dependencies</li>
+                <li><strong>Load Order</strong>: Calculates correct load order (topological sort)</li>
+            </ul>
+        </section>
 
             <section class="section">
-                <h2>Login Process</h2>
-                <ol>
-                    <li>Display login screen</li>
-                    <li>Capture username and password</li>
-                    <li>Verify credentials</li>
-                    <li>Create user session</li>
-                    <li>Start user shell/desktop</li>
-                </ol>
-            </section>
+                <h2>Module API</h2>
+            <table>
+                <tr>
+                    <th>Function</th>
+                    <th>Description</th>
+                </tr>
+                <tr>
+                    <td><code>module_load()</code></td>
+                    <td>Load module from memory</td>
+                </tr>
+                <tr>
+                    <td><code>module_unload()</code></td>
+                    <td>Unload module</td>
+                </tr>
+                <tr>
+                    <td><code>module_find()</code></td>
+                    <td>Find module by name</td>
+                </tr>
+                <tr>
+                    <td><code>module_init_func()</code></td>
+                    <td>Initialize module (call init function)</td>
+                </tr>
+                <tr>
+                    <td><code>module_get()</code></td>
+                    <td>Increment reference count</td>
+                </tr>
+                <tr>
+                    <td><code>module_put()</code></td>
+                    <td>Decrement reference count</td>
+                </tr>
+                <tr>
+                    <td><code>module_list_all()</code></td>
+                    <td>List all loaded modules</td>
+                </tr>
+                <tr>
+                    <td><code>symbol_export()</code></td>
+                    <td>Export symbol</td>
+                </tr>
+                <tr>
+                    <td><code>symbol_resolve()</code></td>
+                    <td>Resolve symbol (find address)</td>
+                </tr>
+                <tr>
+                    <td><code>symbol_unexport()</code></td>
+                    <td>Unexport symbol</td>
+                </tr>
+                <tr>
+                    <td><code>module_resolve_dependencies()</code></td>
+                    <td>Resolve module dependencies</td>
+                </tr>
+                <tr>
+                    <td><code>module_check_circular()</code></td>
+                    <td>Check for circular dependencies</td>
+                </tr>
+            </table>
+        </section>
 
             <section class="section">
-                <h2>Security</h2>
-                <ul>
-                    <li>Password hashing (SHA-256)</li>
-                    <li>Account lockout after failed attempts</li>
-                    <li>Session token generation</li>
-                    <li>Secure credential storage</li>
-                </ul>
-            </section>
+                <h2>Features</h2>
+            <ul>
+                <li>ELF module loading (ELF64 relocatable/shared objects)</li>
+                <li>Module metadata (name, version, license, description)</li>
+                <li>Symbol export/import (kernel and module symbols)</li>
+                <li>Dependency resolution (automatic dependency loading)</li>
+                <li>Reference counting (safe module unloading)</li>
+                <li>Module locking (thread-safe operations)</li>
+                <li>Module list management (track all loaded modules)</li>
+                <li>Module states (UNLOADED, LOADED, RUNNING, UNLOADING)</li>
+                <li>Module initialization/cleanup (init/exit functions)</li>
+                <li>Up to 256 modules supported</li>
+            </ul>
+        </section>
 
             <section class="section">
                 <h2>Implementation</h2>
-                <p>FreeWorld Logon is implemented as a Node.js application with a graphical login interface using the kernel GUI system.</p>
+            <p><strong>Total Lines of Code</strong>: ~1,395 lines</p>
+            <ul>
+                <li><code>kernel/modules/module.asm</code> (~850 lines) - Module loader</li>
+                <li><code>kernel/modules/symbols.asm</code> (~400 lines) - Symbol system</li>
+                <li><code>kernel/modules/dependencies.asm</code> (~150 lines) - Dependency system</li>
+            </ul>
+        </section>
+
+            <section class="section">
+                <h2>Integration</h2>
+                <p>The module system is integrated with:</p>
+                <ul>
+                    <li>Kernel initialization sequence</li>
+                    <li>Kernel symbol export during initialization</li>
+                    <li>Memory management (kmalloc/kfree)</li>
+                    <li>All kernel components (for module loading)</li>
+                </ul>
             </section>
         </main>
     </div>
 </body>
 </html>
+

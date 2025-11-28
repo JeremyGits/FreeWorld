@@ -8,24 +8,119 @@
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>Kernel GUI System</h1>
-            <p class="subtitle">Low-level graphics rendering engine and windowing system</p>
-        </header>
-
         <nav class="sidebar">
             <h2>Navigation</h2>
             <ul class="nav-menu">
                 <li><a href="../index.html">Home</a></li>
+                <li class="nav-section">Boot Components</li>
+                <li><a href="bootmgr.html">BOOTMGR</a></li>
+                <li><a href="bcd.html">BCD</a></li>
+                <li><a href="freeload.html">freeload.exe</a></li>
+                <li><a href="uefi-boot.html">UEFI Boot</a></li>
+                <li><a href="boot-parameters.html">Boot Parameters</a></li>
+                <li class="nav-section">Core System</li>
+                <li><a href="kernel.html">fwoskrnl.exe</a></li>
+                <li><a href="early-hardware-detection.html">Early Hardware Detection</a></li>
+                <li><a href="acpi-support.html">ACPI Support</a></li>
+                <li><a href="hal.html">hal.dll</a></li>
+                <li><a href="io-infrastructure.html">I/O Infrastructure</a></li>
+                <li><a href="memory.html">Memory Management</a></li>
+                <li><a href="drivers.html">Device Drivers</a></li>
+                <li><a href="storage-drivers.html">Storage Drivers</a></li>
+                <li><a href="vesa-graphics.html">VESA/VBE Graphics</a></li>
+                <li><a href="gpu-drivers.html">GPU Drivers</a></li>
+                <li><a href="display-output.html">Display Output</a></li>
+                <li><a href="usb-system.html">USB System</a></li>
+                <li><a href="filesystem-drivers.html">Filesystem Drivers</a></li>
+                <li><a href="process.html">Process Management</a></li>
+                <li><a href="execve.html">execve() System Call</a></li>
+                <li><a href="resource-manager.html">Resource Manager</a></li>
+                <li><a href="ipc-system.html">IPC System</a></li>
+                <li><a href="filesystem-kernel.html">File System</a></li>
+                <li><a href="kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="interrupt-handling.html">Interrupt Handling</a></li>
+                <li><a href="debugging.html">Kernel Debugging</a></li>
+                <li><a href="logging.html">Kernel Logging</a></li>
+                <li><a href="modules.html">Kernel Modules</a></li>
+                <li><a href="power-management.html">Power Management</a></li>
+                <li><a href="elf-loader.html">ELF Loader</a></li>
                 <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="c-library.html">C Library (glibc equivalent)</a></li>
+                <li><a href="build-system.html">Build System</a></li>
+                <li class="nav-section">Services</li>
+                <li><a href="fwcompositor.html">fwcompositor</a></li>
+                <li><a href="smss.html">smss.exe</a></li>
+                <li><a href="csrss.html">csrss.exe</a></li>
+                <li><a href="freeworldlogon.html">freeworldlogon.exe</a></li>
+                <li><a href="networkd.html">networkd</a></li>
+                <li><a href="logd.html">logd</a></li>
+                <li><a href="securityd.html">securityd</a></li>
+                <li><a href="services-manager.html">Services Manager</a></li>
+                <li><a href="task-manager.html">Task Manager</a></li>
+                <li><a href="display-manager.html">display-manager</a></li>
+                <li class="nav-section">User Interface</li>
+                <li><a href="shell.html">Shell</a></li>
+                <li><a href="wanderer.html">Wanderer</a></li>
+                <li><a href="fwmic.html">FWMIC</a></li>
+                <li><a href="file-type-associations.html">File Type Associations</a></li>
+                <li><a href="icon-system.html">Icon System</a></li>
+                <li class="nav-section">GUI Subsystems</li>
+                <li><a href="event-system.html">Event System</a></li>
+                <li><a href="input-manager.html">Input Manager</a></li>
+                <li><a href="windowing-architecture.html">Windowing Architecture</a></li>
+                <li><a href="gui-kernel.html">Kernel GUI System</a></li>
                 <li><a href="dc.html">Device Context</a></li>
                 <li><a href="compositor.html">Compositor</a></li>
+                <li><a href="resources.html">Resource Manager</a></li>
+                <li><a href="clipboard.html">Clipboard & Drag & Drop</a></li>
+                <li><a href="window-relationships.html">Window Relationships</a></li>
+                <li><a href="menu.html">Menu System</a></li>
+                <li><a href="nonclient.html">Non-Client Area</a></li>
+                <li><a href="controls.html">Standard Controls</a></li>
                 <li><a href="window.html">Window Management</a></li>
+                <li><a href="wm-client.html">Window Manager Client</a></li>
+                <li><a href="graphics.html">Graphics System</a></li>
+                <li><a href="drivers.html">Graphics Drivers</a></li>
+                <li><a href="gui-integration.html">GUI Integration</a></li>
+                <li><a href="timer.html">Timer Manager</a></li>
+                <li><a href="property.html">Property Manager</a></li>
+                <li><a href="hooks.html">Hook Manager</a></li>
+                <li><a href="focus.html">Focus Manager</a></li>
+                <li class="nav-section">System Services</li>
+                <li><a href="object-manager.html">Object Manager</a></li>
+                <li><a href="path.html">Path Parser</a></li>
+                <li><a href="registry.html">Registry</a></li>
+                <li><a href="filesystem-watcher.html">File System Watcher</a></li>
+                <li><a href="security.html">Security Manager</a></li>
+                <li><a href="error.html">Error Manager</a></li>
+                <li><a href="shell-ecosystem.html">Shell Ecosystem</a></li>
+                <li class="nav-section">Node.js System</li>
+                <li><a href="window.html">Window API</a></li>
+                <li><a href="desktop.html">Desktop</a></li>
+                <li><a href="api.html">System API</a></li>
+                <li><a href="filesystem.html">Filesystem API</a></li>
+                <li><a href="integration.html">System Integration</a></li>
+                <li class="nav-section">Reference</li>
+                <li><a href="naming-conventions.html">Naming Conventions</a></li>
+                <li><a href="boot-process.html">Boot Process</a></li>
+                <li><a href="architecture.html">Architecture</a></li>
+                <li><a href="syscalls.html">System Calls</a></li>
+                <li><a href="variables.html">Variables & Constants</a></li>
             </ul>
         </nav>
 
-        <main>
-            <section>
+        <main class="content">
+            <div class="page-header">
+                <h1>Kernel GUI System</h1>
+                <div class="meta">
+                    <strong>Location:</strong> kernel/gui/<br>
+                    <strong>Type:</strong> Kernel GUI System (Assembly)<br>
+                    <strong>Status:</strong> ✅ Fully Implemented
+                </div>
+            </div>
+
+            <section class="section">
                 <h2>Overview</h2>
                 <p>The Kernel GUI System provides the foundation for graphical rendering in FreeWorld OS. It operates at the kernel level, directly accessing the VESA framebuffer to draw windows, UI components, and handle user input.</p>
                 
@@ -46,7 +141,7 @@
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Architecture</h2>
                 <p>The Kernel GUI System consists of several modules:</p>
                 
@@ -157,7 +252,7 @@
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Integration</h2>
                 <p>The Kernel GUI System integrates with:</p>
                 
@@ -185,7 +280,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Rendering Context</h2>
                 <p>The renderer maintains a global rendering context:</p>
                 <pre><code>render_context:
@@ -196,7 +291,7 @@ call gui_start_graphical_environment</code></pre>
     .pitch: dd 0          ; Bytes per scanline</code></pre>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Color Format</h2>
                 <p>Colors are stored in ARGB format (32-bit):</p>
                 <ul>
@@ -215,7 +310,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Build System</h2>
                 <p>The GUI system is built as part of the kernel with 19 modules:</p>
                 <pre><code>GUI_OBJS = gui/renderer.o gui/window.o gui/font.o gui/font_complete.o \
@@ -227,7 +322,7 @@ call gui_start_graphical_environment</code></pre>
                 <p>All modules are compiled as 64-bit ELF objects and linked into the kernel.</p>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Double Buffering</h2>
         <p>The double buffering system provides smooth rendering by drawing to an off-screen buffer and then swapping it with the front buffer. This eliminates flickering and provides a better user experience.</p>
         <ul>
@@ -261,7 +356,7 @@ call gui_start_graphical_environment</code></pre>
         <p>Components respond to mouse clicks and keyboard input, posting appropriate Windows messages (WM_COMMAND, WM_CHAR, etc.) to their parent windows.</p>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Window Management (kernel/gui/window_manager.asm)</h2>
                 <p>Complete window management system with z-order, focus, and window procedures:</p>
                 <ul>
@@ -276,7 +371,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Window Controls (kernel/gui/window_controls.asm)</h2>
                 <p>Window control buttons (close, minimize, maximize):</p>
                 <ul>
@@ -285,7 +380,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Cursor Rendering (kernel/gui/cursor.asm)</h2>
                 <p>Mouse cursor display system:</p>
                 <ul>
@@ -297,7 +392,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Clipping (kernel/gui/clipping.asm)</h2>
                 <p>Clipping regions for window content:</p>
                 <ul>
@@ -308,7 +403,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Graphics Primitives (kernel/gui/graphics_primitives.asm)</h2>
                 <p>Additional graphics primitives:</p>
                 <ul>
@@ -318,7 +413,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Driver Integration (kernel/gui/driver_integration.asm)</h2>
                 <p>Connects keyboard and mouse drivers to GUI event system:</p>
                 <ul>
@@ -328,7 +423,7 @@ call gui_start_graphical_environment</code></pre>
                 </ul>
             </section>
 
-            <section>
+            <section class="section">
                 <h2>Future Enhancements</h2>
                 <ul>
                     <li>Transparency and alpha blending</li>
