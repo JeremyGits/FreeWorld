@@ -31,6 +31,12 @@
                 <li><a href="pages/io-infrastructure.html">I/O Infrastructure</a></li>
                 <li><a href="pages/memory.html">Memory Management</a></li>
                 <li><a href="pages/drivers.html">Device Drivers</a></li>
+                <li><a href="pages/storage-drivers.html">Storage Drivers</a></li>
+                <li><a href="pages/vesa-graphics.html">VESA/VBE Graphics</a></li>
+                <li><a href="pages/gpu-drivers.html">GPU Drivers</a></li>
+                <li><a href="pages/display-output.html">Display Output</a></li>
+                <li><a href="pages/usb-system.html">USB System</a></li>
+                <li><a href="pages/filesystem-drivers.html">Filesystem Drivers</a></li>
                 <li><a href="pages/process.html">Process Management</a></li>
                 <li><a href="pages/execve.html">execve() System Call</a></li>
                 <li><a href="pages/resource-manager.html">Resource Manager</a></li>
@@ -39,9 +45,16 @@
                 <li><a href="../INTEGRATION-GAPS.md">Integration Gaps</a></li>
                 <li><a href="pages/filesystem-kernel.html">File System</a></li>
                 <li><a href="pages/kernel-decompression.html">Kernel Decompression</a></li>
+                <li><a href="pages/interrupt-handling.html">Interrupt Handling</a></li>
+                <li><a href="pages/debugging.html">Kernel Debugging</a></li>
+                <li><a href="pages/logging.html">Kernel Logging</a></li>
+                <li><a href="pages/modules.html">Kernel Modules</a></li>
+                <li><a href="pages/power-management.html">Power Management</a></li>
                 <li><a href="pages/elf-loader.html">ELF Loader</a></li>
                 <li><a href="pages/graphics.html">Graphics System</a></li>
                 <li><a href="pages/minimal-libc.html">Minimal C Library</a></li>
+                <li><a href="pages/c-library.html">C Library (glibc equivalent)</a></li>
+                <li><a href="pages/cpp-library.html">C++ Standard Library</a></li>
                 <li><a href="pages/build-system.html">Build System</a></li>
                 <li class="nav-section">Services</li>
                 <li><a href="pages/fwcompositor.html">fwcompositor</a></li>
@@ -149,6 +162,78 @@
                         <p>Comprehensive command-line parsing and boot configuration</p>
                         <p class="status-badge">✅ Fully Implemented</p>
                         <a href="pages/boot-parameters.html">View Boot Parameters →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Interrupt Handling</h4>
+                        <p>Complete interrupt and exception handling with APIC/IOAPIC support</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/interrupt-handling.html">View Interrupt Handling →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Kernel Debugging</h4>
+                        <p>KDB (Kernel Debugger), stack traces, and panic handler</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/debugging.html">View Kernel Debugging →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Kernel Logging</h4>
+                        <p>klog, dmesg, and syslog integration for comprehensive logging</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/logging.html">View Kernel Logging →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Kernel Modules</h4>
+                        <p>Loadable Kernel Modules (LKM) system with symbol resolution</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/modules.html">View Kernel Modules →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Power Management</h4>
+                        <p>CPU frequency scaling, suspend/resume, and ACPI states</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/power-management.html">View Power Management →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Storage Drivers</h4>
+                        <p>Complete storage driver support: AHCI/SATA, NVMe, USB, SCSI, CD/DVD</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/storage-drivers.html">View Storage Drivers →</a>
+                    </div>
+                    <div class="card">
+                        <h4>VESA/VBE Graphics</h4>
+                        <p>Enhanced VESA/VBE driver with mode switching, double buffering, multi-color depth</p>
+                        <p class="status-badge">✅ Fully Enhanced</p>
+                        <a href="pages/vesa-graphics.html">View VESA/VBE Graphics →</a>
+                    </div>
+                    <div class="card">
+                        <h4>GPU Drivers</h4>
+                        <p>Complete GPU driver support: Intel, AMD, NVIDIA with full hardware acceleration</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/gpu-drivers.html">View GPU Drivers →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Display Output</h4>
+                        <p>DisplayPort, HDMI, DVI support with multi-monitor management and hot-plug</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/display-output.html">View Display Output →</a>
+                    </div>
+                    <div class="card">
+                        <h4>USB System</h4>
+                        <p>Complete USB support: host controllers (UHCI/OHCI/EHCI/xHCI), HID, audio, transfers</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/usb-system.html">View USB System →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Filesystem Drivers</h4>
+                        <p>Native ext2/ext3/ext4 and NTFS support with full read/write operations</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/filesystem-drivers.html">View Filesystem Drivers →</a>
+                    </div>
+                    <div class="card">
+                        <h4>Virtual Filesystems</h4>
+                        <p>Complete /proc, /sys, /dev, /tmp, tmpfs, and devtmpfs support</p>
+                        <p class="status-badge">✅ Fully Implemented</p>
+                        <a href="pages/filesystem-drivers.html#virtual-filesystems">View Virtual Filesystems →</a>
                     </div>
                     <div class="card">
                         <h4>Kernel & HAL</h4>
